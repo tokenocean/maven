@@ -372,13 +372,6 @@
               <button type="submit" class="secondary-btn">Submit</button>
             </form>
           {/if}
-        {:else if !artwork.auction_start || compareAsc(now, parseISO(artwork.auction_start)) === 1}
-          <button
-            on:click={startBidding}
-            class="secondary-btn"
-            {disabled}
-            class:disabled>Make an offer</button
-          >
         {/if}
       {/if}
 
