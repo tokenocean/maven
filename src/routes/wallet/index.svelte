@@ -1,15 +1,26 @@
+<script context="module">
+  export async function load({ session }) {
+    if (!(session && session.user)) return {
+      status: 302,
+      redirect: '/login'
+    } 
+
+    return {};
+  }
+</script>
+
 <script>
   import Fa from "svelte-fa";
   import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
   import { border, bg } from "./_colors";
   import { page } from "$app/stores";
+  import { browser } from "$app/env";
   import { query } from "$lib/api";
   import { onDestroy, onMount, tick } from "svelte";
   import {
     asset,
     assets,
     balances,
-    locked,
     pending,
     password,
     user,
@@ -25,21 +36,12 @@
   import Withdraw from "./_withdraw.svelte";
   import Transactions from "./_transactions.svelte";
 
-  $: requireLogin($page);
-
   let balance;
   balances.subscribe((b) => b && (balance = val($asset, b[$asset] || 0)));
 
-  let loading = true;
   if (!$asset) $asset = btc;
   let name = (a) => {
     return tickers[a] ? tickers[a].name : assetLabel(a);
-  };
-
-  let ticker = (a) => {
-    let artwork = artworks.find((aw) => aw.a === a);
-    if (artwork) return artwork.title;
-    return tickers[a] ? tickers[a].ticker : a.substr(0, 5);
   };
 
   let funding;
@@ -56,22 +58,13 @@
   };
 
   let poll;
-  let artworks = [];
-  $: init($user);
-  let init = (u) =>
-    u &&
-    query(getArtworksByOwner($user.id))
-      .then((res) => {
-        artworks = res.artworks;
+  let pollBalances = async () => {
+    await getBalances();
+    poll = setTimeout(pollBalances, 5000);
+  } 
 
-        getBalances();
-        clearInterval(poll);
-        poll = setInterval(getBalances, 5000);
-        loading = false;
-      })
-      .catch(err);
-
-  onDestroy(() => clearInterval(poll));
+  onMount(pollBalances);
+  onDestroy(() => clearTimeout(poll));
 
 </script>
 
@@ -110,11 +103,7 @@
 
 </style>
 
-{#if loading}
-  <div class="absolute top-0 w-full left-0">
-    <ProgressLinear app={true} />
-  </div>
-{:else if $balances && $pending}
+{#if $balances && $pending}
   <div class="w-full">
     {#if $assets.length > 1}
       <div class="mb-5">
@@ -151,15 +140,6 @@
           <div class="flex mt-3">
             <span
               class="light-color mr-3">{$pending && val($asset, $pending[$asset] || 0)}</span>
-            <span class="text-gray-400">{assetLabel($asset)}</span>
-          </div>
-        </div>
-      {/if}
-      {#if $locked && $asset === btc}
-        <div class="m-6">
-          <div class="text-sm light-color">Locked in active transactions</div>
-          <div class="flex mt-3">
-            <span class="light-color mr-3">{val($asset, $locked)}</span>
             <span class="text-gray-400">{assetLabel($asset)}</span>
           </div>
         </div>
