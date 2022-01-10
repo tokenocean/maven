@@ -33,6 +33,8 @@
   export let count;
   export let initialArtworks;
 
+  console.log("INITIAL", initialArtworks);
+
   let filtered = initialArtworks;
 
   let offset = 0;

@@ -26,3 +26,4 @@
 - "!include public_users.yaml"
 - "!include public_userstats.yaml"
 - "!include public_utxos.yaml"
+- "!include public_variations.yaml"

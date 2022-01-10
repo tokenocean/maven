@@ -6,13 +6,20 @@ export async function get({ headers, locals, query }) {
   let limit = parseInt(query.get("limit")) || 5000;
   let offset = 0;
   let where = {};
-  let order_by = {
-    created_at: "desc",
-  };
+  let order_by = [
+    {
+      sequence: "asc",
+    },
+    {
+      created_at: "desc",
+    },
+  ];
 
   try {
     let { artworks_aggregate: a } = await q(countArtworks, { where });
-    let { sequenced: artworks } = await q(getLimited, { limit, offset, order_by, where });
+    let { artworks } = await q(getLimited, { limit, offset, order_by, where });
+
+    console.log(artworks);
 
     return {
       body: {

@@ -1,6 +1,17 @@
 <script context="module">
+  import { prerendering } from "$app/env";
+  import { get } from "$lib/api";
+
   export async function load({ fetch, page, session }) {
-    const props = await fetch(`/addresses.json`).then((r) => r.json());
+    if (prerendering)
+      return {
+        props: {
+          addresses: [],
+          titles: [],
+        },
+      };
+
+    const props = await get(`/addresses.json`, fetch);
 
     if (
       session &&
@@ -14,41 +25,40 @@
       };
 
     return {
-      maxage: 90,
       props,
     };
   }
-
 </script>
 
 <script>
   import { browser } from "$app/env";
-  import { session } from "$app/stores";
+  import { page, session } from "$app/stores";
   import decode from "jwt-decode";
-  import {
-    Avatar,
-    ProgressLinear,
-    Sidebar,
-    Navbar,
-    Dialog,
-    Footer,
-    Snack,
-    Head,
-  } from "$comp";
+  import { Sidebar, Navbar, Dialog, Footer, Snack, Head } from "$comp";
   import {
     addresses as a,
     meta,
     titles as t,
     user,
     password,
+    poll,
     token,
   } from "$lib/store";
-  import { onMount } from "svelte";
-  import { fade } from "svelte/transition";
-  import { publicPages } from "$lib/utils";
+  import { onDestroy, onMount } from "svelte";
+  import branding from "$lib/branding";
 
   export let addresses, titles;
-  let open;
+
+  let interval;
+  let refresh = async () => {
+    try {
+      let { jwt_token } = await get("/auth/refresh.json", fetch);
+      $token = jwt_token;
+      if (!$token && $session) delete $session.user;
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   if (browser) {
     history.pushState = new Proxy(history.pushState, {
@@ -61,37 +71,48 @@
     $a = addresses;
     $t = titles;
 
-    $user = $session.user;
-    $token = $session.jwt;
+    if ($session) {
+      $user = $session.user;
+      $token = $session.jwt;
+    }
+
+    interval = setInterval(refresh, 60000);
   }
 
-
-  onMount(async () => {
-    if (!$password) $password = window.sessionStorage.getItem("password");
-  });
-
+  let open = false;
   let y;
 
-</script>
+  let stopPolling = () => $poll.map(clearInterval);
+  $: stopPolling($page);
 
-<style global src="../main.css">
-</style>
+  onDestroy(() => clearInterval(interval));
+  onMount(() => {
+    if (browser && !$password)
+      $password = window.sessionStorage.getItem("password");
+  });
+</script>
 
 <svelte:window bind:scrollY={y} />
 
-<Head />
+{#if !($page.path.includes("/a/") && $page.path.split("/").length === 3)}
+  <Head metadata={branding.meta} />
+{/if}
+
 <Snack />
 
-  <Sidebar bind:open />
-  <div class={y > 50 ? 'sticky' : ''} in:fade>
-    <Navbar bind:sidebar={open} />
+<Sidebar bind:open />
+<div class={y > 50 ? "sticky" : ""}>
+  <Navbar bind:sidebar={open} />
+</div>
+<Dialog />
+
+<main>
+  <div class="mx-auto min-h-screen">
+    <slot />
   </div>
-  <Dialog />
+</main>
 
-  <main>
-    <div class="mx-auto min-h-screen">
-      <slot />
-    </div>
-  </main>
+<Footer />
 
-  <Footer />
+<style global src="../main.css">
+</style>

@@ -34,10 +34,12 @@
   import { pub } from "$lib/api";
 
   export let count;
-  export let initialArtworks;
+  export let initialArtworks = [];
 
   $artworks = initialArtworks;
   let filtered = initialArtworks;
+
+  console.log("FILT", filtered);
 
   let offset = 0;
 

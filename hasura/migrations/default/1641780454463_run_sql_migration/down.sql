@@ -1,0 +1,17 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- CREATE OR REPLACE FUNCTION convert_to_integer(v_input text)
+-- RETURNS INTEGER AS $$
+-- DECLARE v_int_value INTEGER DEFAULT NULL;
+-- BEGIN
+--     BEGIN
+--         v_int_value := v_input::INTEGER;
+--     EXCEPTION WHEN OTHERS THEN
+--         RAISE NOTICE 'Invalid integer value: "%".  Returning NULL.', v_input;
+--         RETURN NULL;
+--     END;
+-- RETURN v_int_value;
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- update artworks set sequence = convert_to_integer(regexp_replace(title, '^.* ', ''));

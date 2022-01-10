@@ -1,41 +1,5 @@
 <script>
   import HomePageLink from "$components/HomePageLink.svelte";
-  import { onMount } from "svelte";
-  import { query } from "$lib/api";
-  import { Summary } from "$comp";
-  import { fade } from "svelte/transition";
-  import { user } from "$lib/store";
-  import { topCollectors, topArtists } from "$queries/users";
-  import { getFeatured } from "$queries/artworks";
-  import { Activity, RecentActivityCard, LatestPiecesCard } from "$comp";
-  import { err, goto } from "$lib/utils";
-  import { getRecentActivity, getLatestPieces } from "$queries/transactions";
-
-  let featured = [];
-  let recent = [];
-  let latest = [];
-
-  onMount(() => {
-    query(getFeatured)
-      .then((res) => (featured = res.featured))
-      .catch(err);
-
-    query(getRecentActivity(3))
-      .then((res) => (recent = res.recentactivity))
-      .catch(err);
-
-    query(getLatestPieces(3))
-      .then((res) => (latest = res.transactions))
-      .catch(err);
-  });
-
-  setInterval(() => {
-    current++;
-    if (current >= featured.length) current = 0;
-  }, 6000);
-
-  let current = 0;
-
 </script>
 
 <style>
@@ -148,42 +112,3 @@
       href={`/agriculture`}>Get started</a>
   </div>
 </div>
-
-{#if featured[current]}
-  <div class="flex secondary-header">
-    <div
-      class="container flex mx-auto flex-col justify-end md:justify-center secondary-header-text m-10 pl-6 z-10">
-      <div class="blur-bg">
-        <h2>{featured[current].artwork.artist.username}</h2>
-        <p>
-          {featured[current].artwork.title}
-          <button
-            class="button-transparent header-button border mt-10"
-            style="border-color: white; color: white"
-            on:click={() => goto(`/a/${featured[current].artwork.slug}`)}>
-            View Artwork</button>
-        </p>
-      </div>
-    </div>
-
-    {#if featured[current].artwork.filetype.includes('video')}
-      <video
-        in:fade
-        out:fade
-        class="lazy cover absolute secondary-header"
-        autoplay
-        muted
-        playsinline
-        loop
-        src={`/api/ipfs/${featured[current].artwork.filename}`}
-        :key={featured[current].id} />
-    {:else}
-      <img
-        in:fade
-        out:fade
-        class="lazy cover absolute secondary-header"
-        alt={featured[current].artwork.title}
-        src={`/api/ipfs/${featured[current].artwork.filename}`} />
-    {/if}
-  </div>
-{/if}

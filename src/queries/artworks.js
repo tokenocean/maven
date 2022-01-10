@@ -5,12 +5,16 @@ export const marketFields = `
   title
   filename
   filetype
+  favorited
   list_price
   auction_start
   auction_end
   asking_asset
+  has_royalty
   slug
+  views
   created_at
+  transferred_at
   owner {
     id
     username
@@ -21,7 +25,15 @@ export const marketFields = `
     username
     avatar_url
   },
-`
+  bid {
+    id
+    user {
+      id
+      username
+    } 
+    amount 
+  }
+`;
 
 export const fields = `
   id,
@@ -66,6 +78,8 @@ export const fields = `
   owner {
     id
     username
+    full_name
+    email
     avatar_url
     address
     pubkey
@@ -106,13 +120,14 @@ export const txFields = `
     id
     username
     avatar_url
+    full_name
+    email
   } 
   artwork_id
   artwork {
     ${fields}
   } 
 `;
-
 
 export const getFeatured = `query {
  featured {
@@ -126,8 +141,8 @@ export const getFeatured = `query {
   }
 }`;
 
-export const getLimited = `query ($where: sequenced_bool_exp!, $limit: Int, $offset: Int, $order_by: sequenced_order_by!)  {
- sequenced(where: $where, limit: $limit, offset: $offset, order_by: [$order_by]) {
+export const getLimited = `query($where: artworks_bool_exp!, $limit: Int, $offset: Int, $order_by: [artworks_order_by!]) {
+ artworks(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
     ${marketFields}
   }
 }`;
@@ -142,7 +157,7 @@ export const getArtworks = `query($where: artworks_bool_exp!, $limit: Int, $offs
 }`;
 
 export const getUserArtworks = `query($id: uuid!) {
- artworks(where: { _or: [{ artist_id: { _eq: $id }}, { owner_id: { _eq: $id }}]}) {
+ artworks(where: { _or: [{ artist_id: { _eq: $id }}, { owner_id: { _eq: $id }}, { favorited: { _eq: true }}]}) {
     ${fields}
     tags {
       tag
