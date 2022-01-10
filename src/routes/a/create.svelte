@@ -1,9 +1,10 @@
 <script context="module">
   export async function load({ session }) {
-    if (!(session && session.user)) return {
-      status: 302,
-      redirect: '/login'
-    } 
+    if (!(session && session.user))
+      return {
+        status: 302,
+        redirect: "/login",
+      };
 
     return {};
   }
@@ -14,7 +15,7 @@
   import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
   import { page } from "$app/stores";
   import { v4 } from "uuid";
-  import { hasura } from "$lib/api";
+  import { hasura, api } from "$lib/api";
   import { tick, onDestroy } from "svelte";
   import {
     edition,
@@ -26,7 +27,7 @@
     token,
   } from "$lib/store";
   import { Dropzone, ProgressLinear } from "$comp";
-  import  { upload  } from "$lib/upload";
+  import { upload, supportedTypes } from "$lib/upload";
   import { create } from "$queries/artworks";
   import { btc, kebab, goto, err } from "$lib/utils";
   import { requireLogin, requirePassword } from "$lib/auth";
@@ -88,6 +89,9 @@
     ({ type } = file);
     artwork.filetype = type;
 
+    if (supportedTypes.includes(type))
+      throw new Error("Supported file types are jpg, png, gif, mp4");
+
     if (file.size < 100000000) previewFile(file);
 
     try {
@@ -115,25 +119,17 @@
   let hash, tx;
   const issue = async (ticker) => {
     let contract;
-    let domain =
-      $user.username === branding.superUserName
-        ? branding.urls.base
-        : `${$user.username.toLowerCase()}.${branding.urls.base}`;
+    let domain = "mavennft.io";
 
     let error, success;
 
     await requirePassword();
 
-    try {
-      contract = await createIssuance(artwork, domain, tx);
+    contract = await createIssuance(artwork, domain, tx);
 
-      await sign();
-      await broadcast(true);
-      await tick();
-    } catch (e) {
-      if (e.message.includes("Insufficient")) throw e;
-      throw new Error("Issuance failed: " + e.message);
-    }
+    await sign();
+    await broadcast(true);
+    await tick();
 
     tx = $psbt.extractTransaction();
     artwork.asset = parseAsset(
@@ -150,16 +146,18 @@
   $: generateTicker(title);
   let generateTicker = (t) => {
     if (!t) return;
-    artwork.ticker = (t.split(" ").length > 2
-      ? t
-          .split(" ")
-          .map((w) => w[0])
-          .join("")
-      : t
+    artwork.ticker = (
+      t.split(" ").length > 2
+        ? t
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+        : t
     )
       .substr(0, 3)
       .toUpperCase();
 
+    checkTicker();
   };
 
   let checkTicker = async () => {
@@ -216,8 +214,6 @@
 
   let submit = async (e) => {
     e.preventDefault();
-
-    console.log("SUBMIT");
     if (!artwork.title) return err("Please enter a title");
     if (!artwork.ticker) return err("Please enter a ticker symbol");
 
@@ -240,20 +236,18 @@
         tickers.push(ticker.toUpperCase());
       }
 
+      await checkTickers(tickers);
+
       if (artwork.editions > 1) $prompt = Issuing;
-      console.log("HERE");
 
       for ($edition = 1; $edition <= artwork.editions; $edition++) {
-      console.log("HERE");
         if ($edition > 1) {
           artwork.ticker = tickers[$edition - 1];
           await new Promise((r) => setTimeout(r, 5000));
         }
         artwork.ticker = artwork.ticker.toUpperCase();
 
-      console.log("HBERE");
         let contract = await issue();
-      console.log("ISSUED");
         tries = 0;
         artwork.id = v4();
         artwork.edition = $edition;
@@ -283,7 +277,6 @@
           },
           tags,
         };
-      console.log("HERE");
 
         let result = await hasura
           .auth(`Bearer ${$token}`)
@@ -293,24 +286,88 @@
           })
           .json();
 
-      console.log("HERE");
-
         if (result.error) throw new Error(result.error.message);
+
+        $user.email &&
+          (await api
+            .url("/mail-artwork-minted")
+            .auth(`Bearer ${$token}`)
+            .post({
+              to: $user.email,
+              userName: $user.full_name ? $user.full_name : "",
+              artworkTitle: artwork.title,
+              artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+            }));
       }
 
       $prompt = undefined;
       goto(`/a/${artwork.slug}`);
     } catch (e) {
-      console.log(e);
       err(e);
       loading = false;
     }
   };
 </script>
 
+<div class="container mx-auto py-20">
+  <div
+    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow"
+  >
+    <a
+      class="block mb-6 text-midblue"
+      href="."
+      on:click|preventDefault={() => window.history.back()}
+    >
+      <div class="flex">
+        <Fa icon={faChevronLeft} class="my-auto mr-1" />
+        <div>Back</div>
+      </div>
+    </a>
+    <h2>Submit artwork</h2>
+    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
+      <div class="w-full lg:w-1/2 lg:pr-10">
+        <div class:invisible={!loading}>
+          <ProgressLinear />
+        </div>
+        <div class:invisible={loading}>
+          <Form bind:artwork bind:focus on:submit={submit} bind:title />
+        </div>
+      </div>
+      {#if percent}
+        <div class="ml-2 flex-1 flex">
+          <div class="upload-button mx-auto">
+            <ArtworkMedia
+              {artwork}
+              {preview}
+              showDetails={false}
+              thumb={false}
+            />
+            <div class="w-full bg-grey-light p-8">
+              <div
+                class="font-light p-4 mx-auto max-w-xs text-center"
+                class:bg-primary={percent >= 100 && artwork.filename}
+                class:bg-yellow-200={percent < 100 || !artwork.filename}
+                style={width}
+              >
+                {#if percent < 100}
+                  {percent}%
+                {:else if artwork.filename}
+                  Upload complete!
+                {:else}Processing...{/if}
+              </div>
+            </div>
+          </div>
+        </div>
+      {:else}
+        <Dropzone on:file={uploadFile} style="box" />
+      {/if}
+    </div>
+  </div>
+</div>
+
 <style>
   .container {
-    background-color: #ecf6f7;
+    @apply bg-primary;
     width: 100% !important;
     min-height: 100vh;
     margin: 0;
@@ -336,55 +393,3 @@
     }
   }
 </style>
-
-<div class="container mx-auto py-20">
-  <div
-    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow">
-    <a
-      class="block mb-6 text-midblue"
-      href="."
-      on:click|preventDefault={() => window.history.back()}>
-      <div class="flex">
-        <Fa icon={faChevronLeft} class="my-auto mr-1" />
-        <div>Back</div>
-      </div>
-    </a>
-    <h2>Submit artwork</h2>
-    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
-      <div class="w-full lg:w-1/2 lg:pr-10">
-        <div class:invisible={!loading}>
-          <ProgressLinear />
-        </div>
-        <div class:invisible={loading}>
-          <Form bind:artwork bind:focus on:submit={submit} bind:title />
-        </div>
-      </div>
-      {#if percent}
-        <div class="ml-2 flex-1 flex">
-          <div class="upload-button mx-auto">
-            <ArtworkMedia
-              {artwork}
-              {preview}
-              showDetails={false}
-              thumb={false} />
-            <div class="w-full bg-grey-light p-8">
-              <div
-                class="font-light p-4 mx-auto max-w-xs text-center"
-                class:bg-primary={percent >= 100 && artwork.filename}
-                class:bg-yellow-200={percent < 100 || !artwork.filename}
-                style={width}>
-                {#if percent < 100}
-                  {percent}%
-                {:else if artwork.filename}
-                  Upload complete!
-                {:else}Processing...{/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      {:else}
-        <Dropzone on:file={uploadFile} style="box" />
-      {/if}
-    </div>
-  </div>
-</div>

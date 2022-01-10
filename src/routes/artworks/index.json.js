@@ -19,8 +19,6 @@ export async function get({ headers, locals, query }) {
     let { artworks_aggregate: a } = await q(countArtworks, { where });
     let { artworks } = await q(getLimited, { limit, offset, order_by, where });
 
-    console.log(artworks);
-
     return {
       body: {
         artworks,

@@ -39,8 +39,6 @@
   $artworks = initialArtworks;
   let filtered = initialArtworks;
 
-  console.log("FILT", filtered);
-
   let offset = 0;
 
   $: filter($artworks, $painting, $variation, $edition);

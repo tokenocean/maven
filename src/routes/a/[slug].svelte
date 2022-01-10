@@ -2,11 +2,15 @@
   import { post } from "$lib/api";
   import { browser } from "$app/env";
   import branding from "$lib/branding";
+  import { host } from "$lib/utils";
 
-  export async function load({ fetch, page }) {
-    const props = await fetch(`/artworks/${page.params.slug}.json`).then((r) =>
-      r.json()
-    );
+  export async function load({
+    fetch,
+    page: {
+      params: { slug },
+    },
+  }) {
+    const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
 
     let { artwork } = props;
 
@@ -15,8 +19,15 @@
         status: 404,
       };
 
-    // if (!browser) await post("artworks/viewed", { id: artwork.id }, fetch).json()
-    artwork.views++;
+    if (!browser) {
+      try {
+        await post("/artworks/viewed", { id: artwork.id }, fetch).res();
+        artwork.views++;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     props.views = artwork.views;
 
     let metadata = { ...branding.meta };
@@ -25,14 +36,17 @@
       metadata.keywords + " " + artwork.tags.map((t) => t.tag).join(" ");
     metadata.description = artwork.description;
 
-    if (artwork.filetype.includes("video"))
-      metadata.video = "/api/ipfs/" + artwork.filename;
-    else metadata.image = "/api/ipfs/" + artwork.filename;
+    let type = "image";
+    metadata[type] = `${host}/api/public/${artwork.filename}.png`;
+    if (artwork.filetype.includes("video")) type = "video";
+
+    metadata[type] = `${host}/api/public/${artwork.filename}.${
+      artwork.filetype.split("/")[1]
+    }`;
 
     props.metadata = metadata;
 
     return {
-      maxage: 90,
       props,
     };
   }
@@ -69,14 +83,22 @@
     requestSignature,
     sign,
     broadcast,
+    releaseToSelf,
   } from "$lib/wallet";
   import { Psbt } from "liquidjs-lib";
   import { api, query } from "$lib/api";
-  import { SocialShare } from "$comp";
 
   export let artwork, others, metadata, views;
 
+  let release = async () => {
+    await requirePassword();
+    $psbt = await releaseToSelf(artwork);
+    $psbt = await sign();
+    await broadcast($psbt);
+  };
+
   $: disabled =
+    loading ||
     !artwork ||
     artwork.transactions.some(
       (t) => ["purchase", "creation", "cancel"].includes(t.type) && !t.confirmed
@@ -84,10 +106,8 @@
 
   let start_counter, end_counter, now, timeout;
 
-  let id = artwork ? artwork.id : $page.params.id;
-
   let fetch = async () => {
-    query(getArtwork, { id }).then((res) => {
+    query(getArtwork, { id: artwork.id }).then((res) => {
       artwork = res.artworks_by_pk;
       artwork.views = views;
 
@@ -126,22 +146,74 @@
   let val, sats, ticker;
   let amount;
 
-  $: transaction.amount = sats && sats(amount);
-
+  let transaction = {};
   let makeOffer = async (e) => {
     try {
       if (e) e.preventDefault();
       offering = true;
+
+      transaction.amount = sats(amount);
+      transaction.asset = artwork.asset;
       transaction.type = "bid";
 
       await requirePassword();
 
       $psbt = await createOffer(artwork, transaction.amount);
       $psbt = await sign();
+
       transaction.psbt = $psbt.toBase64();
-      transaction.hash = $psbt.__CACHE.__TX.getId();
+      transaction.hash = $psbt.data.globalMap.unsignedTx.tx.getId();
+
       await save();
       await fetch();
+
+      const sortedBidTransactions = artwork.transactions
+        .filter((t) => t.type === "bid")
+        .sort((a, b) => b.amount - a.amount);
+
+      const highestBidTransaction = sortedBidTransactions.length
+        ? sortedBidTransactions[0]
+        : null;
+
+      highestBidTransaction &&
+        highestBidTransaction.user.email &&
+        (await api
+          .url("/mail-outbid")
+          .auth(`Bearer ${$token}`)
+          .post({
+            to: highestBidTransaction.user.email,
+            userName: highestBidTransaction.user.full_name
+              ? highestBidTransaction.user.full_name
+              : "",
+            bidAmount: `${val(transaction.amount)} L-BTC`,
+            artworkTitle: artwork.title,
+            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+          }));
+
+      $user.email &&
+        (await api
+          .url("/mail-bid-processed")
+          .auth(`Bearer ${$token}`)
+          .post({
+            to: $user.email,
+            userName: $user.full_name ? $user.full_name : "",
+            bidAmount: `${val(transaction.amount)} L-BTC`,
+            artworkTitle: artwork.title,
+            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+          }));
+
+      artwork.owner.email &&
+        (await api
+          .url("/mail-someone-bid")
+          .auth(`Bearer ${$token}`)
+          .post({
+            to: artwork.owner.email,
+            userName: artwork.owner.full_name ? artwork.owner.full_name : "",
+            bidAmount: `${val(transaction.amount)} L-BTC`,
+            artworkTitle: artwork.title,
+            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+          }));
+
       offering = false;
     } catch (e) {
       console.log(e);
@@ -174,13 +246,6 @@
     amountInput.focus();
   };
 
-  let transaction = {
-    artwork_id: null,
-    amount: null,
-    type: "bid",
-    hash: "",
-  };
-
   let loading;
   let buyNow = async () => {
     try {
@@ -188,6 +253,7 @@
       loading = true;
 
       transaction.amount = -artwork.list_price;
+      transaction.asset = artwork.asset;
       transaction.type = "purchase";
 
       $psbt = await executeSwap(artwork);
@@ -204,12 +270,31 @@
       transaction.psbt = $psbt.toBase64();
 
       await save();
-
-      transaction.amount = 1;
-      transaction.asset = artwork.asset;
-      transaction.user;
-
       await fetch();
+
+      $user.email &&
+        (await api
+          .url("/mail-purchase-successful")
+          .auth(`Bearer ${$token}`)
+          .post({
+            to: $user.email,
+            userName: $user.full_name ? $user.full_name : "",
+            bidAmount: `${val(artwork.list_price)} L-BTC`,
+            artworkTitle: artwork.title,
+            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+          }));
+
+      artwork.owner.email &&
+        (await api
+          .url("/mail-artwork-sold")
+          .auth(`Bearer ${$token}`)
+          .post({
+            to: artwork.owner.email,
+            userName: artwork.owner.full_name ? artwork.owner.full_name : "",
+            bidAmount: `${val(artwork.list_price)} L-BTC`,
+            artworkTitle: artwork.title,
+            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
+          }));
     } catch (e) {
       err(e);
     }
@@ -227,7 +312,7 @@
 <div class="container mx-auto mt-10 md:mt-20">
   <div class="flex flex-wrap">
     <div class="lg:text-left w-full lg:w-1/3 lg:max-w-xs">
-      <h1 class="text-3xl font-black primary-color">
+      <h1 class="text-3xl font-black primary-color break-words">
         {artwork.title || "Untitled"}
       </h1>
       <div class="flex mt-4 mb-6">
@@ -261,17 +346,19 @@
             </div>
           </div>
         </a>
-        <a href={`/u/${artwork.owner.username}`}>
-          <div class="flex mb-6 secondary-color">
-            <Avatar user={artwork.owner} />
-            <div class="ml-2">
-              <div>@{artwork.owner.username}</div>
-              <div class="text-xs text-gray-600">
-                {artwork.held ? "" : "Presumed "}Owner
+        {#if artwork.artist_id !== artwork.owner_id}
+          <a href={`/u/${artwork.owner.username}`}>
+            <div class="flex mb-6 secondary-color">
+              <Avatar user={artwork.owner} />
+              <div class="ml-2">
+                <div>@{artwork.owner.username}</div>
+                <div class="text-xs text-gray-600">
+                  {artwork.held ? "" : "Presumed "}Owner
+                </div>
               </div>
             </div>
-          </div>
-        </a>
+          </a>
+        {/if}
       </div>
 
       <div class="mobileImage">
@@ -284,10 +371,7 @@
         {#if artwork.list_price}
           <div class="my-2">
             <div class="text-sm mt-auto">List Price</div>
-            <div class="text-lg">
-              {list_price}
-              {ticker}
-            </div>
+            <div class="text-lg">{list_price} {ticker}</div>
           </div>
         {/if}
         {#if artwork.reserve_price}
@@ -307,7 +391,7 @@
         {/if}
       </div>
 
-      <RoyaltyInfo {artwork} hideDetails={true} />
+      <RoyaltyInfo {artwork} />
 
       {#if loading}
         <ProgressLinear />
@@ -320,6 +404,16 @@
             class:disabled>List</a
           >
         </div>
+        {#if artwork.held === "multisig" && !artwork.has_royalty && !artwork.auction_end}
+          <div class="w-full mb-2">
+            <a
+              href="/"
+              on:click|preventDefault={release}
+              class="block text-center text-sm secondary-btn w-full"
+              class:disabled>Release</a
+            >
+          </div>
+        {/if}
         <div class="w-full mb-2">
           <a
             href={`/a/${artwork.slug}/transfer`}
@@ -350,7 +444,7 @@
           {#if offering}
             <ProgressLinear />
           {:else}
-            <form on:submit={makeOffer}>
+            <form on:submit|preventDefault={makeOffer}>
               <div class="flex flex-col mb-4">
                 <div>
                   <div class="mt-1 relative rounded-md shadow-sm">
@@ -372,6 +466,13 @@
               <button type="submit" class="secondary-btn">Submit</button>
             </form>
           {/if}
+        {:else if !artwork.auction_start || compareAsc(now, parseISO(artwork.auction_start)) === 1}
+          <button
+            on:click={startBidding}
+            class="secondary-btn"
+            {disabled}
+            class:disabled>Make an offer</button
+          >
         {/if}
       {/if}
 

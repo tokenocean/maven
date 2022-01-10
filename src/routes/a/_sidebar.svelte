@@ -66,4 +66,14 @@
     </div>
   {/if}
 
+  <div class="art-likes-container">
+    <div class="art-likes">
+      <Heart {artwork} />
+      <p>{artwork.num_favorites}</p>
+    </div>
+    <div class="art-likes">
+      <Eye />
+      <p>{artwork.views}</p>
+    </div>
+  </div>
 </div>

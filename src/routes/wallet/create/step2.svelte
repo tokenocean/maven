@@ -19,30 +19,16 @@
 </script>
 
 <style>
-  .pagination {
-    color: lightgray;
-    padding: 7px;
-  }
-  .pagination:focus {
-    color: #6aced5;
-  }
-
-  .active {
-    color: #6aced5;
-  }
-
   .word {
     padding: 10px;
     display: inline-block;
     border-radius: 10px;
-    background-color: whitesmoke;
     font-weight: bold;
   }
 
   .word b {
     margin-right: 10px;
     font-size: 15px;
-    color: gray;
   }
 </style>
 
