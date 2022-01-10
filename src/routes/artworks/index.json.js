@@ -8,7 +8,7 @@ export async function post({ body, locals }) {
       limit = undefined,
       offset = 0,
       where = {},
-      order_by = { created_at: "desc" },
+      order_by = [{ sequence: "asc" }, { created_at: "desc" }],
     } = body;
 
     let { artworks_aggregate: a } = await q(countArtworks, { where });
