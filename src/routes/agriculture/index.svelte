@@ -1,16 +1,15 @@
 <script context="module">
+  import { post } from "$lib/api";
   export async function load({ fetch }) {
-    const r = await fetch("/artworks.json").then((r) => r.json());
+    const r = await post("/artworks.json", {}, fetch).json();
 
     return {
-      maxage: 720,
       props: {
-        count: r.count,
+        count: r.total,
         initialArtworks: r.artworks,
       },
     };
   }
-
 </script>
 
 <script>
@@ -58,8 +57,6 @@
     $edition = undefined;
     $painting = undefined;
     $variation = undefined;
-    const r = await fetch("/artworks.json").then((r) => r.json());
-    $artworks = r.artworks;
   });
 
 </script>

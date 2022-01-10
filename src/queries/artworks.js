@@ -1,5 +1,6 @@
 export const marketFields = `
   id
+  sequence
   edition
   editions
   title
@@ -44,6 +45,7 @@ export const fields = `
   title
   description
   artist_id
+  sequence
   owner_id
   filename
   filetype

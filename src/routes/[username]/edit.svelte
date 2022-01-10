@@ -82,7 +82,7 @@
         else err(r.error);
       } else {
         info("Profile updated");
-        goto(`/${rest.username}`);
+        goto(`/u/${rest.username}`);
       }
     });
   };
@@ -90,7 +90,7 @@
 
 <style>
   .container {
-    background-color: #111;
+    background-color: #ecf6f7;
     height: auto;
     min-height: 100vh;
     margin: 0;
@@ -129,8 +129,8 @@
 <div class="container mx-auto pt-5 md:pt-20">
   {#if form}
     <div
-      class="mb-4 w-full sm:max-w-3xl md:shadow rounded-xl md:p-10 m-auto lg:flex-row bg-black">
-      <a class="block mb-6 text-midblue" href={`/${$user.username}`}>
+      class="mb-4 w-full sm:max-w-3xl md:shadow rounded-xl md:p-10 m-auto lg:flex-row  bg-white">
+      <a class="block mb-6 text-midblue" href={`/u/${$user.username}`}>
         <div class="flex">
           <Fa icon={faChevronLeft} class="my-auto mr-1" />
           <div>Back</div>

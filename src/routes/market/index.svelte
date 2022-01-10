@@ -1,17 +1,17 @@
 <script context="module">
+  import { post } from "$lib/api";
   export async function load({ fetch }) {
-    const r = await fetch("/artworks.json?limit=5000").then((r) => r.json());
+    const r = await post("/artworks.json", {}, fetch).json();
 
     return {
-      maxage: 720,
       props: {
-        count: Math.min(r.count, 5000),
+        total: r.total,
         initialArtworks: r.artworks,
       },
     };
   }
-
 </script>
+
 
 <script>
   import { onMount } from "svelte";
@@ -32,8 +32,6 @@
 
   export let count;
   export let initialArtworks;
-
-  console.log("INITIAL", initialArtworks);
 
   let filtered = initialArtworks;
 
