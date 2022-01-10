@@ -17,9 +17,9 @@
 
   <div class="grid grid-cols-2 gap-8 mb-8">
     <div>
-      <img src="/jose.jpg" class="mx-auto mb-2 rounded" />
-      <img src="/jose2.png" class="mx-auto mb-2 rounded" />
-      <img src="/jose3.jpg" class="mx-auto mb-2 rounded" />
+      <img src="/jose.jpg" class="mx-auto mb-2 rounded" alt="Jose" />
+      <img src="/jose2.png" class="mx-auto mb-2 rounded" alt="Jose" />
+      <img src="/jose3.jpg" class="mx-auto mb-2 rounded" alt="Jose" />
     </div>
     <div>
       <div>

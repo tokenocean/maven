@@ -17,8 +17,8 @@
 
   <div class="grid grid-cols-2 gap-8 mb-8">
     <div>
-      <img src="/carmen.jpg" class="mx-auto mb-2 rounded" />
-      <img src="/carmen2.jpg" class="mx-auto mb-2 rounded" />
+      <img src="/carmen.jpg" class="mx-auto mb-2 rounded" alt="Carmen" />
+      <img src="/carmen2.jpg" class="mx-auto mb-2 rounded" alt="Carmen" />
     </div>
     <div>
       <div>

@@ -14,7 +14,7 @@
   <h3 class="text-center mb-10">ARMANDO CANDELARIO MARTINEZ</h3>
 
   <div class="grid grid-cols-2 gap-8 mb-8">
-    <img src="/armando.jpg" class="mx-auto mb-2 rounded" />
+    <img src="/armando.jpg" class="mx-auto mb-2 rounded" alt="Armando" />
     <div>
       <div>
         <span>Name</span>

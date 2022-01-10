@@ -16,7 +16,7 @@
   <h3 class="text-center mb-10">CATALINA GUEVARA</h3>
 
   <div class="grid grid-cols-2 gap-8 mb-8">
-    <img src="/catalina.jpg" class="mx-auto mb-2 rounded" />
+    <img src="/catalina.jpg" class="mx-auto mb-2 rounded" alt="Catalina" />
     <div>
       <div>
         <span>Name</span>

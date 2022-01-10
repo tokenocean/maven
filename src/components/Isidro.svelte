@@ -16,7 +16,7 @@
   <h3 class="text-center mb-10">ISIDRO ANTONIO LLANES PEREZ</h3>
 
   <div class="grid grid-cols-2 gap-8 mb-8">
-    <img src="/isidro.jpg" class="mx-auto mb-2 rounded" />
+    <img src="/isidro.jpg" class="mx-auto mb-2 rounded" alt="Isidro" />
     <div>
       <div>
         <span>Name</span>

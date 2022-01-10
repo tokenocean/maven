@@ -16,7 +16,7 @@
   <h3 class="text-center mb-10">MARIA JUSTA JARQUIN RAMIREZ</h3>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-    <img src="/justa.jpg" class="mx-auto mb-2 rounded" />
+    <img src="/justa.jpg" class="mx-auto mb-2 rounded" alt="Justa" />
     <div>
       <div>
         <span>Name</span>

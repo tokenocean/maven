@@ -9,10 +9,12 @@ const { retry } = middlewares.default || middlewares;
 wretch().polyfills({ fetch });
 
 export const api = wretch().url("/api");
-export const electrs = wretch().url("/api/el");
+export const electrs = wretch()
+  .middlewares([retry({ maxAttempts: 5 })])
+  .url("/api/el");
 
 export const hasura = wretch()
-  .middlewares([retry({ maxAttempts: 2 })])
+  .middlewares([retry({ maxAttempts: 5 })])
   .url("/api/v1/graphql");
 
 export const pub = (t) => (t ? hasura.auth(`Bearer ${t}`) : hasura);
@@ -25,7 +27,8 @@ export const query = async (query, variables) => {
 export const hbp = wretch().url(import.meta.env.VITE_HBP);
 export const serverApi = wretch().url(import.meta.env.VITE_APP);
 
-export const get = (url, fetch) => wretch().polyfills({ fetch }).url(url).get().json();
+export const get = (url, fetch) =>
+  wretch().polyfills({ fetch }).url(url).get().json();
 
 export const post = (url, body, fetch) =>
   wretch().polyfills({ fetch }).url(url).post(body);

@@ -1,4 +1,4 @@
-const { api, ipfs, q, electrs, registry, w } = require("./api");
+const { api, ipfs, q, electrs, registry } = require("./api");
 const { formatISO, compareAsc, parseISO, subMinutes } = require("date-fns");
 const reverse = require("buffer-reverse");
 const fs = require("fs");
@@ -33,6 +33,7 @@ const network = process.env.LIQUID_ELECTRS_URL.includes("blockstream")
 
 const btc = network.assetHash;
 const txcache = {};
+const hexcache = {};
 
 const updateAvatars = async () => {
   fs.readdir("/export", async (err, files) => {
@@ -278,7 +279,8 @@ let updateTransactions = async (address, user_id) => {
   for (let i = 0; i < txns.length; i++) {
     let { txid, vin, vout, status } = txns[i];
 
-    let hex = await electrs.url(`/tx/${txid}/hex`).get().text();
+    let hex = hexcache[txid] || await electrs.url(`/tx/${txid}/hex`).get().text();
+    hexcache[txid] = hex;
 
     let total = {};
 
@@ -330,13 +332,7 @@ let updateTransactions = async (address, user_id) => {
       try {
         let {
           insert_transactions_one: { id },
-        } = await q(createTransaction, {
-          transaction,
-          hash: txid,
-          user_id,
-          asset,
-          address,
-        });
+        } = await q(createTransaction, { transaction });
         transactions.push(transaction);
       } catch (e) {
         console.log(e);
@@ -355,8 +351,11 @@ let scanUtxos = async (address) => {
   if (!users.length) return [];
   let { id } = users[0];
 
+  console.log("scanning utxos", address);
+
   await updateTransactions(address, id);
   let { transactions } = await q(getTransactions, { id });
+
 
   let { utxos } = await q(getUtxos, { address });
   let outs = utxos.map(
@@ -378,6 +377,8 @@ let scanUtxos = async (address) => {
       transaction_id,
     })
   );
+
+  console.log("utxos", utxos.length);
 
   transactions = transactions.filter(
     (tx) => !outs.length || tx.sequence > outs[0].sequence
@@ -425,6 +426,7 @@ let scanUtxos = async (address) => {
     let { vout, asset, value, transaction_id } = unseen[i];
 
     try {
+      console.log("creating utxo", transaction_id, vout);
       await q(createUtxo, {
         utxo: {
           vout,

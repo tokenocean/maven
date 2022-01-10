@@ -1,4 +1,5 @@
 const wretch = require("wretch");
+const middlewares = require( "wretch-middlewares");
 const fetch = require("node-fetch");
 const w = wretch().polyfills({ fetch });
 const {
@@ -14,6 +15,7 @@ const {
 } = process.env;
 
 const DELAY = LIQUID_ELECTRS_URL.includes("blockstream") ? 25 : 0;
+const { retry } = middlewares.default || middlewares;
 
 const queue = [];
 
@@ -31,7 +33,7 @@ const hasura = wretch().url(`${HASURA_URL}/v1/graphql`);
 const api = (h) => hasura.headers(h);
 const adminApi = hasura.headers({ "x-hasura-admin-secret": HASURA_SECRET });
 
-const electrs = wretch().middlewares([enqueue]).url(LIQUID_ELECTRS_URL);
+const electrs = wretch().middlewares([enqueue, retry({ maxAttempts: 5 })]).url(LIQUID_ELECTRS_URL);
 const registry = wretch().url("https://assets.blockstream.info/");
 const coinos = wretch().url(COINOS_URL).auth(`Bearer ${COINOS_TOKEN}`);
 const ipfs = wretch().url(IPFS_WEB_URL);
@@ -50,6 +52,9 @@ const cf = wretch()
 
 const hbp = wretch().url(HBP_URL);
 
+const { APP_URL } = process.env;
+const lnft = wretch().url(APP_URL);
+
 module.exports = {
   hasura: adminApi,
   api,
@@ -59,6 +64,7 @@ module.exports = {
   hbp,
   coinos,
   ipfs,
+  lnft,
   q,
   w,
 };

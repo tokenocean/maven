@@ -1,11 +1,11 @@
 <script context="module">
-  export async function load({ fetch, page, session }) {
+  export async function load({ fetch, params, session }) {
     if (!(session && session.user)) return {
       status: 302,
       redirect: '/login'
     } 
 
-    const props = await fetch(`/artworks/${page.params.slug}.json`).then((r) =>
+    const props = await fetch(`/artworks/${params.slug}.json`).then((r) =>
       r.json()
     );
 
@@ -25,6 +25,7 @@
   import { createTransaction } from "$queries/transactions";
   import { api, query } from "$lib/api";
   import { page } from "$app/stores";
+  import { requirePassword } from "$lib/auth";
   import {
     broadcast,
     isMultisig,
@@ -32,7 +33,6 @@
     pay,
     sign,
   } from "$lib/wallet";
-  import { requirePassword } from "$lib/auth";
 
   export let artwork;
 
@@ -68,6 +68,8 @@
         type: "transfer",
       };
 
+      console.log("HUM", transaction);
+
       query(createTransaction, { transaction });
 
       await api
@@ -86,6 +88,7 @@
       info(`Artwork sent to ${recipient.username}!`);
       goto(`/a/${artwork.slug}`);
     } catch (e) {
+      console.log(e);
       err(e);
     }
     loading = false;
@@ -98,8 +101,8 @@
     @apply text-gray-400 border-gray-400;
   }
 
-  :global(.huh) {
-    @apply rounded-lg px-8 py-4 text-black w-full !important;
+  :global(.transferSelect) {
+    @apply rounded-lg px-8 py-4 text-white w-full !important;
   }
 
 </style>
@@ -117,7 +120,7 @@
         placeholder="Recipient"
         items={$addresses.filter((a) => a.id !== $user.id)}
         className="w-full"
-        inputClassName="huh"
+        inputClassName="transferSelect"
         labelFieldName="username"
         bind:selectedItem={recipient}>
         <div class="flex" slot="item" let:item let:label>

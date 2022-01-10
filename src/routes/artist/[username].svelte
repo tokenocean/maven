@@ -1,6 +1,6 @@
 <script context="module">
-  export async function load({ fetch, page }) {
-    let { username } = page.params;
+  export async function load({ fetch, params }) {
+    let { username } = params;
     const r = await fetch(`/artworks/username/${username}.json`).then((r) => r.json());
 
     return {

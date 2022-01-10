@@ -21,40 +21,6 @@
     margin-bottom: 34px;
   }
 
-  .secondary-header {
-    height: 600px !important;
-    width: 100%;
-    object-fit: cover;
-  }
-
-  .blur-bg {
-    display: flex;
-    padding: 60px;
-    flex-direction: column;
-    background: rgba(54, 58, 74, 0.45);
-    backdrop-filter: blur(30px);
-    box-shadow: 2px 2px 4px 0 rgb(0 0 0 / 10%);
-    border-radius: 8px;
-    color: white;
-    width: 50%;
-    width: fit-content;
-  }
-
-  .blur-bg h2 {
-    color: white !important;
-  }
-
-  .blur-bg p {
-    color: white !important;
-    margin-top: 20px;
-  }
-
-  .header-button {
-    width: 200px;
-    border: 1px solid;
-    border-radius: 30px;
-    padding: 0.7rem 1.5rem !important;
-  }
 
   @media only screen and (max-width: 768px) {
     .header {
@@ -68,16 +34,6 @@
 
     .header .primary-btn {
       width: 100%;
-    }
-
-    .secondary-header {
-      height: 400px !important;
-    }
-
-    .blur-bg {
-      padding: 24px;
-      width: 75%;
-      width: fit-content;
     }
   }
 

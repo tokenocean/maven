@@ -1,12 +1,12 @@
 <script context="module">
-  export async function load({ fetch, page, session }) {
+  export async function load({ fetch, params, session }) {
     if (!(session && session.user))
       return {
         status: 302,
         redirect: "/login",
       };
 
-    const props = await fetch(`/artworks/${page.params.slug}.json`).then((r) =>
+    const props = await fetch(`/artworks/${params.slug}.json`).then((r) =>
       r.json()
     );
 

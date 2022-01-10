@@ -5,9 +5,7 @@
   import { host } from "$lib/utils";
   export async function load({
     fetch,
-    page: {
-      params: { slug },
-    },
+    params: { slug },
   }) {
     const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
 
@@ -97,7 +95,6 @@
   import Juan from "$components/Juan.svelte";
   import Justa from "$components/Justa.svelte";
   import Felix from "$components/Felix.svelte";
-
 
   export let artwork, others, metadata, views;
 

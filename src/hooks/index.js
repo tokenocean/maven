@@ -62,7 +62,7 @@ export async function handle({ request, resolve }) {
 
   const response = await resolve(request);
 
-  if (setCookie && request.path !== "/auth/login")
+  if (setCookie && request.url.pathname !== "/auth/login")
     response.headers["set-cookie"] = setCookie;
 
   return response;

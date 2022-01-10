@@ -16,7 +16,7 @@
   <h3 class="text-center mb-10">JUAN FILEMON MENDOZA PEREIRA</h3>
 
   <div class="grid grid-cols-2 gap-8 mb-8">
-    <img src="/juan.jpg" class="mx-auto mb-2 rounded" />
+    <img src="/juan.jpg" class="mx-auto mb-2 rounded" alt="Juan" />
     <div>
       <div>
         <span>Name</span>
