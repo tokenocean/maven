@@ -547,8 +547,6 @@
         {/if}
       </div>
 
-      <RoyaltyInfo {artwork} />
-
       {#if loading}
         <ProgressLinear />
       {:else if $user && $user.id === artwork.owner_id && artwork.held}

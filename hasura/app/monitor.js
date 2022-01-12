@@ -351,7 +351,7 @@ let updateTransactions = async (address, user_id) => {
         } = await q(createTransaction, { transaction });
         transactions.push(transaction);
       } catch (e) {
-        console.log(e);
+        console.log(e, transaction);
         continue;
       }
     }
