@@ -1,6 +1,6 @@
 version: 3
-endpoint: https://mavennft.io
-admin_secret: oYD1X5rWSzZsepLuovLEa3A5Bj8WT5
+endpoint: http://localhost:8080
+admin_secret: liquidart
 api_paths:
   v1_query: v1/query
   v2_query: v2/query
