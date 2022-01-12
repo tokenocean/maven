@@ -1,5 +1,4 @@
 const wretch = require("wretch");
-const middlewares = require( "wretch-middlewares");
 const fetch = require("node-fetch");
 const w = wretch().polyfills({ fetch });
 const {
@@ -15,7 +14,6 @@ const {
 } = process.env;
 
 const DELAY = LIQUID_ELECTRS_URL.includes("blockstream") ? 25 : 0;
-const { retry } = middlewares.default || middlewares;
 
 const queue = [];
 

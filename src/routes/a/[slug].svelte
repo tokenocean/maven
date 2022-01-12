@@ -96,7 +96,7 @@
   import Justa from "$components/Justa.svelte";
   import Felix from "$components/Felix.svelte";
 
-  export let artwork, others, metadata, views;
+  export let artwork, metadata, views;
 
   $: updatePage($page);
   const updatePage = () => ($painting = artwork.sequence);
@@ -454,21 +454,9 @@
     }
   }
 
-  .others :global(img),
-  .others :global(video) {
-    height: 160px;
-    width: 100%;
-  }
-
   @media only screen and (max-width: 768px) {
     .popup :global(img),
     .popup :global(video) {
-      height: auto;
-      width: 100%;
-    }
-
-    .others :global(img),
-    .others :global(video) {
       height: auto;
       width: 100%;
     }
@@ -754,24 +742,6 @@
           thumb={false}
           popup={true} />
       </div>
-
-      {#if others.length}
-        <div class="w-full mt-64 mb-4">
-          <h2 class="text-2xl font-bold primary-color py-10 px-0">
-            More by this artist
-          </h2>
-          <div class="w-full grid md:grid-cols-3 gap-4 others">
-            {#each others as artwork (artwork.id)}
-              <Card {artwork} showDetails={false} />
-            {/each}
-          </div>
-        </div>
-        <div class="flex w-full">
-          <a
-            class="primary-btn mx-auto mb-12"
-            href={`/artist/${artwork.artist.username}`}>View all</a>
-        </div>
-      {/if}
     </div>
   </div>
 </div>
