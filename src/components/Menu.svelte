@@ -8,8 +8,41 @@
   let dropdown;
   let showDropdown = () => (dropdown = true);
   let hideDropdown = () => (dropdown = false);
-
 </script>
+
+<div
+  class="flex justify-between items-center menu relative"
+  on:mouseout={hideDropdown}
+  on:blur={hideDropdown}
+>
+  <a href="https://www.mavennft.io/" style="color: #83e68d"
+    ><button>Home</button></a
+  >
+  <a href="https://www.mavennft.io/portfolio" style="color: #83e68d"
+    ><button>Marketplace</button></a
+  >
+  <a href="https://www.mavennft.io/about-us" style="color: #83e68d"
+    ><button>About</button></a
+  >
+  <a href="https://www.mavennft.io/what-is-an-nft" style="color: #83e68d"
+    ><button>What's an NFT?</button></a
+  >
+  <a href="https://www.mavennft.io/contact" style="color: #83e68d"
+    ><button>Contact</button></a
+  >
+  {#if $user}
+    {#if $user.is_admin}
+      <a href="/admin"><button>Admin</button></a>
+    {/if}
+    <a href={`/${$user.username}`}>
+      <button class="flex">
+        <Avatar user={$user} />
+      </button></a
+    >
+  {:else}
+    <a href="/login" style="color: #83e68d"><button>Sign In</button></a>
+  {/if}
+</div>
 
 <style>
   .menu button {
@@ -61,45 +94,4 @@
       width: 100%;
     }
   }
-
 </style>
-
-<div class="flex justify-between items-center menu relative" on:mouseout={hideDropdown} on:blur={hideDropdown}>
-  <a
-    href="/agriculture"
-    style="color: #83e68d"
-    on:mouseover={showDropdown} on:focus={showDropdown}><button
-      on:click={toggle}>Marketplace</button></a>
-    <div class="lg:absolute lg:mt-40 " class:lg:hidden={!dropdown} on:mouseover={showDropdown} on:focus={showDropdown}>
-      <div>
-        <a href="/agriculture" style="color: #83e68d"><button
-            on:click={toggle}>Agriculture</button></a>
-      </div>
-      <div>
-        <a href="/real-estate" style="color: #83e68d"><button
-            on:click={toggle}>Real Estate</button></a>
-      </div>
-      <div>
-        <a href="/music" style="color: #83e68d"><button
-            on:click={toggle}>Music</button></a>
-      </div>
-      <div>
-        <a href="/vehicles" style="color: #83e68d"><button
-            on:click={toggle}>Vehicles</button></a>
-      </div>
-    </div>
-  <a href="/about" style="color: #83e68d" on:mouseover={hideDropdown} on:focus={hideDropdown}><button
-      on:click={toggle}>About</button></a>
-  <a href="/faq" style="color: #83e68d"><button on:click={toggle}>What's an NFT?</button></a>
-  {#if $user}
-    {#if $user.is_admin}
-      <a href="/admin"><button on:click={toggle}>Admin</button></a>
-    {/if}
-    <a href={`/${$user.username}`}>
-      <button on:click={toggle} class="flex">
-        <Avatar user={$user} />
-      </button></a>
-  {:else}
-    <a href="/login" style="color: #83e68d"><button on:click={toggle}>Sign In</button></a>
-  {/if}
-</div>
