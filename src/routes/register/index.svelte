@@ -45,6 +45,8 @@
 
 <style>
   .form-container {
+    background: url("/bg.png");
+    background-size: 100% 100vh;
     width: 100%;
     height: 100vh;
     display: flex;
@@ -56,7 +58,7 @@
   .form-container form {
     width: 100%;
     max-width: 450px;
-    background-color: black;
+    background-color: rgb(0, 0, 0, 0.8);
     padding: 40px;
     box-shadow: 0 1px 5px rgb(0 0 0 / 18%);
     border-radius: 10px;
@@ -87,7 +89,7 @@
 
 </style>
 
-<div class="form-container bg-lightblue px-4">
+<div class="form-container px-4">
   <form class="mb-6" on:submit|preventDefault={submit} autocomplete="off">
     {#if loading}
       <ProgressLinear />
@@ -156,15 +158,14 @@
         </div>
       </div>
       <span class="block w-full">By signing up, you agree to the
-        <a href="/terms-and-conditions">Terms and
-          Conditions</a>
+        <a href="/terms-and-conditions">Terms and Conditions</a>
         and
         <a href="/privacy-policy">Privacy Policy</a></span>
       <div class="flex my-5 justify-end">
         <button class="primary-btn w-full" type="submit">Register</button>
       </div>
 
-      <a href="/login" class="text-midblue">
+      <a href="/login" class="text-lightblue">
         Already have an account? Sign in</a>
     {/if}
   </form>

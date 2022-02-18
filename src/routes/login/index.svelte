@@ -46,6 +46,8 @@
 
 <style>
   .form-container {
+    background: url("/bg.png");
+    background-size: 100% 100vh;
     width: 100%;
     height: 100vh;
     display: flex;
@@ -57,7 +59,7 @@
   .form-container form {
     width: 100%;
     max-width: 450px;
-    background-color: black;
+    background-color: rgb(0, 0, 0, 0.8);
     padding: 40px;
     box-shadow: 0 1px 5px rgb(0 0 0 / 18%);
     border-radius: 10px;
@@ -111,11 +113,11 @@
         </button>
       </div>
     </div>
-    <a href="/forgot-password" class="block w-full text-midblue">Forgot
+    <a href="/forgot-password" class="block w-full text-lightblue">Forgot
       password?</a>
     <div class="flex my-5 justify-end">
       <button class="primary-btn w-full" type="submit">Sign In</button>
     </div>
-    <a href="/register" class="text-midblue">Don't have an account? Sign up</a>
+    <a href="/register" class="text-lightblue">Don't have an account? Sign up</a>
   </form>
 </div>
