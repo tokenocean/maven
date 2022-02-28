@@ -39,7 +39,8 @@
   });
 
   $: focus($page);
-  export let focus = (p) => browser && p && tick().then(() => input && input.select());
+  export let focus = (p) =>
+    browser && p && tick().then(() => input && input.select());
 
   $: value = artwork.tags.map(({ tag }) => ({
     value: tag,
@@ -53,6 +54,11 @@
 </script>
 
 <style>
+  .doesthiswork {
+    --itemHoverBG: #83e68d;
+    --multiItemBG: #83e68d;
+  }
+
   .tooltip {
     cursor: pointer;
   }
@@ -88,19 +94,9 @@
     <input
       class="border-0 border-b-2"
       style="border-radius: 0 !important"
-      placeholder="What's your artwork title?"
+      placeholder="What's your asset title?"
       on:input={({ target: { value } }) => debounce(value)}
       bind:this={input} />
-  </div>
-  <div class="toggle mb-6">
-    <label for="physical" class="inline-flex items-center">
-      <input
-        id="physical"
-        class="form-checkbox h-6 w-6"
-        type="checkbox"
-        bind:checked={artwork.is_physical} />
-      <span class="ml-3">This is a physical artwork</span>
-    </label>
   </div>
   {#if !artwork.id}
     <div class="flex flex-col mb-6">
@@ -119,31 +115,13 @@
       placeholder="How would you describe it?"
       bind:value={artwork.description} />
   </div>
-  {#if !artwork.id}
-    <div class="flex flex-col mb-6">
-      <div class="mb-0">
-        <label for="ticker" class="flex">
-          <div class="mr-2">Ticker</div>
-          <div class="mt-1 mb-0">
-            <span class="tooltip">
-              <i class="text-midblue text-xl">
-                <Fa icon={faQuestionCircle} />
-              </i>
-              <span class="tooltip-text bg-gray-100 shadow ml-4 rounded">The
-                ticker is a short 3-5 character identifier for your asset that
-                you'll see in other wallets and explorers.</span>
-            </span>
-          </div>
-        </label>
-      </div>
-      <input
-        id="ticker"
-        class="w-1/2"
-        bind:value={artwork.ticker}
-        maxlength="5" />
-    </div>
-  {/if}
-  <div class="flex flex-col mb-6">
+  <input
+    id="ticker"
+    class="w-1/2"
+    type="hidden"
+    bind:value={artwork.ticker}
+    maxlength="5" />
+  <div class="flex flex-col mb-6 doesthiswork">
     <label for="tags">Tags
       <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span></label>
     <Select

@@ -10,6 +10,7 @@
       },
     };
   }
+
 </script>
 
 <script>
@@ -57,7 +58,7 @@
     if ($edition) $edition = undefined;
     else if ($painting) $painting = undefined;
     else if ($variation) $variation = undefined;
-  } 
+  };
 
   onMount(async () => {
     $edition = undefined;
@@ -85,10 +86,11 @@
   class="container mx-auto flex flex-wrap flex-col-reverse md:flex-row sm:justify-between my-10 md:mt-20">
   <h2 class="md:mb-0">Agriculture</h2>
   {#if $user && $user.is_artist}
-    <a href="/a/create" class="primary-btn">Submit a new asset</a>
+    <a href="/a/create" class="primary-btn">Mint a new asset</a>
   {/if}
   {#if $painting}
-    <a href="/a/create" class="primary-btn" on:click|preventDefault={back}>Go back</a>
+    <a href="/a/create" class="primary-btn" on:click|preventDefault={back}>Go
+      back</a>
   {/if}
 </div>
 

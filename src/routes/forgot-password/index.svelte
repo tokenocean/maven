@@ -14,6 +14,7 @@
   let ref;
   let pageChange = () => setTimeout(() => ref && ref.select(), 50);
   $: if (ref) pageChange($page);
+
 </script>
 
 <style>
@@ -29,7 +30,7 @@
   .form-container form {
     width: 100%;
     max-width: 450px;
-    background-color: white;
+    background-color: black;
     padding: 40px;
     box-shadow: 0 1px 5px rgb(0 0 0 / 18%);
     border-radius: 10px;
@@ -53,6 +54,7 @@
       margin-top: 50px;
     }
   }
+
 </style>
 
 <div class="form-container bg-lightblue" key={$page.url.pathname}>
