@@ -82,10 +82,11 @@
         else err(r.error);
       } else {
         info("Profile updated");
-        goto(`/u/${rest.username}`);
+        goto(`/${rest.username}`);
       }
     });
   };
+
 </script>
 
 <style>
@@ -124,13 +125,14 @@
       margin-bottom: 200px;
     }
   }
+
 </style>
 
 <div class="container mx-auto pt-5 md:pt-20">
   {#if form}
     <div
       class="mb-4 w-full sm:max-w-3xl md:shadow rounded-xl md:p-10 m-auto lg:flex-row  bg-white">
-      <a class="block mb-6 text-midblue" href={`/u/${$user.username}`}>
+      <a class="block mb-6 text-midblue" href={`/${$user.username}`}>
         <div class="flex">
           <Fa icon={faChevronLeft} class="my-auto mr-1" />
           <div>Back</div>
@@ -144,7 +146,10 @@
           autocomplete="off">
           <div class="flex flex-col mb-4">
             <label for="name">Name</label>
-            <input id="name" placeholder="Full Name" bind:value={form.full_name} />
+            <input
+              id="name"
+              placeholder="Full Name"
+              bind:value={form.full_name} />
           </div>
           <div class="flex flex-col mb-4">
             <label for="username">Username</label>

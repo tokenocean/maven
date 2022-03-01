@@ -49,7 +49,7 @@
 </script>
 
 <div class="container mx-auto mt-20">
-  <h2 class="mb-10">Artist Applicants</h2>
+  <h2 class="mb-10">Applicants</h2>
   {#each users as user}
     <div class="flex w-full mb-8">
       <div class="flex-grow mb-auto mr-2">

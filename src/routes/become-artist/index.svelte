@@ -161,7 +161,7 @@
           <div>Back</div>
         </div>
       </a>
-      <h2 class="mb-10">Become an artist</h2>
+      <h2 class="mb-10">Become a lister</h2>
       {#if submitted}
         <div>
           Thank you! Your application has been recorded. We'll follow up by
@@ -169,9 +169,9 @@
         </div>
       {:else}
         <p>
-          We currently work with a limited number of artists, so we might take
+          We currently work with a limited number of listers, so we might take
           some time to review your work and get back to you. But you are welcome
-          to submit your profile and apply to become an artist.
+          to submit your profile and apply to become a lister.
         </p>
         <div class="flex mt-4 m-auto flex-col-reverse lg:flex-row">
           <form

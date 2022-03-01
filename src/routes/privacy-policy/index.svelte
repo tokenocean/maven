@@ -51,14 +51,14 @@
     <div class="faq-content">
       <div class="faq">
         <p>
-          At Maven (“Website”, “we”) We are committed to protecting the
-          privacy and confidentiality of any personal data we collect when you
-          use this Website. This Privacy Policy describes the ways we collect
-          information from and about you, and what we do with the information,
-          so that you may decide whether or not to provide information to us. By
-          accessing or using Maven (www.mavennft.io), you agree to be
-          bound by the terms and conditions described in this document and also
-          by any terms and conditions incorporated by reference.
+          At Maven (“Website”, “we”) We are committed to protecting the privacy
+          and confidentiality of any personal data we collect when you use this
+          Website. This Privacy Policy describes the ways we collect information
+          from and about you, and what we do with the information, so that you
+          may decide whether or not to provide information to us. By accessing
+          or using Maven (www.mavennft.io), you agree to be bound by the terms
+          and conditions described in this document and also by any terms and
+          conditions incorporated by reference.
         </p>
         <h3>1. Scope of definitions</h3>
         <p>
@@ -67,8 +67,8 @@
         </p>
 
         <p>
-          “<b>Sites</b>” are all websites that are owned and operated by
-          Maven, including mavennft.io and all subdomains
+          “<b>Sites</b>” are all websites that are owned and operated by Maven,
+          including mavennft.io and all subdomains
         </p>
 
         <p>
@@ -106,7 +106,7 @@
           retain this information until you ask to be removed from the Website.
           The User may choose to provide their full name, location, biographical
           information, and include links to their website or other social
-          platforms. For users submitting an application to become Artists in
+          platforms. For users submitting an application to become Listers in
           the Website we may collect information such as name, email address,
           artwork samples, information about your promoting sites (website or
           other social platforms) and other information about your art. In
@@ -154,8 +154,8 @@
           associated with Maven may be hosted on third-party websites.
           Additionally, we may provide links to third-party websites for
           informational purposes. The privacy practices of those sites may
-          differ from our practices, are not controlled by Maven, and are
-          not covered by this Privacy Policy. We do not make any representations
+          differ from our practices, are not controlled by Maven, and are not
+          covered by this Privacy Policy. We do not make any representations
           about third-party websites. We encourage you to review their privacy
           policies before submitting your personal data to such sites.
         </p>
@@ -168,8 +168,8 @@
           services are not designed for or directed to children under the age of
           18, and we will not intentionally collect or maintain information
           about anyone under the age of 13. If a child under 13 submits Personal
-          Information to Maven and we learn that the Personal Information is
-          the information of a child under 13, we will attempt to delete the
+          Information to Maven and we learn that the Personal Information is the
+          information of a child under 13, we will attempt to delete the
           information as soon as possible. If you believe that we might have any
           Personal Data from a child under 13, please contact us at
           support@mavennft.io.
@@ -177,18 +177,18 @@
 
         <h3>3. What do we use this information for?</h3>
         <p>
-          We use web visit information to measure interest in and develop
-          Maven and marketing plans, customize the content you view on your
-          web visits based on your activity on past visits, diagnose technical
-          problems, and to generally administer the Platform. If any Token is
-          associated with a physical item, we will use the shipping information
-          you provide in order to ship the products to your address.
+          We use web visit information to measure interest in and develop Maven
+          and marketing plans, customize the content you view on your web visits
+          based on your activity on past visits, diagnose technical problems,
+          and to generally administer the Platform. If any Token is associated
+          with a physical item, we will use the shipping information you provide
+          in order to ship the products to your address.
         </p>
 
         <p>
           Any information actively collected, such as names and email addresses,
-          will be used to provide you with information regarding Maven
-          services when you sign up on our Platform.
+          will be used to provide you with information regarding Maven services
+          when you sign up on our Platform.
         </p>
 
         <h3>4. Disclosure of personal information</h3>
@@ -206,9 +206,9 @@
             you through our Site; to conduct quality assurance testing; to
             facilitate shipping of physical items in the Platform; to provide
             technical support; and/or to provide hosting and other services to
-            Maven. In such events, personal information will only be shared
-            to the extent reasonably necessary to perform their functions and
-            they will not be authorized to use it for any other function,
+            Maven. In such events, personal information will only be shared to
+            the extent reasonably necessary to perform their functions and they
+            will not be authorized to use it for any other function,
           </li>
           <li>
             when we believe it is necessary to comply with the law, including in
