@@ -1,6 +1,5 @@
 export const marketFields = `
   id
-  sequence
   edition
   editions
   title
@@ -45,7 +44,6 @@ export const fields = `
   title
   description
   artist_id
-  sequence
   owner_id
   filename
   filetype
@@ -143,8 +141,8 @@ export const getFeatured = `query {
   }
 }`;
 
-export const getLimited = `query($where: artworks_bool_exp!, $limit: Int, $offset: Int, $order_by: [artworks_order_by!]) {
- artworks(where: $where, limit: $limit, offset: $offset, order_by: $order_by) {
+export const getLimited = `query($where: artworks_bool_exp!, $limit: Int, $offset: Int, $order_by: artworks_order_by!) {
+ artworks(where: $where, limit: $limit, offset: $offset, order_by: [$order_by]) {
     ${marketFields}
   }
 }`;
@@ -208,24 +206,9 @@ export const getArtworksByUsername = (username) => `query {
 }`;
 
 export const getArtworksByTag = (tag) => `query {
-  artworks(where: {tags: {tag: {_eq: "${tag}"}}}) {
+  artworks(where: {tags: {tag: {_eq: "${tag}"}}}, order_by: { created_at: asc }) {
     ${fields}
   }
-}`;
-
-export const create = `mutation ($artwork: artworks_insert_input!, $tags: [tags_insert_input!]!, $transaction: transactions_insert_input!) {
-  insert_artworks_one(object: $artwork) {
-    ${fields}
-    tags {
-      tag
-    } 
-  }
-  insert_tags(objects: $tags) {
-    affected_rows
-  }
-  insert_transactions_one(object: $transaction) {
-    ${txFields}
-  } 
 }`;
 
 export const updateArtwork = `mutation update_artwork($artwork: artworks_set_input!, $id: uuid!) {
@@ -284,6 +267,12 @@ export const countArtworks = `query($where: artworks_bool_exp!) {
 export const getTags = `query {
   tags {
     tag
+  } 
+}`;
+
+export const getTagsWithArtwork = `query {
+  tags {
+    tag
     artwork {
       ${fields}
     } 
@@ -300,3 +289,6 @@ export const getTitles = `query {
     owner_id
   }
 }`;
+
+export const getArtworksByTicker = `query($ticker: String!) { artworks(where: { ticker: { _like: $ticker }}) { ticker }}`;
+export const queryTickers = `query($tickers: [String!]) { artworks(where: { ticker: { _in: $tickers }}) { ticker }}`;

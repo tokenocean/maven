@@ -1,15 +1,18 @@
 <script context="module">
   export async function load({ session }) {
-    if (!(session && session.user)) return {
-      status: 302,
-      redirect: '/login'
-    } 
+    if (!(session && session.user))
+      return {
+        status: 302,
+        redirect: "/login",
+      };
 
     return {};
   }
+
 </script>
 
 <script>
+  import { session } from "$app/stores";
   import Fa from "svelte-fa";
   import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
   import { border, bg } from "./_colors";
@@ -59,9 +62,9 @@
 
   let poll;
   let pollBalances = async () => {
-    await getBalances();
+    await getBalances($session);
     poll = setTimeout(pollBalances, 5000);
-  } 
+  };
 
   onMount(pollBalances);
   onDestroy(() => clearTimeout(poll));

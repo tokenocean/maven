@@ -1,4 +1,5 @@
 <script>
+  import { session } from "$app/stores";
   import Fa from "svelte-fa";
   import {
     faUserSecret,
@@ -55,7 +56,7 @@
   };
 
   onMount(async () => {
-    await getBalances();
+    await getBalances($session);
     await tick();
   });
 
