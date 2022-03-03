@@ -138,68 +138,72 @@
   let tries;
   let l;
 
-  $: generateTicker(title);
-  let generateTicker = (t) => {
-    if (!t) return;
-    artwork.ticker = (
-      t.split(" ").length > 2
-        ? t
-            .split(" ")
-            .map((w) => w[0])
-            .join("")
-        : t
-    )
-      .substr(0, 3)
-      .toUpperCase();
+  let generateTickers = async (count) => {
+    const randomTicker = () => {
+      let a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
+      let ticker = "";
+      for (let j = 0; j < 5; j++) {
+        const random = Math.floor(Math.random() * (a.length - 1));
+        ticker = `${ticker}${a[random]}`;
+      }
+      return ticker;
+    };
 
-    checkTicker();
-  };
+    let tickers = [];
+    for (let i = 0; i < count; i++) {
+      let randTicker = randomTicker();
 
-  let checkTicker = async () => {
-    let { ticker } = artwork;
-    let { artworks } = await query(getArtworksByTicker, {
-      ticker: ticker + "%",
-    });
+      // check that ticker is unique in our tickers array
+      while (tickers.indexOf(randTicker) !== -1) {
+        randTicker = randomTicker();
+      }
 
-    if (artworks && artworks.length) {
-      let tickers = artworks.sort(({ ticker: a }, { ticker: b }) =>
-        b.length < a.length
-          ? 1
-          : b.length > a.length
-          ? -1
-          : a.charCodeAt(a.length - 1) - b.charCodeAt(b.length - 1)
-      );
+      tickers.push(randTicker);
+    }
 
-      if (tickers.map((a) => a.ticker).includes(ticker)) {
-        let { ticker: t } = tickers.pop();
-        artwork.ticker = t.substr(0, 3) + c[c.indexOf(t.substr(3)) + 1];
+    let tickersOK = false;
+
+    while (!tickersOK) {
+      const result = await checkTickers({
+        tickers,
+      });
+
+      if (result.success) tickersOK = true;
+
+      if (result.error && result.tickersUnavailable.length) {
+        result.tickersUnavailable.forEach((ticker) => {
+          const index = tickers.indexOf(ticker);
+          tickers[index] = randomTicker();
+        });
       }
     }
+
+    return tickers;
   };
 
-  let checkTickers = async (tickers) => {
-    let { artworks } = await query(queryTickers, { tickers });
+  let checkTickers = async ({ tickers }) => {
+    let { artworks } = await query(
+      `query { artworks(where: { ticker: { _in: ${JSON.stringify(
+        tickers
+      )} }}) { ticker }}`
+    );
+
     if (artworks.length)
-      throw new Error(
-        `Ticker(s) not available: ${artworks.map((a) => a.ticker).join(", ")}`
-      );
-  };
+      return {
+        error: `Ticker(s) not available: ${artworks
+          .map((a) => a.ticker)
+          .join(", ")}`,
+        tickersUnavailable: data.artworks.map((a) => a.ticker),
+      };
 
-  let a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  let b = [];
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < a.length; j++) {
-      b.push(a[i] + a[j]);
-    }
-  }
-  let c = [...a, ...b];
+    return { success: true };
+  };
 
   let submit = async (e) => {
     e.preventDefault();
     await requirePassword($session);
     transactions = [];
     if (!artwork.title) return err("Please enter a title");
-    if (!artwork.ticker) return err("Please enter a ticker symbol");
 
     if (!artwork.filename)
       return err("File not uploaded or hasn't finished processing");
@@ -209,16 +213,7 @@
 
     try {
       let { ticker } = artwork;
-      let tickers = [];
-
-      for ($edition = 1; $edition <= artwork.editions; $edition++) {
-        if ($edition > 1)
-          ticker =
-            artwork.ticker.substr(0, 3) + c[c.indexOf(ticker.substr(3)) + 1];
-        tickers.push(ticker.toUpperCase());
-      }
-
-      await checkTickers(tickers);
+      let tickers = await generateTickers(artwork.editions);
 
       [inputs, total] = await getInputs();
 
