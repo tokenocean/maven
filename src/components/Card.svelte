@@ -42,20 +42,24 @@
       $variation = n;
     } else {
       $edition = n;
-    } 
+    }
   };
 
   let words, n, step, st, end;
-  $: update(artwork, $painting, $variation, $edition)
+  $: update(artwork, $painting, $variation, $edition);
   let update = (a, p, v) => {
     words = artwork.title.split(" ");
     n = parseInt(words[words.length - 1]);
-    step =  (p ? 10 : 100);
+    step = p ? 10 : 100;
     st = n - step + 1;
     end = n;
-  }
+  };
 
-  $: title = $variation ? artwork.title : `Shares ${st}-${end}`;
+  $: title =
+    $variation || !artwork.title.startsWith("Harvest")
+      ? artwork.title
+      : `Shares ${st}-${end}`;
+
 </script>
 
 <style>
@@ -75,7 +79,9 @@
 
 </style>
 
-<div class="{showDetails ? 'card' : ''} flex flex-col justify-between h-full" key={artwork.id}>
+<div
+  class="{showDetails ? 'card' : ''} flex flex-col justify-between h-full"
+  key={artwork.id}>
   <a href={`/a/${artwork.slug}`} on:click={makeSelection}>
     {#if !loaded && justScrolled}
       <div style="height: 350px" class="bg-gray-100 w-full object-cover" />
