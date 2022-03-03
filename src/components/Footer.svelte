@@ -1,5 +1,8 @@
 <script>
   import branding from '$lib/branding';
+  
+  let date = new Date();
+  let year = date.getFullYear();
 </script>
 
 <div class="bg-black px-2 mt-24">
@@ -7,7 +10,7 @@
     <div
       class="flex flex-col text-sm w-full lg:w-2/4 mb-10 order-last lg:order-first">
       <a href="/"><img src="/maven.png" alt="logo" class="w-48" /></a>
-      <p class="mt-4">&copy;2021 Maven</p>
+      <p class="mt-4">&copy;{year} Maven</p>
     </div>
     <div class="w-full lg:w-1/4 mb-10">
       <h4 class="font-bold mb-4">Follow US</h4>
