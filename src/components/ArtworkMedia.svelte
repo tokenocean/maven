@@ -12,7 +12,7 @@
   export let popup = false;
   let img, vid;
   let path;
-  $: if (thumb) {
+  $: if (thumb && artwork.title.startsWith("Harvest")) {
     if ($painting || $variation || $edition) {
       path = `/api/public/${artwork.filename}.mp4`;
     } else {
