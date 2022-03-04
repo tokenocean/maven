@@ -125,7 +125,7 @@
 
 </style>
 
-{#if $painting || $variation || $edition}
+{#if artwork.filetype.includes('vid')}
   <div
     class="w-full"
     class:inline-block={!popup}
