@@ -473,7 +473,15 @@ const fund = async (
       }
 
       if (total < amount) {
-        throw { message: "Insufficient funds", amount, asset, total };
+        let e = {
+          message: "Insufficient funds",
+          amount,
+          asset,
+          total,
+          address,
+        };
+        console.log(e);
+        throw e;
       }
     } else {
       total += utxos[i].value;
@@ -744,7 +752,7 @@ export const executeSwap = async (artwork) => {
   let p = Psbt.fromBase64(list_price_tx);
   let out = singlesig();
   let script = (has_royalty ? multisig() : singlesig()).output;
-  let total = list_price;
+  let total = 0;
 
   fee.set(100);
 
@@ -755,22 +763,6 @@ export const executeSwap = async (artwork) => {
     value: 1,
   });
 
-  if (artist_id !== owner_id && has_royalty) {
-    for (let i = 0; i < royalty_recipients.length; i++) {
-      const element = royalty_recipients[i];
-
-      const recipientValue = Math.round((list_price * element.amount) / 100);
-      total += recipientValue;
-
-      p.addOutput({
-        asset: asking_asset,
-        value: recipientValue,
-        nonce,
-        script: Address.toOutputScript(element.address, network),
-      });
-    }
-  }
-
   let p2 = Psbt.fromBase64(p.toBase64());
 
   let construct = async (p, total) => {
@@ -779,11 +771,11 @@ export const executeSwap = async (artwork) => {
     await fund(p, out, asking_asset, total);
   };
 
-  await construct(p, total);
+  await construct(p, list_price);
   addFee(p);
   estimateFee(p);
 
-  await construct(p2, total);
+  await construct(p2, list_price);
 
   addFee(p2);
 
@@ -967,19 +959,41 @@ export const createRelease = async ({ asset, owner }, tx) => {
 };
 
 export const createSwap = async (artwork, amount, tx) => {
-  let { asset, asking_asset } = artwork;
+  let { asset, asking_asset, has_royalty, royalty_recipients } = artwork;
 
   if (asking_asset === btc && amount < DUST)
     throw new Error(
       `Minimum asking price is ${(DUST / 100000000).toFixed(8)} L-BTC`
     );
 
-  let p = new Psbt().addOutput({
-    asset: asking_asset,
-    nonce,
-    script: singlesig().output,
-    value: amount,
-  });
+  let p = new Psbt();
+  let total = 0;
+
+  if (has_royalty) {
+    for (let i = 0; i < royalty_recipients.length; i++) {
+      const element = royalty_recipients[i];
+
+      const recipientValue = Math.round((amount * element.amount) / 100);
+      console.log("RV", recipientValue);
+      total += recipientValue;
+
+      p.addOutput({
+        asset: asking_asset,
+        value: recipientValue,
+        nonce,
+        script: Address.toOutputScript(element.address, network),
+      });
+    }
+  }
+
+  if (amount - total > DUST) {
+    p.addOutput({
+      asset: asking_asset,
+      nonce,
+      script: singlesig().output,
+      value: amount - total,
+    });
+  }
 
   if (tx) {
     let index = tx.outs.findIndex((o) => parseAsset(o.asset) === asset);
@@ -1040,7 +1054,7 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
     value: amount,
   });
 
-  let total = parseInt(amount);
+  let total = 0;
   let pubkey = fromBase58(artwork.owner.pubkey, network).publicKey;
 
   if (has_royalty) {
@@ -1048,9 +1062,7 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
       for (let i = 0; i < royalty_recipients.length; i++) {
         const element = royalty_recipients[i];
 
-        const recipientValue = Math.round(
-          (parseInt(amount) * element.amount) / 100
-        );
+        const recipientValue = Math.round((amount * element.amount) / 100);
         total += recipientValue;
 
         p.addOutput({
@@ -1111,11 +1123,11 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
     addFee(p);
     return p;
   } else {
-    await construct(p, total);
+    await construct(p, total - amount);
     addFee(p);
     estimateFee(p);
 
-    await construct(p2, total);
+    await construct(p2, total - amount);
 
     addFee(p2);
     return p2;
@@ -1149,6 +1161,7 @@ export const requestSignature = async (psbt) => {
     .headers({ authorization: `Bearer ${get(token)}` })
     .post({ psbt: psbt.toBase64() })
     .json();
+
   return Psbt.fromBase64(base64);
 };
 
