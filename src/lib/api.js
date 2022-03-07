@@ -7,6 +7,7 @@ import { err } from "$lib/utils";
 
 const { retry } = middlewares.default || middlewares;
 
+const queue = [];
 const DELAY = 100;
 const enqueue = (next) => (url, opts) =>
   new Promise((r) => queue.push(() => r(next(url, opts))) && ddequeue());
