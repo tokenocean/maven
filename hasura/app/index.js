@@ -12,7 +12,6 @@ app.register(require("fastify-static"), {
   prefix: "/public/", // optional: default '/'
 });
 
-
 require("./auth");
 require("./artworks");
 require("./auctions");

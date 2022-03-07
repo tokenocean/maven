@@ -34,7 +34,7 @@
     window.scrollTo(0, 0);
     let words = artwork.title.split(" ");
     let n = parseInt(words[words.length - 1]);
-    if (!$variation) e.preventDefault();
+    if (artwork.title.startsWith("Harvest") && !$variation) e.preventDefault();
 
     if (!$painting) {
       $painting = n;
