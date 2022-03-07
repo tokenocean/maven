@@ -2,8 +2,10 @@ const fs = require("fs");
 const ipfsClient = require("ipfs-http-client");
 const sharp = require("sharp");
 const ffmpeg = require("fluent-ffmpeg");
-const { PassThrough } = require("stream");
+const stream = require('stream');
 const Clone = require("readable-stream-clone");
+const util = require('util');
+const pipeline = util.promisify(stream.pipeline);
 
 app.register(require("fastify-multipart"));
 
@@ -25,14 +27,14 @@ app.post("/upload", async function (req, res) {
   const thumb = `${path}.${ext}`;
 
   try {
-    s4.pipe(fs.createWriteStream(path));
+    await pipeline(s4, fs.createWriteStream(path));
 
     if (ext === "gif") throw new Error("Can't process gifs");
     if (ext === "mp4") {
       await createFragmentPreview(s2, s3, thumb);
     } else {
       let t = sharp().rotate().resize(1000).webp();
-      s2.pipe(t).pipe(fs.createWriteStream(thumb));
+      await pipeline(s2, t, fs.createWriteStream(thumb));
     }
   } catch (e) {
     console.log("Processing failed", e);
