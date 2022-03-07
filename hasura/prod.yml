@@ -5,7 +5,7 @@ services:
     depends_on:
       - lapp
     container_name: ui
-    restart: on-failure
+    restart: always
     ports:
       - '3000:3000'
   lapp:
@@ -13,7 +13,7 @@ services:
       - hbp
     container_name: lapp
     image: gcr.io/coinos-326717/github.com/tokenocean/maven-server:prod
-    restart: on-failure
+    restart: always
     environment:
       APP_URL: '${APP_URL}'
       SERVER_URL: '${SERVER_URL}'
@@ -36,6 +36,7 @@ services:
       SMTP_PASS: '${SMTP_PASS}'
       SMTP_SENDER: '${SMTP_SENDER}'
     volumes:
+      - ./app:/app
       - ./custom:/opt/src/hasura/app/custom
       - ${STORAGE_DIR}:/export
     ports:
