@@ -334,7 +334,7 @@ app.post("/issue", auth, async (req, res) => {
     let slug =
       kebab(req.body.artwork.title || "untitled") + "-" + ids[0].substr(0, 5);
 
-    await wait(() => issuances[issuance].i > 0);
+    await wait(() => issuances[issuance] && issuances[issuance].i > 0);
 
     res.send({ issuance, slug });
   } catch (e) {
