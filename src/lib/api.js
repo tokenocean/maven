@@ -7,11 +7,25 @@ import { err } from "$lib/utils";
 
 const { retry } = middlewares.default || middlewares;
 
-export const api = wretch().url("/api");
-export const electrs = wretch()
-  .middlewares([retry({ maxAttempts: 5 })])
-  .url("/api/el");
+const DELAY = 100;
+const enqueue = (next) => (url, opts) =>
+  new Promise((r) => queue.push(() => r(next(url, opts))) && ddequeue());
 
+let timer;
+const dequeue = () => {
+  if (queue.length) {
+    queue.shift()();
+    ddequeue();
+  }
+};
+
+const ddequeue = () => {
+  clearTimeout(timer);
+  timer = setTimeout(dequeue, DELAY);
+};
+
+export const api = wretch().url("/api");
+export const electrs = wretch().middlewares([enqueue]).url("/api/el");
 export const hasura = wretch()
   .middlewares([retry({ maxAttempts: 5 })])
   .url("/api/v1/graphql");
