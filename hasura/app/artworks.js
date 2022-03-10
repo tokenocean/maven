@@ -250,9 +250,10 @@ const issue = async (
   let tries = 0;
   let i = 0;
 
-  while (transactions.length && tries < 40) {
+  while (i < transactions.length && tries < 40) {
+    let slug;
     try {
-      artwork.ticker = tickers[0].toUpperCase();
+      artwork.ticker = tickers[i].toUpperCase();
       artwork.id = ids[i];
       artwork.edition = i + 1;
       artwork.slug = kebab(artwork.title || "untitled");
@@ -262,7 +263,7 @@ const issue = async (
       artwork.slug += "-" + artwork.id.substr(0, 5);
       if (i === 0) slug = artwork.slug;
 
-      let { contract, psbt } = transactions[0];
+      let { contract, psbt } = transactions[i];
       let p = Psbt.fromBase64(psbt);
       await broadcast(p);
       let tx = p.extractTransaction();
@@ -277,19 +278,28 @@ const issue = async (
         artwork_id: artwork.id,
       }));
 
-      let artworkSansTags = { ...artwork };
-      delete artworkSansTags.tags;
+      let { id, asset, title, description, ticker, edition, editions } =
+        artwork;
 
       let variables = {
-        artwork: artworkSansTags,
+        artwork: {
+          id,
+          title,
+          description,
+          ticker,
+          asset,
+          slug,
+          edition,
+          editions,
+        },
         transaction: {
-          artwork_id: artwork.id,
+          artwork_id: id,
           type: "creation",
           hash,
           contract,
-          asset: artwork.asset,
+          asset,
           amount: 1,
-          psbt,
+          psbt: p.toBase64(),
         },
         tags,
       };
@@ -298,12 +308,14 @@ const issue = async (
         .post({ query: createArtwork, variables })
         .json());
 
-      if (errors) throw new Error(errors[0].message);
+      if (errors) {
+        console.log(variables);
+        throw new Error(errors[0].message);
+      }
 
       tries = 0;
-      transactions.shift();
-      tickers.shift();
       issuances[issuance].i = ++i;
+      issuances[issuance].asset = artwork.asset;
     } catch (e) {
       console.log("failed issuance", e);
       await sleep(5000);
@@ -326,16 +338,26 @@ const issue = async (
 
 app.post("/issue", auth, async (req, res) => {
   try {
+    let { artwork, transactions } = req.body;
     let issuance = v4();
-    let ids = req.body.transactions.map((t) => v4());
+    let ids = transactions.map((t) => v4());
     issue(issuance, ids, req);
-    let slug =
-      kebab(req.body.artwork.title || "untitled") + "-" + ids[0].substr(0, 5);
+    let slug = kebab(artwork.title || "untitled") + "-" + ids[0].substr(0, 5);
 
-    let fn = () => issuances[issuance] && issuances[issuance].i > 0;
-    await wait(fn);
+    await wait(async () => {
+      try {
+        if (!issuances[issuance]) return;
+        let utxos = await lnft
+          .url(`/address/${artwork.owner.address}/utxo`)
+          .get()
+          .json();
+        return utxos.find((tx) => tx.asset === issuances[issuance].asset);
+      } catch (e) {
+        console.log("failed to get utxos", e);
+      }
+    });
 
-    res.send({ issuance, slug });
+    res.send({ id: ids[0], asset: issuances[issuance].asset, issuance, slug });
   } catch (e) {
     console.log(e);
     res.code(500).send(e.message);
