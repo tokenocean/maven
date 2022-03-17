@@ -1,4 +1,5 @@
 <script>
+  import { page } from "$app/stores";
   import { Avatar, ArtworkMedia, Heart } from "$comp";
   import { edition, painting, variation } from "$lib/store";
   import countdown from "$lib/countdown";
@@ -31,7 +32,12 @@
   count();
 
   let makeSelection = (e) => {
-    if (artwork.title.startsWith("Vida") && !$variation) e.preventDefault();
+    if (
+      $page.url.pathname.includes("agri") &&
+      artwork.title.startsWith("Vida") &&
+      !$variation
+    )
+      e.preventDefault();
 
     window.scrollTo(0, 0);
     let words = artwork.title.split(" ");
