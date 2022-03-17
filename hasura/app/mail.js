@@ -33,6 +33,25 @@ mail = new Email({
   },
 });
 
+app.get("/mail-test", auth, async (req, res) => {
+  try {
+    await mail.send({
+      template: "artist-application-approved",
+      locals: {
+        artistName: "adam",
+      },
+      message: {
+        to: "adam@coinos.io",
+      },
+    });
+
+    return res.send("ok");
+  } catch (err) {
+    console.error(err);
+    return res.code(400).send();
+  }
+});
+
 app.post("/mail-artist-application-approved", auth, async (req, res) => {
   try {
     const { userId: id } = req.body;
@@ -96,7 +115,10 @@ app.post("/offer-notifications", auth, async (req, res) => {
 
     const { artworks_by_pk: artwork, transactions } = await query(
       getArtworkWithBidTransactionByHash,
-      { id: artworkId, hash: transactionHash }
+      {
+        id: artworkId,
+        hash: transactionHash,
+      }
     );
 
     const transaction = transactions.length ? transactions[0] : null;
