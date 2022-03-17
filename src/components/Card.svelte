@@ -31,7 +31,6 @@
   count();
 
   let makeSelection = (e) => {
-    console.log(artwork.title);
     if (artwork.title.startsWith("Vida") && !$variation) e.preventDefault();
 
     window.scrollTo(0, 0);
