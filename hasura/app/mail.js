@@ -33,12 +33,13 @@ mail = new Email({
   },
 });
 
-app.get("/mail-test", auth, async (req, res) => {
+app.get("/mail-test", async (req, res) => {
   try {
     await mail.send({
-      template: "artist-application-approved",
+      template: "activate-account",
       locals: {
-        artistName: "adam",
+        url: "mavennft.io",
+        ticket: 123,
       },
       message: {
         to: "adam@coinos.io",
