@@ -12,6 +12,7 @@ export const marketFields = `
   asking_asset
   has_royalty
   slug
+  sequence
   views
   created_at
   transferred_at
@@ -60,6 +61,7 @@ export const fields = `
   extension_interval
   max_extensions
   has_royalty
+  sequence
   royalty_recipients {
     id
     name

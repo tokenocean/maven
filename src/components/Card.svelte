@@ -31,10 +31,12 @@
   count();
 
   let makeSelection = (e) => {
+    console.log(artwork.title);
+    if (artwork.title.startsWith("Vida") && !$variation) e.preventDefault();
+
     window.scrollTo(0, 0);
     let words = artwork.title.split(" ");
     let n = parseInt(words[words.length - 1]);
-    if (artwork.title.startsWith("Harvest") && !$variation) e.preventDefault();
 
     if (!$painting) {
       $painting = n;

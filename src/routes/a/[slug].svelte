@@ -103,9 +103,7 @@
   import Felix from "$components/Felix.svelte";
 
   export let artwork, metadata, views;
-
-  $: updatePage($page);
-  const updatePage = () => ($painting = artwork.sequence);
+  let { sequence } = artwork;
 
   let release = async () => {
     await requirePassword();
@@ -702,34 +700,34 @@
       {/if}
 
       <div class="break-words">
-        {#if $painting > 0 && $painting <= 100}
+        {#if sequence > 0 && sequence <= 100}
           <Jose />
         {/if}
-        {#if $painting > 100 && $painting <= 200}
+        {#if sequence > 100 && sequence <= 200}
           <Isidro />
         {/if}
-        {#if $painting > 200 && $painting <= 300}
+        {#if sequence > 200 && sequence <= 300}
           <Catalina />
         {/if}
-        {#if $painting > 300 && $painting <= 400}
+        {#if sequence > 300 && sequence <= 400}
           <Armando />
         {/if}
-        {#if $painting > 400 && $painting <= 500}
+        {#if sequence > 400 && sequence <= 500}
           <Felipe />
         {/if}
-        {#if $painting > 500 && $painting <= 600}
+        {#if sequence > 500 && sequence <= 600}
           <Carmen />
         {/if}
-        {#if $painting > 600 && $painting <= 700}
+        {#if sequence > 600 && sequence <= 700}
           <Genaro />
         {/if}
-        {#if $painting > 700 && $painting <= 800}
+        {#if sequence > 700 && sequence <= 800}
           <Juan />
         {/if}
-        {#if $painting > 800 && $painting <= 900}
+        {#if sequence > 800 && sequence <= 900}
           <Justa />
         {/if}
-        {#if $painting > 900 && $painting <= 1000}
+        {#if sequence > 900 && sequence <= 1000}
           <Felix />
         {/if}
       </div>

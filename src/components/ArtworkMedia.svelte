@@ -12,7 +12,7 @@
   export let popup = false;
   let img, vid;
   let path;
-  $: if (thumb && artwork.title.startsWith("Harvest")) {
+  $: if (thumb && artwork.title.startsWith("Vida")) {
     if ($painting || $variation || $edition) {
       path = `/api/public/${artwork.filename}.mp4`;
     } else {
@@ -125,7 +125,7 @@
 
 </style>
 
-{#if artwork.filetype.includes('vid')}
+{#if path.includes('mp4')}
   <div
     class="w-full"
     class:inline-block={!popup}
