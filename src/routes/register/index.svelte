@@ -1,7 +1,8 @@
 <script>
   import Fa from "svelte-fa";
+  import { post } from "$lib/api";
   import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-  import { err, dev } from "$lib/utils";
+  import { err, dev, goto, info } from "$lib/utils";
   import { page } from "$app/stores";
   import { register } from "$lib/register";
   import { ProgressLinear } from "$comp";
@@ -33,7 +34,9 @@
 
     try {
       await register(email, username, password);
-      registered = true;
+      window.sessionStorage.setItem("password", password);
+      await post("auth/login", { email, password }, fetch).json();
+      window.location.reload(true);
     } catch (e) {
       err(e);
     }
@@ -93,13 +96,6 @@
   <form class="mb-6" on:submit|preventDefault={submit} autocomplete="off">
     {#if loading}
       <ProgressLinear />
-    {:else if registered}
-      <h2 class="mb-8">Registered!</h2>
-      <p>Thanks for registering.</p>
-
-      <p class="mt-4">
-        <a href="/login" class="text-primary">Continue to sign in page</a>
-      </p>
     {:else}
       <h2 class="mb-8">Sign up</h2>
       <div class="flex flex-col mb-4">

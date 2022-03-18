@@ -248,6 +248,9 @@ module.exports = {
       order_by: [{ sequence: desc }]
     ) {
       hash
+      asset
+      type
+      user_id
     }
   }`,
   getTransactions: `query($id: uuid!, $limit: Int) {
