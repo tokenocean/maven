@@ -83,9 +83,9 @@
     {#if suggest}
       {#await search(debounced) then r}
         {#if r.tag || r.artwork || r.user}
-          <div class="absolute w-1/3 shadow z-10">
+          <div class="absolute shadow z-10 bg-black">
             <div class="flex p-4">
-              {#each r.tag || [] as o}
+              {#each r.tag.slice(0, 3) || [] as o}
                 <div
                   class="secondary-color text-sm font-bold uppercase mr-5 cursor-pointer"
                   on:click={() => go(o)}>
@@ -94,17 +94,17 @@
               {/each}
             </div>
 
-            {#each r.artwork || [] as o}
+            {#each r.artwork.slice(0, 3) || [] as o}
               <div
                 on:click={() => go(o)}
-                class="p-4 cursor-pointer hover:bg-green-100">
+                class="p-4 cursor-pointer hover:bg-primary">
                 {o.s}
               </div>
             {/each}
-            {#each r.user || [] as o}
+            {#each r.user.slice(0, 3) || [] as o}
               <div
                 on:click={() => go(o)}
-                class="p-4 cursor-pointer hover:bg-green-100">
+                class="p-4 cursor-pointer hover:bg-primary">
                 {o.s}
               </div>
             {/each}

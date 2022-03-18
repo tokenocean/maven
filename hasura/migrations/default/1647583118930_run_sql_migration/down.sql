@@ -1,0 +1,12 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- CREATE OR REPLACE FUNCTION public.searchable(t text)
+--  RETURNS SETOF search
+--  LANGUAGE sql
+--  STABLE
+-- AS $function$
+-- SELECT   *
+-- FROM     search
+-- WHERE    t <% ( s )
+-- ORDER BY similarity(t, ( s )) DESC;
+-- $function$;

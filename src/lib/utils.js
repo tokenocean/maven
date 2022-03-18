@@ -227,8 +227,8 @@ const validateEmail = (email) => {
 };
 
 const go = ({ id, type, s }) => {
-  let url = { user: "u", artwork: "artwork", tag: "tag" }[type];
-  goto(`/${url}/${url === "artwork" ? id : s}`);
+  let url = { user: "u", artwork: "a", tag: "tag" }[type];
+  goto(`/${url}/${url === "a" ? id : s}`);
 };
 
 const kebab = (str) =>

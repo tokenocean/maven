@@ -68,6 +68,7 @@
   class="flex justify-between items-center menu relative"
   on:mouseout={hideDropdown}
   on:blur={hideDropdown}>
+  <Search />
   <a
     href="https://www.mavennft.io/"
     style="color: #83e68d"><button>Home</button></a>

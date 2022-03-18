@@ -5,26 +5,8 @@
   import Menu from "./Menu.svelte";
 
   export let sidebar = false;
-</script>
 
-<header
-  class="flex container mx-auto justify-between px-4 py-4 items-center text-gray-300"
->
-  <nav class="flex hambuger">
-    <Hamburger bind:open={sidebar} />
-  </nav>
-  <div>
-    <a href="https://www.mavennft.io/">
-      <img src="/maven.png" alt="logo" class="w-24" /></a
-    >
-  </div>
-  <a class="mobileSearch" href="/agriculture">
-    <Fa icon={faSearch} />
-  </a>
-  <nav class="hidden text-bold lg:block">
-    <Menu />
-  </nav>
-</header>
+</script>
 
 <style>
   header {
@@ -57,4 +39,22 @@
       z-index: 100;
     }
   }
+
 </style>
+
+<header
+  class="flex container mx-auto justify-between px-4 py-4 items-center text-gray-300">
+  <nav class="flex hambuger">
+    <Hamburger bind:open={sidebar} />
+  </nav>
+  <div>
+    <a href="https://www.mavennft.io/">
+      <img src="/maven.png" alt="logo" class="w-24" /></a>
+  </div>
+  <a class="mobileSearch" href="/search">
+    <Fa icon={faSearch} />
+  </a>
+  <nav class="hidden text-bold lg:block">
+    <Menu />
+  </nav>
+</header>

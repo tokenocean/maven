@@ -6,16 +6,16 @@
 
 {#if $results.tag || $results.artwork || $results.user}
   <div class="container mx-auto my-10">
-    <div class="text-xl font-bold mb-4">You could also be looking for...</div>
-    <div class="flex secondary-color cursor-pointer">
-      {#each $results.tag || [] as o}
+    <h1 class="text-xl font-bold mb-4">Search results</h1>
+    <div class="secondary-color cursor-pointer">
+      {#each ($results.tag || []).slice(0, 10) as o}
         <div on:click={() => go(o)} class="mr-8 cursor-pointer">#{o.s}</div>
       {/each}
 
-      {#each $results.artwork || [] as o}
+      {#each ($results.artwork || []).slice(0, 10) as o}
         <div on:click={() => go(o)} class="mr-8 cursor-pointer">{o.s}</div>
       {/each}
-      {#each $results.user || [] as o}
+      {#each ($results.user || []).slice(0, 10) as o}
         <div on:click={() => go(o)} class="mr-8 cursor-pointer">{o.s}</div>
       {/each}
     </div>
