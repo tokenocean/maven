@@ -17,7 +17,6 @@
   const debounce = (v) => {
     loading = true;
     artwork.title = v;
-    artwork.ticker = "";
     clearTimeout(timer);
     timer = setTimeout(() => {
       title = v;
@@ -50,8 +49,57 @@
   let handle = ({ detail }) => {
     artwork.tags = detail.map(({ value: tag }) => ({ tag }));
   };
-
 </script>
+
+<form class="flex flex-col w-full mb-6 mt-20" on:submit autocomplete="off">
+  <div class="flex flex-col mb-6">
+    <input
+      class="border-0 border-b-2"
+      style="border-radius: 0 !important"
+      placeholder="What's your asset title?"
+      on:input={({ target: { value } }) => debounce(value)}
+      bind:this={input}
+    />
+  </div>
+  {#if !artwork.id}
+    <div class="flex flex-col mb-6">
+      <label for="editions">Number of editions</label>
+      <input
+        id="editions"
+        placeholder="Editions"
+        bind:value={artwork.editions}
+        class="w-1/2"
+      />
+    </div>
+  {/if}
+  <div class="flex flex-col mb-6">
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      placeholder="How would you describe it?"
+      bind:value={artwork.description}
+    />
+  </div>
+  <div class="flex flex-col mb-6 doesthiswork">
+    <label for="tags"
+      >Tags
+      <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span
+      ></label
+    >
+    <Select
+      id="tags"
+      {items}
+      isMulti={true}
+      placeholder="Tags"
+      on:select={handle}
+      {value}
+      isCreatable={true}
+    />
+  </div>
+  <div class="flex">
+    <button type="submit" class="primary-btn">Submit</button>
+  </div>
+</form>
 
 <style>
   .doesthiswork {
@@ -86,54 +134,4 @@
   textarea {
     @apply rounded-lg;
   }
-
 </style>
-
-<form class="flex flex-col w-full mb-6 mt-20" on:submit autocomplete="off">
-  <div class="flex flex-col mb-6">
-    <input
-      class="border-0 border-b-2"
-      style="border-radius: 0 !important"
-      placeholder="What's your asset title?"
-      on:input={({ target: { value } }) => debounce(value)}
-      bind:this={input} />
-  </div>
-  {#if !artwork.id}
-    <div class="flex flex-col mb-6">
-      <label for="editions">Number of editions</label>
-      <input
-        id="editions"
-        placeholder="Editions"
-        bind:value={artwork.editions}
-        class="w-1/2" />
-    </div>
-  {/if}
-  <div class="flex flex-col mb-6">
-    <label for="description">Description</label>
-    <textarea
-      id="description"
-      placeholder="How would you describe it?"
-      bind:value={artwork.description} />
-  </div>
-  <input
-    id="ticker"
-    class="w-1/2"
-    type="hidden"
-    bind:value={artwork.ticker}
-    maxlength="5" />
-  <div class="flex flex-col mb-6 doesthiswork">
-    <label for="tags">Tags
-      <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span></label>
-    <Select
-      id="tags"
-      {items}
-      isMulti={true}
-      placeholder="Tags"
-      on:select={handle}
-      {value}
-      isCreatable={true} />
-  </div>
-  <div class="flex">
-    <button type="submit" class="primary-btn">Submit</button>
-  </div>
-</form>

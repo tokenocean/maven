@@ -8,7 +8,6 @@
 
     return {};
   }
-
 </script>
 
 <script>
@@ -21,7 +20,6 @@
   import { edition, fee, psbt, password, titles, txcache } from "$lib/store";
   import { Dropzone, ProgressLinear } from "$comp";
   import { upload, supportedTypes } from "$lib/upload";
-  import { getArtworksByTicker, queryTickers } from "$queries/artworks";
   import { btc, kebab, goto, err } from "$lib/utils";
   import { requirePassword } from "$lib/auth";
   import {
@@ -112,7 +110,7 @@
 
   let hash, tx, inputs, total, transactions;
   let required = 0;
-  const issue = async (ticker) => {
+  const issue = async () => {
     let contract;
     let domain =
       $session.user.username === branding.superUserName
@@ -138,67 +136,6 @@
   let tries;
   let l;
 
-  let generateTickers = async (count) => {
-    const randomTicker = () => {
-      let a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
-      let ticker = "";
-      for (let j = 0; j < 5; j++) {
-        const random = Math.floor(Math.random() * (a.length - 1));
-        ticker = `${ticker}${a[random]}`;
-      }
-      return ticker;
-    };
-
-    let tickers = [];
-    for (let i = 0; i < count; i++) {
-      let randTicker = randomTicker();
-
-      // check that ticker is unique in our tickers array
-      while (tickers.indexOf(randTicker) !== -1) {
-        randTicker = randomTicker();
-      }
-
-      tickers.push(randTicker);
-    }
-
-    let tickersOK = false;
-
-    while (!tickersOK) {
-      const result = await checkTickers({
-        tickers,
-      });
-
-      if (result.success) tickersOK = true;
-
-      if (result.error && result.tickersUnavailable.length) {
-        result.tickersUnavailable.forEach((ticker) => {
-          const index = tickers.indexOf(ticker);
-          tickers[index] = randomTicker();
-        });
-      }
-    }
-
-    return tickers;
-  };
-
-  let checkTickers = async ({ tickers }) => {
-    let { artworks } = await query(
-      `query { artworks(where: { ticker: { _in: ${JSON.stringify(
-        tickers
-      )} }}) { ticker }}`
-    );
-
-    if (artworks.length)
-      return {
-        error: `Ticker(s) not available: ${artworks
-          .map((a) => a.ticker)
-          .join(", ")}`,
-        tickersUnavailable: data.artworks.map((a) => a.ticker),
-      };
-
-    return { success: true };
-  };
-
   let submit = async (e) => {
     e.preventDefault();
     await requirePassword($session);
@@ -212,9 +149,6 @@
     loading = true;
 
     try {
-      let { ticker } = artwork;
-      let tickers = await generateTickers(artwork.editions);
-
       [inputs, total] = await getInputs();
 
       for ($edition = 1; $edition <= artwork.editions; $edition++) {
@@ -230,7 +164,6 @@
         .auth(`Bearer ${$session.jwt}`)
         .post({
           artwork,
-          tickers,
           transactions,
         })
         .json();
@@ -242,8 +175,63 @@
       loading = false;
     }
   };
-
 </script>
+
+<div class="container mx-auto py-20">
+  <div
+    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow"
+  >
+    <a
+      class="block mb-6 text-midblue"
+      href="."
+      on:click|preventDefault={() => window.history.back()}
+    >
+      <div class="flex">
+        <Fa icon={faChevronLeft} class="my-auto mr-1" />
+        <div>Back</div>
+      </div>
+    </a>
+    <h2>Mint asset</h2>
+    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
+      <div class="w-full lg:w-1/2 lg:pr-10">
+        <div class:invisible={!loading}>
+          <ProgressLinear />
+        </div>
+        <div class:invisible={loading}>
+          <Form bind:artwork bind:focus on:submit={submit} bind:title />
+        </div>
+      </div>
+      {#if percent}
+        <div class="ml-2 flex-1 flex">
+          <div class="upload-button mx-auto">
+            <ArtworkMedia
+              {artwork}
+              {preview}
+              showDetails={false}
+              thumb={false}
+            />
+            <div class="w-full p-8">
+              <div
+                class="font-light p-4 mx-auto max-w-xs text-center"
+                class:bg-primary={percent >= 100 && artwork.filename}
+                class:bg-yellow-200={percent < 100 || !artwork.filename}
+                style={width}
+              >
+                {#if percent < 100}
+                  {percent}%
+                {:else if artwork.filename}
+                  Upload complete!
+                {:else}Processing...{/if}
+              </div>
+            </div>
+          </div>
+        </div>
+      {:else}
+        <Dropzone on:file={uploadFile} style="box" />
+      {/if}
+    </div>
+  </div>
+</div>
 
 <style>
   .container {
@@ -272,57 +260,4 @@
       background: none;
     }
   }
-
 </style>
-
-<div class="container mx-auto py-20">
-  <div
-    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow">
-    <a
-      class="block mb-6 text-midblue"
-      href="."
-      on:click|preventDefault={() => window.history.back()}>
-      <div class="flex">
-        <Fa icon={faChevronLeft} class="my-auto mr-1" />
-        <div>Back</div>
-      </div>
-    </a>
-    <h2>Mint asset</h2>
-    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
-      <div class="w-full lg:w-1/2 lg:pr-10">
-        <div class:invisible={!loading}>
-          <ProgressLinear />
-        </div>
-        <div class:invisible={loading}>
-          <Form bind:artwork bind:focus on:submit={submit} bind:title />
-        </div>
-      </div>
-      {#if percent}
-        <div class="ml-2 flex-1 flex">
-          <div class="upload-button mx-auto">
-            <ArtworkMedia
-              {artwork}
-              {preview}
-              showDetails={false}
-              thumb={false} />
-            <div class="w-full p-8">
-              <div
-                class="font-light p-4 mx-auto max-w-xs text-center"
-                class:bg-primary={percent >= 100 && artwork.filename}
-                class:bg-yellow-200={percent < 100 || !artwork.filename}
-                style={width}>
-                {#if percent < 100}
-                  {percent}%
-                {:else if artwork.filename}
-                  Upload complete!
-                {:else}Processing...{/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      {:else}
-        <Dropzone on:file={uploadFile} style="box" />
-      {/if}
-    </div>
-  </div>
-</div>
