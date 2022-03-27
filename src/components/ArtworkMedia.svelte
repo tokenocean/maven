@@ -125,7 +125,7 @@
 
 </style>
 
-{#if artwork.filetype.includes('mp4') && (!thumb || path.includes('mp4'))}
+{#if artwork.filetype.includes('mp4') && !(thumb && artwork.title.startsWith('Vida') && !path.includes('mp4'))}
   <div
     class="w-full"
     class:inline-block={!popup}
