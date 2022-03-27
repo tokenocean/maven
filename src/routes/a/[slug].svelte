@@ -264,7 +264,7 @@
   let loading;
   let buyNow = async () => {
     try {
-      await requirePassword();
+      await requirePassword($page);
       loading = true;
 
       transaction.amount = -artwork.list_price;

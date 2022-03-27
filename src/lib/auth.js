@@ -17,20 +17,20 @@ import { goto, err } from "$lib/utils";
 export const expired = (t) => !t || decode(t).exp * 1000 < Date.now();
 
 export const requireLogin = async (p) => {
-  if (p && p.path === "/login") return;
+  if (p && p.url.pathname === "/login") return;
   let $token = get(token);
   try {
     if (expired($token)) throw new Error("Login required");
   } catch (e) {
     console.log(e);
-    redirect.set(get(page).url.pathname);
+    redirect.set(p.url.pathname);
     goto("/login");
     throw e;
   }
 };
 
-export const requirePassword = async () => {
-  await requireLogin();
+export const requirePassword = async (p) => {
+  await requireLogin(p);
   if (get(pw)) return;
   let unsub;
   await new Promise(
