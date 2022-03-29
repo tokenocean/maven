@@ -8,6 +8,7 @@
 
     return {};
   }
+
 </script>
 
 <script>
@@ -138,7 +139,7 @@
 
   let submit = async (e) => {
     e.preventDefault();
-    await requirePassword($session);
+    await requirePassword();
     transactions = [];
     if (!artwork.title) return err("Please enter a title");
 
@@ -175,63 +176,8 @@
       loading = false;
     }
   };
-</script>
 
-<div class="container mx-auto py-20">
-  <div
-    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow"
-  >
-    <a
-      class="block mb-6 text-midblue"
-      href="."
-      on:click|preventDefault={() => window.history.back()}
-    >
-      <div class="flex">
-        <Fa icon={faChevronLeft} class="my-auto mr-1" />
-        <div>Back</div>
-      </div>
-    </a>
-    <h2>Mint asset</h2>
-    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
-      <div class="w-full lg:w-1/2 lg:pr-10">
-        <div class:invisible={!loading}>
-          <ProgressLinear />
-        </div>
-        <div class:invisible={loading}>
-          <Form bind:artwork bind:focus on:submit={submit} bind:title />
-        </div>
-      </div>
-      {#if percent}
-        <div class="ml-2 flex-1 flex">
-          <div class="upload-button mx-auto">
-            <ArtworkMedia
-              {artwork}
-              {preview}
-              showDetails={false}
-              thumb={false}
-            />
-            <div class="w-full p-8">
-              <div
-                class="font-light p-4 mx-auto max-w-xs text-center"
-                class:bg-primary={percent >= 100 && artwork.filename}
-                class:bg-yellow-200={percent < 100 || !artwork.filename}
-                style={width}
-              >
-                {#if percent < 100}
-                  {percent}%
-                {:else if artwork.filename}
-                  Upload complete!
-                {:else}Processing...{/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      {:else}
-        <Dropzone on:file={uploadFile} style="box" />
-      {/if}
-    </div>
-  </div>
-</div>
+</script>
 
 <style>
   .container {
@@ -260,4 +206,57 @@
       background: none;
     }
   }
+
 </style>
+
+<div class="container mx-auto py-20">
+  <div
+    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow">
+    <a
+      class="block mb-6 text-midblue"
+      href="."
+      on:click|preventDefault={() => window.history.back()}>
+      <div class="flex">
+        <Fa icon={faChevronLeft} class="my-auto mr-1" />
+        <div>Back</div>
+      </div>
+    </a>
+    <h2>Mint asset</h2>
+    <div class="flex flex-wrap flex-col-reverse lg:flex-row">
+      <div class="w-full lg:w-1/2 lg:pr-10">
+        <div class:invisible={!loading}>
+          <ProgressLinear />
+        </div>
+        <div class:invisible={loading}>
+          <Form bind:artwork bind:focus on:submit={submit} bind:title />
+        </div>
+      </div>
+      {#if percent}
+        <div class="ml-2 flex-1 flex">
+          <div class="upload-button mx-auto">
+            <ArtworkMedia
+              {artwork}
+              {preview}
+              showDetails={false}
+              thumb={false} />
+            <div class="w-full p-8">
+              <div
+                class="font-light p-4 mx-auto max-w-xs text-center"
+                class:bg-primary={percent >= 100 && artwork.filename}
+                class:bg-yellow-200={percent < 100 || !artwork.filename}
+                style={width}>
+                {#if percent < 100}
+                  {percent}%
+                {:else if artwork.filename}
+                  Upload complete!
+                {:else}Processing...{/if}
+              </div>
+            </div>
+          </div>
+        </div>
+      {:else}
+        <Dropzone on:file={uploadFile} style="box" />
+      {/if}
+    </div>
+  </div>
+</div>

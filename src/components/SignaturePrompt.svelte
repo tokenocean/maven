@@ -21,7 +21,7 @@
   };
 
   export const submit = async (e) => {
-    await requirePassword($session);
+    await requirePassword();
 
     try {
       $signStatus = ACCEPTED;

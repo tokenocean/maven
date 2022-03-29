@@ -171,7 +171,7 @@
       transaction.asset = artwork.asset;
       transaction.type = "bid";
 
-      await requirePassword();
+      await requirePassword($page);
 
       $psbt = await createOffer(artwork, transaction.amount);
       $psbt = await sign();

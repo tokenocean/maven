@@ -91,7 +91,7 @@
 
 <style>
   .container {
-    background-color: #ecf6f7;
+    @apply bg-primary;
     height: auto;
     min-height: 100vh;
     margin: 0;
@@ -100,7 +100,7 @@
 
   input,
   textarea {
-    @apply appearance-none border rounded py-4 px-3 text-gray-700 leading-tight;
+    @apply appearance-none border rounded py-4 px-3 leading-tight;
   }
 
   label {
@@ -131,7 +131,7 @@
 <div class="container mx-auto pt-5 md:pt-20">
   {#if form}
     <div
-      class="mb-4 w-full sm:max-w-3xl md:shadow rounded-xl md:p-10 m-auto lg:flex-row  bg-white">
+      class="mb-4 w-full sm:max-w-3xl md:shadow rounded-xl md:p-10 m-auto lg:flex-row  bg-black">
       <a class="block mb-6 text-midblue" href={`/${$user.username}`}>
         <div class="flex">
           <Fa icon={faChevronLeft} class="my-auto mr-1" />

@@ -80,7 +80,7 @@ export const getTransactions = (user) => {
 };
 
 export const getBalances = async ({ user, jwt }) => {
-  await requirePassword({ jwt });
+  await requirePassword();
 
   let { confirmed: c, pending: p } = await api
     .auth(`Bearer ${jwt}`)

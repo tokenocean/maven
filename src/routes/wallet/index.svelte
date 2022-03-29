@@ -32,7 +32,6 @@
   import { ProgressLinear } from "$comp";
   import { getArtworksByOwner } from "$queries/artworks";
   import { assetLabel, btc, err, sats, tickers, val } from "$lib/utils";
-  import { requireLogin } from "$lib/auth";
   import { getBalances } from "$lib/wallet";
 
   import Fund from "./_fund.svelte";
