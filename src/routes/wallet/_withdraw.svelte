@@ -60,7 +60,7 @@
   textarea,
   input,
   select {
-    @apply rounded-lg p-2 text-black;
+    @apply rounded-lg p-2;
     margin-top: 10px;
   }
 
@@ -76,7 +76,7 @@
     {:else}
       <div class="flex flex-col mb-4">
         <label for="asset">Asset</label>
-        <select id="asset" class="text-black" bind:value={$asset}>
+        <select id="asset" bind:value={$asset}>
           {#each $assets as asset}
             <option value={asset.asset}>{assetLabel(asset.asset)}</option>
           {/each}

@@ -1,9 +1,10 @@
 <script context="module">
   export async function load({ fetch, params, session }) {
-    if (!(session && session.user)) return {
-      status: 302,
-      redirect: '/login'
-    } 
+    if (!(session && session.user))
+      return {
+        status: 302,
+        redirect: "/login",
+      };
 
     const props = await fetch(`/artworks/${params.slug}.json`).then((r) =>
       r.json()
@@ -108,33 +109,32 @@
 </style>
 
 {#if $addresses}
-<div class="container mx-auto sm:justify-between mt-10 md:mt-20">
-  <h2 class="mb-4">Transfer Artwork</h2>
+  <div class="container mx-auto sm:justify-between mt-10 md:mt-20">
+    <h2 class="mb-4">Transfer Asset</h2>
 
-  {#if loading}
-    <ProgressLinear />
-  {:else}
-    <div class="w-full max-w-lg text-center my-8 mx-auto">
-      <AutoComplete
-        hideArrow={true}
-        placeholder="Recipient"
-        items={$addresses.filter((a) => a.id !== $user.id)}
-        className="w-full"
-        inputClassName="transferSelect"
-        labelFieldName="username"
-        bind:selectedItem={recipient}>
-        <div class="flex" slot="item" let:item let:label>
-          <Avatar class="my-auto" user={item} />
-          <div class="ml-1 my-auto">{item.username}</div>
-        </div>
-      </AutoComplete>
-    <a
-      href="/"
-      on:click|preventDefault={send}
-      class:disabled
-      class="block mt-8 text-center text-sm secondary-btn w-full">Send</a>
-    </div>
-
-  {/if}
-</div>
+    {#if loading}
+      <ProgressLinear />
+    {:else}
+      <div class="w-full max-w-lg text-center my-8 mx-auto">
+        <AutoComplete
+          hideArrow={true}
+          placeholder="Recipient"
+          items={$addresses.filter((a) => a.id !== $user.id)}
+          className="w-full"
+          inputClassName="transferSelect"
+          labelFieldName="username"
+          bind:selectedItem={recipient}>
+          <div class="flex" slot="item" let:item let:label>
+            <Avatar class="my-auto" user={item} />
+            <div class="ml-1 my-auto">{item.username}</div>
+          </div>
+        </AutoComplete>
+        <a
+          href="/"
+          on:click|preventDefault={send}
+          class:disabled
+          class="block mt-8 text-center text-sm secondary-btn w-full">Send</a>
+      </div>
+    {/if}
+  </div>
 {/if}
