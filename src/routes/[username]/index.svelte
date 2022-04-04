@@ -9,8 +9,8 @@
           subject,
         },
       };
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      return { status: 500, error };
     }
   }
 
