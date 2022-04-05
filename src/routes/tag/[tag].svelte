@@ -9,12 +9,16 @@
   let { tag } = $page.params;
   let artworks = [];
   $: query(getArtworksByTag(tag))
-    .then((res) => (artworks = res.artworks))
+    .then((res) => {
+      artworks = res.artworks.filter(
+        (a) => !(a.title.includes("E-CARE") && a.transferred_at)
+      );
+    })
     .catch(err);
 </script>
 
 <div class="container mx-auto mt-10 md:mt-20">
-  <h3 class="mb-10">{galleries[tag] ? galleries[tag] : `#${tag}` }</h3>
+  <h3 class="mb-10">{galleries[tag] ? galleries[tag] : `#${tag}`}</h3>
 
   <div class="flex flex-wrap">
     {#each artworks as artwork (artwork.id)}
