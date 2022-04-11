@@ -56,7 +56,7 @@
       $token = jwt_token;
       if (!$token && $session) delete $session.user;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -76,7 +76,7 @@
       $token = $session.jwt;
     }
 
-    interval = setInterval(refresh, 60000);
+    interval = setInterval(refresh, 720000);
   }
 
   let open = false;
@@ -87,7 +87,8 @@
 
   onDestroy(() => clearInterval(interval));
   onMount(() => {
-    if (browser && !$password) $password = window.sessionStorage.getItem("password");
+    if (browser && !$password)
+      $password = window.sessionStorage.getItem("password");
   });
 </script>
 
