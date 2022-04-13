@@ -9,6 +9,8 @@ RUN npm i -g pnpm
 RUN apk add git
 RUN npm i -g pnpm
 
+WORKDIR /app
+
 COPY package.json .
 RUN NODE_ENV=development pnpm i
 
@@ -16,7 +18,4 @@ COPY . .
 RUN NODE_ENV=development pnpm i
 RUN pnpm build
 
-#RUN cat build/middlewares.js >> shim.js
-#RUN mv shim.js build/middlewares.js
-
-CMD ["node", "build"]
+CMD ["node", "--inspect=0.0.0.0:9229",  "build"]
