@@ -4,7 +4,7 @@
   import { edition, painting, variation } from "$lib/store";
   import countdown from "$lib/countdown";
   import { units } from "$lib/utils";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   export let justScrolled = false;
   export let artwork;
@@ -22,14 +22,17 @@
     width = "1/" + columns;
   }
 
+  let timeout;
   let start_counter, end_counter;
   let count = () => {
     if (!artwork) return;
     start_counter = countdown(new Date(artwork.auction_start));
     end_counter = countdown(new Date(artwork.auction_end));
-    setTimeout(count, 1000);
+    timeout = setTimeout(count, 1000);
   };
-  count();
+
+  onMount(count);
+  onDestroy(() => clearTimeout(timeout));
 
   let makeSelection = (e) => {
     if (
@@ -66,29 +69,12 @@
     $variation || !artwork.title.startsWith("Harvest")
       ? artwork.title
       : `Shares ${st}-${end}`;
-
 </script>
-
-<style>
-  .card {
-    border-radius: 10px;
-    @apply shadow-md;
-  }
-
-  .card :global(img),
-  .card :global(video) {
-    border-radius: 10px 10px 0 0;
-  }
-
-  .price {
-    font-size: 15px;
-  }
-
-</style>
 
 <div
   class="{showDetails ? 'card' : ''} flex flex-col justify-between h-full"
-  key={artwork.id}>
+  key={artwork.id}
+>
   <a href={`/a/${artwork.slug}`} on:click={makeSelection}>
     {#if !loaded && justScrolled}
       <div style="height: 350px" class="bg-gray-100 w-full object-cover" />
@@ -132,8 +118,9 @@
             <div class="price">{val(artwork.bid.amount)} {ticker}</div>
             <div class="text-sm font-medium">
               Current bid by
-              <a
-                href={`/${artwork.bid.user.username}`}>@{artwork.bid.user.username}</a>
+              <a href={`/${artwork.bid.user.username}`}
+                >@{artwork.bid.user.username}</a
+              >
             </div>
           </div>
         {/if}
@@ -176,3 +163,19 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  .card {
+    border-radius: 10px;
+    @apply shadow-md;
+  }
+
+  .card :global(img),
+  .card :global(video) {
+    border-radius: 10px 10px 0 0;
+  }
+
+  .price {
+    font-size: 15px;
+  }
+</style>
