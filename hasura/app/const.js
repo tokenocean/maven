@@ -1,9 +1,9 @@
-module.exports = {
+export default {
   projectName: "Raretoshi",
   urls: {
-    protocol: "https://maven.com",
+    protocol: "https://raretoshi.com",
   },
   emails: {
-    support: "support@maven.com",
+    support: "support@raretoshi.com",
   },
 };

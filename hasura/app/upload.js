@@ -1,13 +1,13 @@
-const fs = require("fs");
-const ipfsClient = require("ipfs-http-client");
-const sharp = require("sharp");
-const ffmpeg = require("fluent-ffmpeg");
-const stream = require('stream');
-const Clone = require("readable-stream-clone");
-const util = require('util');
-const pipeline = util.promisify(stream.pipeline);
+import fs from "fs";
+import ipfsClient from "ipfs-http-client";
+import sharp from "sharp";
+import ffmpeg from "fluent-ffmpeg";
+import { PassThrough } from "stream";
+import Clone from "readable-stream-clone";
+import { app } from "./app.js";
+import fastifyMultipart from "fastify-multipart";
 
-app.register(require("fastify-multipart"));
+app.register(fastifyMultipart);
 
 app.post("/upload", async function (req, res) {
   const ipfs = ipfsClient(process.env.IPFS_URL);
@@ -27,14 +27,14 @@ app.post("/upload", async function (req, res) {
   const thumb = `${path}.${ext}`;
 
   try {
-    await pipeline(s4, fs.createWriteStream(path));
+    s4.pipe(fs.createWriteStream(path));
 
     if (ext === "gif") throw new Error("Can't process gifs");
     if (ext === "mp4") {
       await createFragmentPreview(s2, s3, thumb);
     } else {
       let t = sharp().rotate().resize(1000).webp();
-      await pipeline(s2, t, fs.createWriteStream(thumb));
+      s2.pipe(t).pipe(fs.createWriteStream(thumb));
     }
   } catch (e) {
     console.log("Processing failed", e);
