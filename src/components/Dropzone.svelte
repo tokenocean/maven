@@ -5,7 +5,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let title = "Upload Your Artwork";
+  export let title = "Upload Media File";
   export let style = "box";
 
   let fileInput;

@@ -1,14 +1,12 @@
 <script context="module">
-  export async function load({ fetch, params, session }) {
+  export async function load({ fetch, params: { slug }, session }) {
     if (!(session && session.user))
       return {
         status: 302,
         redirect: "/login",
       };
 
-    const props = await fetch(`/artworks/${params.slug}.json`).then((r) =>
-      r.json()
-    );
+    const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
 
     return {
       props,
@@ -18,6 +16,7 @@
 </script>
 
 <script>
+  import { session } from "$app/stores";
   import { Avatar, ProgressLinear } from "$comp";
   import AutoComplete from "simple-svelte-autocomplete";
   import { addresses, art, psbt, user, token } from "$lib/store";
@@ -25,8 +24,8 @@
   import { updateArtwork } from "$queries/artworks";
   import { createTransaction } from "$queries/transactions";
   import { api, query } from "$lib/api";
+  import { v4 as uuidv4 } from "uuid";
   import { page } from "$app/stores";
-  import { requirePassword } from "$lib/auth";
   import {
     broadcast,
     isMultisig,
@@ -34,64 +33,50 @@
     pay,
     sign,
   } from "$lib/wallet";
+  import { requirePassword } from "$lib/auth";
 
   export let artwork;
 
-  $: disabled = !recipient;
+  $: disabled = !recipient && !address;
 
   let recipient;
+  $: address = recipient
+    ? artwork.has_royalty
+      ? recipient.multisig
+      : recipient.address
+    : "";
+
+  console.log($addresses);
 
   let loading;
 
   let send = async (e) => {
-    await requirePassword();
+    await requirePassword($session);
 
     loading = true;
+
     try {
-      let address = artwork.has_royalty
-        ? recipient.multisig
-        : recipient.address;
       $psbt = await pay(artwork, address, 1);
       await sign();
 
-      if (artwork.has_royalty) {
-        $psbt = await requestSignature($psbt);
-      }
-
-      await broadcast();
-
-      let transaction = {
-        amount: 1,
-        artwork_id: artwork.id,
-        asset: artwork.asset,
-        hash: $psbt.extractTransaction().getId(),
-        psbt: $psbt.toBase64(),
-        type: "transfer",
-      };
-
-      console.log("HUM", transaction);
-
-      query(createTransaction, { transaction });
+      if (artwork.held === "multisig") $psbt = await requestSignature($psbt);
 
       await api
         .auth(`Bearer ${$token}`)
         .url("/transfer")
-        .post({ address, id: recipient.id, transaction })
+        .post({ address, artwork, psbt: $psbt.toBase64() })
         .json();
 
-      query(updateArtwork, {
-        artwork: {
-          owner_id: recipient.id,
-        },
-        id: artwork.id,
-      }).catch(err);
-
-      info(`Artwork sent to ${recipient.username}!`);
+      info(
+        `Artwork sent to ${
+          recipient ? recipient.username : `${address.slice(0, 21)}...`
+        }!`
+      );
       goto(`/a/${artwork.slug}`);
     } catch (e) {
-      console.log(e);
       err(e);
     }
+
     loading = false;
   };
 
@@ -102,7 +87,7 @@
     @apply text-gray-400 border-gray-400;
   }
 
-  :global(.transferSelect) {
+  :global(.huh) {
     @apply rounded-lg px-8 py-4 text-white w-full !important;
   }
 
@@ -110,7 +95,7 @@
 
 {#if $addresses}
   <div class="container mx-auto sm:justify-between mt-10 md:mt-20">
-    <h2 class="mb-4">Transfer Asset</h2>
+    <h2 class="mb-4">Transfer asset</h2>
 
     {#if loading}
       <ProgressLinear />
@@ -118,10 +103,10 @@
       <div class="w-full max-w-lg text-center my-8 mx-auto">
         <AutoComplete
           hideArrow={true}
-          placeholder="Recipient"
-          items={$addresses.filter((a) => a.id !== $user.id)}
+          placeholder="Username"
+          items={$addresses.filter((a) => a.id !== $session.user.id)}
           className="w-full"
-          inputClassName="transferSelect"
+          inputClassName="huh text-center"
           labelFieldName="username"
           bind:selectedItem={recipient}>
           <div class="flex" slot="item" let:item let:label>
@@ -129,6 +114,17 @@
             <div class="ml-1 my-auto">{item.username}</div>
           </div>
         </AutoComplete>
+        <p class="font-bold mt-10 mb-7">OR</p>
+
+        <input
+          type="text"
+          class="w-full rounded-lg p-3 text-center"
+          placeholder="Address"
+          value={recipient ? '' : address}
+          on:keyup={(e) => {
+            recipient = undefined;
+            address = e.target.value;
+          }} />
         <a
           href="/"
           on:click|preventDefault={send}

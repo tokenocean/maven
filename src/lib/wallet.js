@@ -1,7 +1,7 @@
 import { tick } from "svelte";
 import { get } from "svelte/store";
 import { api, electrs, hasura } from "$lib/api";
-// import * as middlewares from "wretch-middlewares";
+import * as middlewares from "wretch-middlewares";
 import { mnemonicToSeedSync } from "bip39";
 import { fromSeed } from "bip32";
 import { fromBase58 } from "bip32";
@@ -28,7 +28,6 @@ import {
   txcache,
   transactions,
   signStatus,
-  acceptStatus,
   prompt,
   user,
   token,
@@ -39,13 +38,18 @@ import { requirePassword } from "$lib/auth";
 import { getActiveBids } from "$queries/transactions";
 import { compareAsc, parseISO } from "date-fns";
 import { SignaturePrompt, AcceptPrompt } from "$comp";
+import createHash from "create-hash";
+
+function sha256(buffer) {
+  return createHash("sha256").update(buffer).digest();
+}
 
 export const CANCELLED = "cancelled";
 export const ACCEPTED = "accepted";
 
-// const { retry } = middlewares.default || middlewares;
+const { retry } = middlewares.default || middlewares;
 
-const DUST = 800;
+export const DUST = 800;
 const satsPerByte = 0.15;
 
 const serverKey = Buffer.from(import.meta.env.VITE_PUBKEY, "hex");
@@ -80,7 +84,7 @@ export const getTransactions = (user) => {
 };
 
 export const getBalances = async ({ user, jwt }) => {
-  await requirePassword();
+  await requirePassword({ jwt });
 
   let { confirmed: c, pending: p } = await api
     .auth(`Bearer ${jwt}`)
@@ -473,15 +477,7 @@ const fund = async (
       }
 
       if (total < amount) {
-        let e = {
-          message: "Insufficient funds",
-          amount,
-          asset,
-          total,
-          address,
-        };
-        console.log(e);
-        throw e;
+        throw { message: "Insufficient funds", amount, asset, total };
       }
     } else {
       total += utxos[i].value;
@@ -629,6 +625,7 @@ export const pay = async (artwork, to, amount) => {
 
   addFee(p2);
 
+  psbt.set(p2);
   return p2;
 };
 
@@ -666,16 +663,6 @@ export const requireSign = async () => {
   return new Promise((resolve) =>
     signStatus.subscribe((signedSub) => {
       signedSub ? resolve(signedSub) : prompt.set(SignaturePrompt);
-    })
-  );
-};
-
-export const requireAccept = async () => {
-  acceptStatus.set(false);
-
-  return await new Promise((resolve) =>
-    acceptStatus.subscribe((acceptedSub) => {
-      acceptedSub ? resolve(acceptedSub) : prompt.set(AcceptPrompt);
     })
   );
 };
@@ -718,10 +705,10 @@ export const broadcast = async (disableRetries = false) => {
 
   let hex = tx.toHex();
   let middlewares = [
-    // retry({
-    //   delayTimer: 6000,
-    //   maxAttempts: 3,
-    // }),
+    retry({
+      delayTimer: 6000,
+      maxAttempts: 5,
+    }),
   ];
 
   if (disableRetries) middlewares = [];
@@ -752,7 +739,7 @@ export const executeSwap = async (artwork) => {
   let p = Psbt.fromBase64(list_price_tx);
   let out = singlesig();
   let script = (has_royalty ? multisig() : singlesig()).output;
-  let total = 0;
+  let total = list_price;
 
   fee.set(100);
 
@@ -763,6 +750,22 @@ export const executeSwap = async (artwork) => {
     value: 1,
   });
 
+  if (artist_id !== owner_id && has_royalty) {
+    for (let i = 0; i < royalty_recipients.length; i++) {
+      const element = royalty_recipients[i];
+
+      const recipientValue = Math.round((list_price * element.amount) / 100);
+      total += recipientValue;
+
+      p.addOutput({
+        asset: asking_asset,
+        value: recipientValue,
+        nonce,
+        script: Address.toOutputScript(element.address, network),
+      });
+    }
+  }
+
   let p2 = Psbt.fromBase64(p.toBase64());
 
   let construct = async (p, total) => {
@@ -771,11 +774,11 @@ export const executeSwap = async (artwork) => {
     await fund(p, out, asking_asset, total);
   };
 
-  await construct(p, list_price);
+  await construct(p, total);
   addFee(p);
   estimateFee(p);
 
-  await construct(p2, list_price);
+  await construct(p2, total);
 
   addFee(p2);
 
@@ -783,7 +786,7 @@ export const executeSwap = async (artwork) => {
 };
 
 export const createIssuance = async (
-  { filename: file, title: name, ticker },
+  { filename: file, title: name },
   domain,
   tx
 ) => {
@@ -803,17 +806,22 @@ export const createIssuance = async (
     issuer_pubkey: keypair().pubkey.toString("hex"),
     name,
     precision: 0,
-    ticker,
+    ticker: null,
     version: 0,
   };
 
+  console.log(tx.getId(), tx.vout);
+
   let construct = async (p) => {
     if (tx) {
-      let index = tx.outs.findIndex(
-        (o) =>
-          parseAsset(o.asset) === btc &&
-          o.script.toString("hex") === out.output.toString("hex")
-      );
+      let txid = tx.getId();
+      let index =
+        tx.vout ||
+        tx.outs.findIndex(
+          (o) =>
+            parseAsset(o.asset) === btc &&
+            o.script.toString("hex") === out.output.toString("hex")
+        );
 
       if (index > -1) {
         let input = {
@@ -863,7 +871,7 @@ export const createIssuance = async (
 };
 
 export const getInputs = async () => {
-  let utxos = await electrs
+  let utxos = await api
     .url(`/address/${singlesig().address}/utxo`)
     .get()
     .json();
@@ -871,7 +879,9 @@ export const getInputs = async () => {
   let txns = [];
   let a = utxos.filter((o) => o.asset === btc && o.value > DUST);
   for (let i = 0; i < a.length; i++) {
-    txns.push(Transaction.fromHex(await getHex(a[i].txid)));
+    let tx = Transaction.fromHex(await getHex(a[i].txid));
+    tx.vout = a[i].vout;
+    txns.push(tx);
   }
 
   return [txns, utxos.reduce((a, b) => a + b.value, 0)];
@@ -886,6 +896,7 @@ export const signOver = async ({ asset }, tx) => {
       .get()
       .json();
     let prevout = utxos.find((o) => o.asset === asset);
+
     let hex = await getHex(prevout.txid);
     tx = Transaction.fromHex(hex);
   }
@@ -902,7 +913,7 @@ export const signOver = async ({ asset }, tx) => {
   });
 
   psbt.set(p);
-  sign(noneAnyoneCanPay);
+  await sign(noneAnyoneCanPay);
   return tx;
 };
 
@@ -959,41 +970,19 @@ export const createRelease = async ({ asset, owner }, tx) => {
 };
 
 export const createSwap = async (artwork, amount, tx) => {
-  let { asset, asking_asset, has_royalty, royalty_recipients } = artwork;
+  let { asset, asking_asset } = artwork;
 
   if (asking_asset === btc && amount < DUST)
     throw new Error(
       `Minimum asking price is ${(DUST / 100000000).toFixed(8)} L-BTC`
     );
 
-  let p = new Psbt();
-  let total = 0;
-
-  if (has_royalty) {
-    for (let i = 0; i < royalty_recipients.length; i++) {
-      const element = royalty_recipients[i];
-
-      const recipientValue = Math.round((amount * element.amount) / 100);
-      console.log("RV", recipientValue);
-      total += recipientValue;
-
-      p.addOutput({
-        asset: asking_asset,
-        value: recipientValue,
-        nonce,
-        script: Address.toOutputScript(element.address, network),
-      });
-    }
-  }
-
-  if (amount - total > DUST) {
-    p.addOutput({
-      asset: asking_asset,
-      nonce,
-      script: singlesig().output,
-      value: amount - total,
-    });
-  }
+  let p = new Psbt().addOutput({
+    asset: asking_asset,
+    nonce,
+    script: singlesig().output,
+    value: amount,
+  });
 
   if (tx) {
     let index = tx.outs.findIndex((o) => parseAsset(o.asset) === asset);
@@ -1054,7 +1043,7 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
     value: amount,
   });
 
-  let total = 0;
+  let total = parseInt(amount);
   let pubkey = fromBase58(artwork.owner.pubkey, network).publicKey;
 
   if (has_royalty) {
@@ -1062,7 +1051,9 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
       for (let i = 0; i < royalty_recipients.length; i++) {
         const element = royalty_recipients[i];
 
-        const recipientValue = Math.round((amount * element.amount) / 100);
+        const recipientValue = Math.round(
+          (parseInt(amount) * element.amount) / 100
+        );
         total += recipientValue;
 
         p.addOutput({
@@ -1123,11 +1114,11 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
     addFee(p);
     return p;
   } else {
-    await construct(p, total - amount);
+    await construct(p, total);
     addFee(p);
     estimateFee(p);
 
-    await construct(p2, total - amount);
+    await construct(p2, total);
 
     addFee(p2);
     return p2;
@@ -1161,7 +1152,6 @@ export const requestSignature = async (psbt) => {
     .headers({ authorization: `Bearer ${get(token)}` })
     .post({ psbt: psbt.toBase64() })
     .json();
-
   return Psbt.fromBase64(base64);
 };
 

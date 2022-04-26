@@ -18,22 +18,34 @@
   import { v4 } from "uuid";
   import { query, api } from "$lib/api";
   import { tick, onDestroy } from "svelte";
-  import { edition, fee, psbt, password, titles, txcache } from "$lib/store";
+  import {
+    edition,
+    fee,
+    psbt,
+    password,
+    titles,
+    token,
+    txcache,
+    user,
+  } from "$lib/store";
   import { Dropzone, ProgressLinear } from "$comp";
   import { upload, supportedTypes } from "$lib/upload";
-  import { btc, kebab, goto, err } from "$lib/utils";
+  import { btc, kebab, goto, err, info, sleep } from "$lib/utils";
   import { requirePassword } from "$lib/auth";
   import {
+    DUST,
     createIssuance,
     sign,
     parseAsset,
     parseVal,
     keypair,
     getInputs,
+    network,
   } from "$lib/wallet";
   import reverse from "buffer-reverse";
   import { ArtworkMedia } from "$comp";
   import branding from "$lib/branding";
+  import { address } from "liquidjs-lib";
 
   import Form from "./_form.svelte";
   import Issuing from "./_issuing.svelte";
@@ -113,11 +125,7 @@
   let required = 0;
   const issue = async () => {
     let contract;
-    let domain =
-      $session.user.username === branding.superUserName
-        ? branding.urls.base
-        : `${$session.user.username.toLowerCase()}.${branding.urls.base}`;
-
+    let domain = branding.urls.base;
     let error, success;
 
     contract = await createIssuance(artwork, domain, inputs.pop());
@@ -129,8 +137,20 @@
 
     tx = $psbt.extractTransaction();
     required += parseVal(tx.outs.find((o) => o.script.length === 0).value);
+
     $txcache[tx.getId()] = tx;
-    inputs.unshift(tx);
+
+    if (
+      tx.outs.find(
+        (o) =>
+          parseAsset(o.asset) === btc &&
+          o.script.toString("hex") ===
+            address.toOutputScript($user.address, network).toString("hex") &&
+          parseVal(o.value) > DUST
+      )
+    ) {
+      inputs.unshift(tx);
+    }
     transactions.push({ contract, psbt: $psbt.toBase64() });
   };
 
@@ -154,6 +174,10 @@
 
       for ($edition = 1; $edition <= artwork.editions; $edition++) {
         await issue();
+        await sleep(10);
+        await info(
+          `Signed issuance transaction ${$edition} of ${artwork.editions}`
+        );
         tries = 0;
       }
 
@@ -162,7 +186,7 @@
 
       let { issuance, slug } = await api
         .url("/issue")
-        .auth(`Bearer ${$session.jwt}`)
+        .auth(`Bearer ${$token}`)
         .post({
           artwork,
           transactions,
@@ -239,7 +263,7 @@
               {preview}
               showDetails={false}
               thumb={false} />
-            <div class="w-full p-8">
+            <div class="w-full bg-grey-light p-8">
               <div
                 class="font-light p-4 mx-auto max-w-xs text-center"
                 class:bg-primary={percent >= 100 && artwork.filename}

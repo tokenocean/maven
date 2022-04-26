@@ -1,14 +1,12 @@
 <script context="module">
-  export async function load({ fetch, params, session }) {
+  export async function load({ fetch, params: { slug }, session }) {
     if (!(session && session.user))
       return {
         status: 302,
         redirect: "/login",
       };
 
-    const props = await fetch(`/artworks/${params.slug}.json`).then((r) =>
-      r.json()
-    );
+    const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
 
     if (!props.artwork)
       return {
@@ -39,14 +37,13 @@
   import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
   import { Psbt } from "liquidjs-lib";
   import { onMount, tick } from "svelte";
-  import { page } from "$app/stores";
   import {
     updateArtwork,
     updateArtworkWithRoyaltyRecipients,
   } from "$queries/artworks";
   import { api, query } from "$lib/api";
   import { fee, password, sighash, prompt, psbt } from "$lib/store";
-  import { requireLogin, requirePassword } from "$lib/auth";
+  import { requirePassword } from "$lib/auth";
   import { createTransaction } from "$queries/transactions";
   import {
     createSwap,
@@ -258,8 +255,10 @@
       await requirePassword();
 
       let base64, tx;
-      if (royalty_value) {
-        tx = await signOver(artwork, tx);
+
+      if (artwork.held === "multisig") {
+        tx = await signOver(artwork);
+        await tick();
         artwork.auction_tx = $psbt.toBase64();
       } else {
         $psbt = await sendToMultisig(artwork);
@@ -268,6 +267,7 @@
         tx = $psbt.extractTransaction();
 
         tx = await signOver(artwork, tx);
+        await tick();
         artwork.auction_tx = $psbt.toBase64();
 
         artwork.auction_release_tx = (
@@ -289,6 +289,7 @@
       if (base64) $psbt = Psbt.fromBase64(base64);
     }
 
+    artwork.held = "multisig";
     artwork.auction_start = start;
     artwork.auction_end = end;
   };
@@ -304,7 +305,6 @@
     }
 
     artwork.has_royalty = true;
-    artwork.royalty_recipients = royalty_recipients;
 
     await query(createTransaction, {
       transaction: {
@@ -318,6 +318,8 @@
     });
 
     stale = true;
+
+    artwork.held = "multisig";
 
     info("Royalties activated!");
   };
@@ -342,6 +344,7 @@
         auction_tx,
         bid_increment,
         extension_interval,
+        held,
         list_price_tx,
         max_extensions,
       } = artwork;
@@ -358,6 +361,7 @@
           auction_tx,
           bid_increment,
           extension_interval,
+          held,
           list_price: sats(artwork.asking_asset, list_price),
           list_price_tx,
           max_extensions,
@@ -474,7 +478,7 @@
       </div>
     </a>
 
-    <h2>List artwork</h2>
+    <h2>List asset</h2>
 
     {#if loading}
       <ProgressLinear />

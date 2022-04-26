@@ -304,6 +304,7 @@ const issue = async (
   let i = 0;
   let contract, psbt;
 
+  console.log("ARTWORK", artwork);
   let tags = artwork.tags.map(({ tag }) => ({
     tag,
     artwork_id: artwork.id,

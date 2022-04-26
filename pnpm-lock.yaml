@@ -15,6 +15,7 @@ specifiers:
   buffer-reverse: ^1.0.1
   cipher-base: github:asoltys/cipher-base
   cookie: ^0.4.2
+  create-hash: ^1.2.0
   crypto-js: ^4.1.1
   cypress-file-upload: ^5.0.8
   date-fns: ^2.28.0
@@ -61,6 +62,7 @@ devDependencies:
   buffer-reverse: 1.0.1
   cipher-base: github.com/asoltys/cipher-base/c77307d86b71ece25f65079b5a8c3041f9f8b735
   cookie: 0.4.2
+  create-hash: 1.2.0
   crypto-js: 4.1.1
   cypress-file-upload: 5.0.8
   date-fns: 2.28.0
