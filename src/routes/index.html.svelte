@@ -2,7 +2,7 @@
   export async function load() {
     return {
       status: 302,
-      redirect: "https://maven.tokenocean.io/",
+      redirect: "/agriculture",
     };
   }
 </script>
