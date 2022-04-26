@@ -56,7 +56,7 @@
           Website. This Privacy Policy describes the ways we collect information
           from and about you, and what we do with the information, so that you
           may decide whether or not to provide information to us. By accessing
-          or using Maven (www.mavennft.io), you agree to be bound by the terms
+          or using Maven (maven.tokenocean.io), you agree to be bound by the terms
           and conditions described in this document and also by any terms and
           conditions incorporated by reference.
         </p>
@@ -68,7 +68,7 @@
 
         <p>
           “<b>Sites</b>” are all websites that are owned and operated by Maven,
-          including mavennft.io and all subdomains
+          including maven.tokenocean.io and all subdomains
         </p>
 
         <p>
@@ -172,7 +172,7 @@
           information of a child under 13, we will attempt to delete the
           information as soon as possible. If you believe that we might have any
           Personal Data from a child under 13, please contact us at
-          support@mavennft.io.
+          support@maven.tokenocean.io.
         </p>
 
         <h3>3. What do we use this information for?</h3>
@@ -230,7 +230,7 @@
         <p>
           If you have a question or complaint about this Privacy Policy or our
           information collection practices, please contact us at
-          support@mavennft.io.
+          support@maven.tokenocean.io.
         </p>
 
         <h3>7. Changes</h3>

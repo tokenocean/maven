@@ -74,7 +74,7 @@
       Hard Asset related and will not be used by any other person. You must
       inform us immediately of any breach of security, loss, theft or
       unauthorized use of your username, password or security information at
-      support@mavennft.io
+      support@maven.tokenocean.io
     </p>
     <p>
       Users agree to use the Website only for purposes that are legal and in

@@ -23,7 +23,7 @@
         <li class="mb-2">
           <a href="https://blockstream.com/liquid/">The Liquid Network</a>
         </li>
-        <li class="mb-2"><a href="mailto:it@mavennft.io">Support</a></li>
+        <li class="mb-2"><a href="mailto:it@maven.tokenocean.io">Support</a></li>
         <li class="mb-2"><a href="/privacy-policy">Privacy Policy</a></li>
         <li class="mb-2">
           <a href="/terms-and-conditions">Terms of Service</a>

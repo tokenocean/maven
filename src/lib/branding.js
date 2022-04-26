@@ -4,14 +4,14 @@ const BRANDING = {
   superUserName: 'maven',
   
   urls: {
-    base: 'mavennft.io',
-    www: 'www.mavennft.io',
-    protocol: 'https://mavennft.io',
+    base: 'maven.tokenocean.io',
+    www: 'maven.tokenocean.io',
+    protocol: 'https://maven.tokenocean.io',
     external: {
       instagram: 'https://www.instagram.com/maven_nft/',
       twitter: 'https://twitter.com/maven_nft',
       telegram: 'https://t.me/maven_nft',
-      blog: 'https://blog.mavennft.io/',
+      blog: 'https://blog.maven.tokenocean.io/',
     }
   },
   
@@ -19,8 +19,8 @@ const BRANDING = {
       title: 'Maven',
       keywords: "Bitcoin Asset Backed NFTs",
       description: "An asset backed NFT marketplace",
-        image: 'https://mavennft.io/splash.png',
-        url: 'https://mavennft.io/',
+        image: 'https://maven.tokenocean.io/splash.png',
+        url: 'https://maven.tokenocean.io/',
 
       twitter: {
         card: 'summary_large_image',
@@ -31,13 +31,13 @@ const BRANDING = {
     artwork: (art) => ({
       title: `Maven - ${art.title}`,
       image: `/api/ipfs/${art.filename}`,
-      url: `https://mavennft.io/a/${art.slug}`,
+      url: `https://maven.tokenocean.io/a/${art.slug}`,
     })
     
   },
   
   emails: {
-    support : 'support@mavennft.io'
+    support : 'support@maven.tokenocean.io'
   }
 };
 

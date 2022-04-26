@@ -70,19 +70,19 @@
   on:blur={hideDropdown}>
   <Search />
   <a
-    href="https://www.mavennft.io/"
+    href="https://maven.tokenocean.io/"
     style="color: #83e68d"><button>Home</button></a>
   <a
-    href="https://www.mavennft.io/marketplace"
+    href="https://maven.tokenocean.io/marketplace"
     style="color: #83e68d"><button>Marketplace</button></a>
   <a
-    href="https://www.mavennft.io/about-us"
+    href="https://maven.tokenocean.io/about-us"
     style="color: #83e68d"><button>About</button></a>
   <a
-    href="https://www.mavennft.io/what-is-an-nft"
+    href="https://maven.tokenocean.io/what-is-an-nft"
     style="color: #83e68d"><button>What's an NFT?</button></a>
   <a
-    href="https://www.mavennft.io/contact"
+    href="https://maven.tokenocean.io/contact"
     style="color: #83e68d"><button>Contact</button></a>
   {#if $user}
     {#if $user.is_admin}<a href="/admin"><button>Admin</button></a>{/if}

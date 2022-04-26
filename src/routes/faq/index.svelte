@@ -136,8 +136,8 @@
         <p>Need more help?</p>
         <h5>Contact us through</h5>
         <a
-          href="mailto:support@mavennft.io"
-          target="_blank">support@mavennft.io</a>
+          href="mailto:support@maven.tokenocean.io"
+          target="_blank">support@maven.tokenocean.io</a>
       </div>
     </div>
   </div>
