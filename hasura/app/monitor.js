@@ -321,7 +321,7 @@ let updateTransactions = async (address, user_id) => {
         let { asset, value, scriptpubkey_address: a } = tx.vout[vout];
         if (address === a) total[asset] = (total[asset] || 0) - parseInt(value);
       } catch (e) {
-        console.log("problem finding input", e);
+        console.log("problem finding input", prev, e);
       }
     }
 
