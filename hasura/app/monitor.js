@@ -297,16 +297,16 @@ let updateTransactions = async (address, user_id) => {
     let { txid, vin, vout, status } = txns[i];
 
     let hex;
-    try {
-      hex =
-        hexcache[txid] || (await electrs.url(`/tx/${txid}/hex`).get().text());
-      hexcache[txid] = hex;
-    } catch (e) {
-      await sleep(3000);
-      hex =
-        hexcache[txid] || (await electrs.url(`/tx/${txid}/hex`).get().text());
-      hexcache[txid] = hex;
-    }
+    await wait(async () => {
+      try {
+        hex =
+          hexcache[txid] || (await electrs.url(`/tx/${txid}/hex`).get().text());
+
+        return hex;
+      } catch {
+        return false;
+      }
+    });
 
     let total = {};
 
