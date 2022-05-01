@@ -138,13 +138,14 @@ export const check = async (psbt) => {
           let amountDue = 0;
 
           for (let i = 0; i < royalty_recipients.length; i++) {
-            const element = royalty_recipients[i];
-
-            amountDue += Math.round((toOwner * element.amount) / 100);
+            const royalty = royalty_recipients[i];
+            amountDue += Math.round(
+              ((toOwner + toRoyaltyRecipients) * royalty.amount) / 100
+            );
           }
 
-          if (toRoyaltyRecipients < amountDue && artist.id !== owner.id)
-            throw new Error("Royalty not paid");
+          if (toRoyaltyRecipients < amountDue)
+            throw new Error("Royalties not paid");
         }
 
         if (

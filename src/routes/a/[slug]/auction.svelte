@@ -195,7 +195,6 @@
   };
 
   const setupSwaps = async () => {
-    console.log("SETUP", stale);
     if (
       !list_price ||
       (!stale &&
