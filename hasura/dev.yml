@@ -9,26 +9,26 @@ services:
     command: ["pnpm", "dev"]
     environment:
       APP_URL: "${APP_URL}"
-      AUTH_EVENT_VALUE: "${AUTH_EVENT_VALUE}"
+      SERVER_URL: "${SERVER_URL}"
+      HASURA_SECRET: "${HASURA_GRAPHQL_ADMIN_SECRET}"
       CLOUDFLARE_TOKEN: "${CLOUDFLARE_TOKEN}"
       CLOUDFLARE_ZONE: "${CLOUDFLARE_ZONE}"
-      COINOS_TOKEN: "${COINOS_TOKEN}"
-      COINOS_URL: "${COINOS_URL}"
       DOMAIN: "${DOMAIN}"
-      HASURA_JWT: "${HASURA_GRAPHQL_JWT_SECRET}"
-      HASURA_SECRET: "${HASURA_GRAPHQL_ADMIN_SECRET}"
+      COINOS_URL: "${COINOS_URL}"
+      COINOS_TOKEN: "${COINOS_TOKEN}"
       HASURA_URL: "${HASURA_URL}"
+      HASURA_JWT: "${HASURA_GRAPHQL_JWT_SECRET}"
+      LIQUID_ELECTRS_URL: "${LIQUID_ELECTRS_URL}"
       HBP_URL: "${HBP_URL}"
       IPFS_URL: "${IPFS_URL}"
       IPFS_WEB_URL: "${IPFS_WEB_URL}"
-      LIQUID_ELECTRS_URL: "${LIQUID_ELECTRS_URL}"
-      SERVER_URL: "${SERVER_URL}"
       SIGNING_SERVER_MNEMONIC: "${SIGNING_SERVER_MNEMONIC}"
       SMTP_HOST: "${SMTP_HOST}"
-      SMTP_PASS: "${SMTP_PASS}"
       SMTP_PORT: "${SMTP_PORT}"
-      SMTP_SENDER: "${SMTP_SENDER}"
       SMTP_USER: "${SMTP_USER}"
+      SMTP_PASS: "${SMTP_PASS}"
+      SMTP_SENDER: "${SMTP_SENDER}"
+      AUTH_EVENT_VALUE: "${AUTH_EVENT_VALUE}"
     volumes:
       - ./app:/app
       - ./custom:/opt/src/hasura/app/custom
@@ -45,6 +45,7 @@ services:
       - ${DATA_DIR}:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    command: ["postgres", "-c", "log_min_duration_statement=1000"]
   hasura:
     logging:
       options:
@@ -61,7 +62,7 @@ services:
       - ./migrations:/hasura-migrations
       - ./metadata:/hasura-metadata
     environment:
-      HASURA_GRAPHQL_ENABLED_LOG_TYPES: "startup, http-log, webhook-log, websocket-log, query-log"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: "startup, http-log, webhook-log, websocket-log"
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
       HASURA_GRAPHQL_ADMIN_SECRET: "${HASURA_GRAPHQL_ADMIN_SECRET}"
       HASURA_GRAPHQL_JWT_SECRET: "${HASURA_GRAPHQL_JWT_SECRET}"
@@ -71,7 +72,7 @@ services:
       AUTH_EVENT_VALUE: "${AUTH_EVENT_VALUE}"
   hbp:
     container_name: hbp
-    image: nhost/hasura-backend-plus:v2.2.4
+    image: nhost/hasura-backend-plus:v2.4.0
     depends_on:
       - hasura
     ports:
