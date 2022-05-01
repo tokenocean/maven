@@ -96,8 +96,7 @@
     end_time,
     auction_enabled,
     auction_underway,
-    multi_royalty_recipients_enabled,
-    royalty_recipients;
+    multi_royalty_recipients_enabled;
 
   let reserve_price;
 
@@ -140,12 +139,12 @@
     }
   }
 
-  royalty_recipients = artwork.royalty_recipients;
+  artwork.royalty_recipients;
 
   if (!list_price && artwork.list_price)
     list_price = val(artwork.asking_asset, artwork.list_price);
   if (!royalty_value)
-    royalty_value = royalty_recipients.reduce(
+    royalty_value = artwork.royalty_recipients.reduce(
       (a, b) => a + (b["amount"] || 0),
       0
     );
@@ -196,6 +195,7 @@
   };
 
   const setupSwaps = async () => {
+    console.log("SETUP", stale);
     if (
       !list_price ||
       (!stale &&
@@ -369,7 +369,7 @@
         },
         id: artwork.id,
         royaltyRecipients: royalty_value
-          ? royalty_recipients.map((item) => {
+          ? artwork.royalty_recipients.map((item) => {
               delete item.id;
               item.artwork_id = artwork.id;
               item.asking_asset = artwork.asking_asset;
@@ -575,7 +575,7 @@
             {#if multi_royalty_recipients_enabled}
               <div class="w-full ">
                 <RoyaltyRecipientList
-                  bind:items={royalty_recipients}
+                  bind:items={artwork.royalty_recipients}
                   bind:royaltyValue={royalty_value}
                   maxTotalRate={100}
                   askingAsset={artwork.asking_asset}
