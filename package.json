@@ -56,5 +56,14 @@
     "wretch": "^1.7.9",
     "wretch-middlewares": "^0.1.13"
   },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "vite",
+        "@react-pdf/renderer",
+        "cypress"
+      ]
+    }
+  },
   "type": "module"
 }
