@@ -964,14 +964,17 @@ export const createSwap = async (artwork, amount, tx) => {
     let royalty = royalty_recipients[i];
 
     let value = Math.round((parseInt(amount) * royalty.amount) / 100);
-    amount -= value;
 
-    outputs.push({
-      asset: asking_asset,
-      nonce,
-      script: Address.toOutputScript(royalty.address, network),
-      value,
-    });
+    if (value > DUST) {
+      amount -= value;
+
+      outputs.push({
+        asset: asking_asset,
+        nonce,
+        script: Address.toOutputScript(royalty.address, network),
+        value,
+      });
+    }
   }
 
   if (asking_asset === btc && amount < DUST)
