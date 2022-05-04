@@ -958,12 +958,12 @@ export const createSwap = async (artwork, amount, tx) => {
 
   let p = new Psbt();
   let outputs = [];
+  let total = amount;
 
-  console.log(royalty_recipients);
   for (let i = 0; i < royalty_recipients.length; i++) {
     let royalty = royalty_recipients[i];
 
-    let value = Math.round((parseInt(amount) * royalty.amount) / 100);
+    let value = Math.round((parseInt(total) * royalty.amount) / 100);
 
     if (value > DUST) {
       amount -= value;
