@@ -977,17 +977,14 @@ export const createSwap = async (artwork, amount, tx) => {
     }
   }
 
-  if (asking_asset === btc && amount < DUST)
-    throw new Error(
-      `Minimum asking price is ${(DUST / 100000000).toFixed(8)} L-BTC`
-    );
-
-  p.addOutput({
-    asset: asking_asset,
-    nonce,
-    script: singlesig().output,
-    value: amount,
-  });
+  if (asking_asset !== btc || amount > DUST) {
+    p.addOutput({
+      asset: asking_asset,
+      nonce,
+      script: singlesig().output,
+      value: amount,
+    });
+  }
 
   outputs.map((output) => p.addOutput(output));
 
