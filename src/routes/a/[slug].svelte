@@ -44,6 +44,10 @@
       props,
     };
   }
+
+  const click = () => {
+    if (!artwork.filetype.includes('pdf')) showPopup = !showPopup;
+  } 
 </script>
 
 <script>
@@ -376,7 +380,7 @@
       </div>
 
       <div class="mobileImage">
-        <span on:click={() => (showPopup = !showPopup)}>
+        <span on:click={click}>
           <Card {artwork} columns={1} showDetails={false} thumb={false} />
         </span>
       </div>
@@ -540,7 +544,7 @@
 
     <div class="w-full lg:w-2/3 lg:pl-40">
       <div class="desktopImage">
-        <span on:click={() => (showPopup = !showPopup)}>
+        <span on:click={click}>
           <Card {artwork} columns={1} showDetails={false} thumb={false} />
         </span>
       </div>
@@ -588,7 +592,7 @@
       </div>
 
       <div
-        on:click={() => (showPopup = !showPopup)}
+        on:click={click}
         class:showPopup
         class="popup"
       >

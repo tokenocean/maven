@@ -32,7 +32,9 @@ app.post("/upload", async function (req, res) {
     if (ext === "gif") throw new Error("Can't process gifs");
     if (ext === "mp4") {
       await createFragmentPreview(s2, s3, thumb);
-    } else {
+    } 
+
+    if (['jpg', 'jpeg', 'png'].includes(ext)) {
       let t = sharp().rotate().resize(1000).webp();
       s2.pipe(t).pipe(fs.createWriteStream(thumb));
     }

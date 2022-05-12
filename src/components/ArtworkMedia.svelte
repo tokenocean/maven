@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faVolumeUp, faVolumeMute } from "@fortawesome/free-solid-svg-icons";
+  import { faHeadphones, faFilePdf, faVolumeUp, faVolumeMute } from "@fortawesome/free-solid-svg-icons";
   import { painting, variation, edition } from "$lib/store";
 
   export let artwork;
@@ -10,7 +10,7 @@
   export let thumb = true;
   export let preview = false;
   export let popup = false;
-  let img, vid;
+  let img, vid, aud;
   let path;
   $: if (thumb && artwork.title.startsWith("Vida")) {
     if ($painting || $variation || $edition) {
@@ -29,8 +29,8 @@
     if (!vid) return;
     vid.load();
   };
-  $: setLoaded(img, vid);
-  let setLoaded = (img, vid) => {
+  $: setLoaded(img, vid, aud);
+  let setLoaded = (img, vid, aud) => {
     img &&
       (img.onload = () => {
         loaded = true;
@@ -39,6 +39,11 @@
     vid &&
       (vid.onloadeddata = () => {
         loaded = true;
+      });
+
+    aud &&
+      (aud.onerror = () => {
+        loaded[artwork.id] = true;
       });
   };
 
@@ -155,6 +160,34 @@
         <Fa icon={muted ? faVolumeMute : faVolumeUp} size="1.5x" />
       </button>
     {/if}
+  </div>
+{:else if artwork.filetype.includes("audio")}
+  <div
+    class="p-5 bg-primary/50 flex justify-center items-center h-full w-full mx-auto rounded-lg"
+  >
+    <img src class="hidden" bind:this={aud} />
+    <figure>
+      <Fa icon={faHeadphones} class="mx-auto" size="3x" />
+      <figcaption class="text-center">NFT audio file</figcaption>
+
+      {#if noAudio === false}
+        <audio class="mx-auto" controls src={preview || path}>
+          Your browser does not support the
+          <code>audio</code> element.
+        </audio>
+      {/if}
+    </figure>
+  </div>
+{:else if artwork.filetype.includes("pdf")}
+  <div
+    class="p-5 bg-primary/50 flex justify-center items-center h-full w-full mx-auto rounded-lg"
+  >
+    <a href={path} download={artwork.slug + '.pdf'}>
+    <figure>
+      <Fa icon={faFilePdf} class="mx-auto" size="3x" />
+      <figcaption class="text-center">PDF file</figcaption>
+    </figure>
+  </a>
   </div>
 {:else}
   <div class="w-full" class:cover class:contain>
