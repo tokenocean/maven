@@ -58,9 +58,9 @@
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
-        "vite",
         "@react-pdf/renderer",
-        "cypress"
+        "cypress",
+        "vite"
       ]
     }
   },
