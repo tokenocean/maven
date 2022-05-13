@@ -44,11 +44,6 @@
       props,
     };
   }
-
-  const click = () => {
-    if (artwork && !artwork.filetype.includes("pdf")) showPopup = !showPopup;
-  };
-
 </script>
 
 <script>
@@ -325,6 +320,9 @@
   let showMore = false;
   let showActivity = false;
 
+  let click = () => {
+    if (!artwork.filetype.includes("pdf")) showPopup = !showPopup;
+  };
 </script>
 
 <style>
