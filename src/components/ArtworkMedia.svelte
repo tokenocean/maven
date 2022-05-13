@@ -184,15 +184,15 @@
     </figure>
   </div>
 {:else if artwork.filetype.includes('pdf')}
-  <div
-    class="p-5 bg-primary/50 flex justify-center items-center h-full w-full mx-auto rounded-lg">
-    <a href={path} download={artwork.slug + '.pdf'}>
+  <a href={path} download={artwork.slug + '.pdf'}>
+    <div
+      class="p-5 bg-primary/50 flex justify-center items-center h-full w-full mx-auto rounded-lg">
       <figure>
         <Fa icon={faFilePdf} class="mx-auto" size="3x" />
         <figcaption class="text-center">PDF file</figcaption>
       </figure>
-    </a>
-  </div>
+    </div>
+  </a>
 {:else}
   <div class="w-full" class:cover class:contain>
     <img
