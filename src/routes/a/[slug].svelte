@@ -647,7 +647,7 @@
 
       {#if artwork.description}
         <div class="mob-desc description whitespace-pre-wrap break-words">
-          <h4 class="mt-10 font-bold">About this artwork</h4>
+          <h4 class="mt-10 font-bold">About this asset</h4>
           <div class="desc-text {showMore ? 'openDesc' : ''}">
             {@html linkify(artwork.description)}
           </div>
@@ -687,7 +687,7 @@
 
       {#if artwork.description}
         <div class="desk-desc description break-words">
-          <h4 class="mt-10 mb-5 font-bold">About this artwork</h4>
+          <h4 class="mt-10 mb-5 font-bold">About this asset</h4>
           <div class="whitespace-pre-wrap">
             {@html linkify(artwork.description)}
           </div>
