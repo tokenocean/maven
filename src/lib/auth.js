@@ -24,6 +24,7 @@ export const requireLogin = async (p) => {
   } catch (e) {
     console.log(e);
     if (p && p.url) redirect.set(p.url.pathname);
+    session.set({});
     goto("/login");
     throw e;
   }
