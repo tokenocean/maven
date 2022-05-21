@@ -187,10 +187,7 @@
   <a href={path} download={artwork.slug + '.pdf'}>
     <div
       class="p-5 bg-primary/50 flex justify-center items-center h-full w-full mx-auto rounded-lg">
-      <figure>
-        <Fa icon={faFilePdf} class="mx-auto" size="3x" />
-        <figcaption class="text-center">PDF file</figcaption>
-      </figure>
+      <img src="/pdf.png" />
     </div>
   </a>
 {:else}

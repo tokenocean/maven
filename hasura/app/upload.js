@@ -10,6 +10,7 @@ import fastifyMultipart from "fastify-multipart";
 app.register(fastifyMultipart);
 
 app.post("/upload", async function (req, res) {
+  console.log("OH");
   const ipfs = ipfsClient(process.env.IPFS_URL);
   const data = await req.file();
 
