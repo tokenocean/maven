@@ -52,7 +52,7 @@
     "svelte-select": "^4.4.7",
     "tailwindcss": "^3.0.23",
     "uuid": "^8.3.2",
-    "vite-plugin-shim-react-pdf": "^1.0.5",
+    "@asoltys/vite-plugin-stream-shim": "^1.0.5",
     "wretch": "^1.7.9",
     "wretch-middlewares": "^0.1.13"
   },
