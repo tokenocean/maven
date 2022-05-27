@@ -27,8 +27,6 @@ app.post("/upload", async function (req, res) {
     const path = `/export/${name}`;
     const thumb = `${path}.${ext}`;
 
-    const ipfs = ipfsClient(process.env.IPFS_URL);
-    const data = await req.file();
 
     if (ext === "gif") throw new Error("Can't process gifs");
     if (ext === "mp4") {
