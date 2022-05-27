@@ -66,8 +66,6 @@ app.post("/updateAvatars", async (req, res) => {
   }
 });
 
-const transferOwnership = async (transaction) => {};
-
 const isSpent = async ({ ins }, artwork_id) => {
   try {
     let { transactions } = await q(getLastTransaction, { artwork_id });
@@ -297,13 +295,13 @@ let updateTransactions = async (address, user_id) => {
     let { txid, vin, vout, status } = txns[i];
 
     let hex;
-    await wait(async () => {
+    wait(async () => {
       try {
         hex =
           hexcache[txid] || (await electrs.url(`/tx/${txid}/hex`).get().text());
-
-        return hex;
-      } catch {
+        hexcache[txid] = hex;
+        return true;
+      } catch (e) {
         return false;
       }
     });
@@ -319,7 +317,7 @@ let updateTransactions = async (address, user_id) => {
         txcache[prev] = tx;
 
         let { asset, value, scriptpubkey_address: a } = tx.vout[vout];
-        if (address === a) total[asset] = (total[asset] || 0) - parseInt(value);
+        if (asset && address === a) total[asset] = (total[asset] || 0) - parseInt(value);
       } catch (e) {
         console.log("problem finding input", prev, e);
       }
@@ -327,7 +325,7 @@ let updateTransactions = async (address, user_id) => {
 
     for (let k = 0; k < vout.length; k++) {
       let { asset, value, scriptpubkey_address: a } = vout[k];
-      if (address === a) total[asset] = (total[asset] || 0) + parseInt(value);
+      if (asset && address === a) total[asset] = (total[asset] || 0) + parseInt(value);
     }
 
     let assets = Object.keys(total);
@@ -410,10 +408,11 @@ let scanUtxos = async (address) => {
 
   let uniq = (a, k) => [...new Map(a.map((x) => [k(x), x])).values()];
   let { transactions } = await q(getTransactions, { id });
+
   transactions = uniq(
     transactions.sort((a, b) => a.sequence - b.sequence),
     (tx) => tx.hash + tx.asset
-  ).filter((tx) => !outs.length || tx.sequence > outs[0].sequence);
+  )
 
   transactions.map(async ({ id, hash, asset: txAsset, json, confirmed }) => {
     try {
