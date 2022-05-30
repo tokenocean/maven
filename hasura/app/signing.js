@@ -140,10 +140,10 @@ export const check = async (psbt) => {
           for (let i = 0; i < royalty_recipients.length; i++) {
             const royalty = royalty_recipients[i];
             amountDue += Math.round(
-              ((toOwner + toRoyaltyRecipients) * royalty.amount) / 100
+              (list_price * royalty.amount) / 100
             );
           }
-
+          
           if (toRoyaltyRecipients < amountDue)
             throw new Error("Royalties not paid");
         }
