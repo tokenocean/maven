@@ -1,3 +1,5 @@
+<svelte:options accessors={true} />
+
 <script>
   import { session } from "$app/stores";
   import { psbt, prompt, signStatus } from "$lib/store";
@@ -21,7 +23,7 @@
   };
 
   export const submit = async (e) => {
-    await requirePassword();
+    await requirePassword($session);
 
     try {
       $signStatus = ACCEPTED;
@@ -51,18 +53,16 @@
   };
 
   let base64 = false;
-
 </script>
 
-<svelte:options accessors={true} />
 {#await Promise.resolve($psbt)}
-  Loading
+  Loading...
 {:then p}
   <div class="flex justify-between">
     <h1 class="font-black text-4xl primary-color">Sign transaction</h1>
   </div>
 
-  <Transaction summary={true} />
+  <Transaction summary={true} psbt={$psbt} />
   {#if base64}
     <div class="break-all font-mono text-xs mb-2">{p.toBase64()}</div>
   {/if}
