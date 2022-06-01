@@ -22,7 +22,6 @@
   import { info, err, goto } from "$lib/utils";
   import { Gallery, Results, Search } from "$comp";
   import { requirePassword } from "$lib/auth";
-  import { pub } from "$lib/api";
 
   export let count;
   export let initialArtworks;
