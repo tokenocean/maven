@@ -92,15 +92,14 @@ export const getBalances = async ({ user, jwt }) => {
     .get()
     .json();
 
-  Object.keys(c).map(async (a) => {
-    let artwork = get(titles).find(
-      (t) => t.asset === a && t.owner_id !== user.id
-    );
+  // Object.keys(c).map(async (a) => {
+  //   let { artworks } = await query(getArtworkByAsset, { asset: a });
+  //   let artwork = artworks[0];
 
-    if (artwork) {
-      await api.auth(`Bearer ${jwt}`).url("/claim").post({ artwork }).json();
-    }
-  });
+  //   if (artwork.owner_id !== user.id) {
+  //     await api.auth(`Bearer ${jwt}`).url("/claim").post({ artwork }).json();
+  //   }
+  // });
 
   balances.set(c);
   pending.set(p);
