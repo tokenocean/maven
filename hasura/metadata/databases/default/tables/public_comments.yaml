@@ -1,0 +1,10 @@
+table:
+  schema: public
+  name: comments
+object_relationships:
+  - name: artwork
+    using:
+      foreign_key_constraint_on: artwork_id
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id

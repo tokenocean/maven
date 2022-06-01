@@ -16,6 +16,15 @@ object_relationships:
         column_mapping:
           id: user_id
 array_relationships:
+  - name: activebids
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: activebids
+        insertion_order: null
+        column_mapping:
+          id: user_id
   - name: artworks
     using:
       foreign_key_constraint_on:
@@ -30,6 +39,13 @@ array_relationships:
         table:
           schema: public
           name: artworks
+  - name: comments
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          schema: public
+          name: comments
   - name: creations
     using:
       manual_configuration:
@@ -131,12 +147,13 @@ select_permissions:
         - confidential
         - email
         - full_name
+        - has_samples
         - id
         - instagram
         - is_artist
-        - is_denied
         - location
         - multisig
+        - prompt_sign
         - pubkey
         - twitter
         - username
@@ -156,15 +173,16 @@ select_permissions:
         - display_name
         - email
         - full_name
+        - has_samples
         - id
         - info
         - instagram
         - is_admin
         - is_artist
-        - is_denied
         - location
         - mnemonic
         - multisig
+        - prompt_sign
         - pubkey
         - twitter
         - updated_at
@@ -186,12 +204,13 @@ select_permissions:
         - confidential
         - email
         - full_name
+        - has_samples
         - id
         - instagram
         - is_artist
-        - is_denied
         - location
         - multisig
+        - prompt_sign
         - pubkey
         - twitter
         - username
@@ -206,8 +225,9 @@ update_permissions:
   - role: approver
     permission:
       columns:
+        - info
         - is_artist
-        - is_denied
+        - prompt_sign
       filter: {}
       check: {}
   - role: user
@@ -226,6 +246,7 @@ update_permissions:
         - location
         - mnemonic
         - multisig
+        - prompt_sign
         - pubkey
         - twitter
         - username

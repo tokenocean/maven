@@ -1,39 +1,44 @@
+import { browser } from "$app/env";
 import cookie from "cookie";
 import wretch from "wretch";
 import * as middlewares from "wretch-middlewares";
-import { token } from "$lib/store";
-import { get as g } from "svelte/store";
+import { get as getStore } from "svelte/store";
 import { err } from "$lib/utils";
+import { token } from "$lib/store";
+
+export const host = import.meta.env.VITE_HOST;
+export const app = import.meta.env.VITE_APP;
 
 const { retry } = middlewares.default || middlewares;
 
-const queue = [];
-const DELAY = 100;
-const enqueue = (next) => (url, opts) =>
-  new Promise((r) => queue.push(() => r(next(url, opts))) && ddequeue());
+export const api = wretch().url(`${host}/api`);
 
-let timer;
-const dequeue = () => {
-  if (queue.length) {
-    queue.shift()();
-    ddequeue();
-  }
-};
+export const newapi = (headers) => {
+  let url = import.meta.env.VITE_APP;
+  let jwt = headers && cookie.parse(headers.get("cookie") || "").token;
 
-const ddequeue = () => {
-  clearTimeout(timer);
-  timer = setTimeout(dequeue, DELAY);
-};
+  if (browser) {
+    url = `${host}/api` 
+    jwt = getStore(token);
+  } 
 
-export const api = wretch().url("/api");
-export const electrs = wretch().middlewares([enqueue]).url("/api/el");
+  return wretch().url(url).auth(jwt ? `Bearer ${jwt}` : undefined);
+} 
+  
+export const electrs = wretch().url(`${host}/api/el`);
+
 export const hasura = wretch()
-  .middlewares([retry({ maxAttempts: 5 })])
-  .url("/api/v1/graphql");
+  .middlewares([retry({ maxAttempts: 2 })])
+  .url(`${host}/api/v1/graphql`);
 
-export const pub = (t) => (t ? hasura.auth(`Bearer ${t}`) : hasura);
-export const query = async (query, variables) => {
-  let { data, errors } = await pub(g(token)).post({ query, variables }).json();
+export const query = async (query, variables, headers = {}) => {
+  let jwt = getStore(token);
+  if (jwt) headers = { ...headers, authorization: `Bearer ${jwt}` };
+
+  let { data, errors } = await hasura
+    .headers(headers)
+    .post({ query, variables })
+    .json();
   if (errors) throw new Error(errors[0].message);
   return data;
 };
@@ -64,6 +69,7 @@ export const getQ = (defaultHeaders) => {
       let r = await fn(q, v, h);
       return r;
     } catch (e) {
+      console.log(e);
       if (h.authorization) delete h.authorization;
       let r = await fn(q, v, h);
       return r;
