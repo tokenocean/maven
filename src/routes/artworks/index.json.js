@@ -6,10 +6,10 @@ export async function post({ request, locals }) {
     let body = await request.json();
     let { q } = locals;
     let {
-      limit = 210,
+      limit,
       offset = 0,
       where = {},
-      order_by = { created_at: "desc" },
+      order_by = { sequence: "asc" },
     } = body;
 
     let { artworks_aggregate: a } = await q(countArtworks, { where });
