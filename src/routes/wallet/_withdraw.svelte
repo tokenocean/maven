@@ -68,7 +68,7 @@
     {:else}
       <div class="flex flex-col mb-4">
         <label for="asset">Asset</label>
-        <select id="asset" class="text-black" bind:value={$asset}>
+        <select id="asset" class="text-white" bind:value={$asset}>
           {#each $assets as { asset: a }}
             <option value={a}
               >{ticker(a) || a }</option
@@ -78,7 +78,7 @@
       </div>
       <div class="flex flex-col mb-4">
         <label for="amount">Amount</label>
-        <div class="flex justify-between text-black">
+        <div class="flex justify-between text-white">
           <input
             id="amount"
             class="w-full"
@@ -108,7 +108,7 @@
   textarea,
   input,
   select {
-    @apply rounded-lg p-2 text-black;
+    @apply rounded-lg p-2 text-white;
     margin-top: 10px;
   }
 </style>
