@@ -81,7 +81,7 @@
     padding: 10px;
     display: inline-block;
     border-radius: 10px;
-    background-color: whitesmoke;
+    background-color: black;
     font-weight: bold;
   }
 
