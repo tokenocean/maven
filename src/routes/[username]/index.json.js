@@ -7,8 +7,6 @@ export async function get({
   try {
     let { users } = await q(getUserByUsername, { username });
 
-    console.log(users.length, username);
-
     if (!users.length) throw new Error("user not found");
 
     return {
