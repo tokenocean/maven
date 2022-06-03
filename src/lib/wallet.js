@@ -3,8 +3,7 @@ import { get } from "svelte/store";
 import { api, electrs, hasura } from "$lib/api";
 import * as middlewares from "wretch-middlewares";
 import { mnemonicToSeedSync } from "bip39";
-import { fromSeed } from "bip32";
-import { fromBase58 } from "bip32";
+import { fromSeed, fromBase58 } from "bip32";
 import {
   address as Address,
   ECPair,
