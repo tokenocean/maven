@@ -695,6 +695,7 @@ export const sign = async (sighash, prompt = true) => {
   });
 
   psbt.set(p);
+
   return p;
 };
 

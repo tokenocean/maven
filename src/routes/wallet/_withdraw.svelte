@@ -45,6 +45,7 @@
         $psbt = await requestSignature($psbt);
       }
 
+      await tick();
       await broadcast();
 
       info("Payment sent!");

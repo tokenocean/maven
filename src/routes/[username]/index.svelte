@@ -1,22 +1,19 @@
 <script context="module">
   import { get } from "$lib/api";
   export async function load({ fetch, params }) {
-    try {
-      const { subject } = await get(`/${params.username}.json`, fetch);
+    const { subject } = await get(`/${params.username}.json`, fetch);
 
-      return {
-        props: {
-          subject,
-        },
-      };
-    } catch (error) {
-      return { status: 500, error };
-    }
+    return {
+      props: {
+        subject,
+      },
+    };
   }
-
 </script>
 
 <script>
+  import { session } from "$app/stores";
+  import { artworksLimit } from "$lib/store";
   import Fa from "svelte-fa";
   import {
     faEnvelope,
@@ -26,10 +23,10 @@
   import { faTwitter, faInstagram } from "@fortawesome/free-brands-svg-icons";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { user, token } from "$lib/store";
   import { err, goto } from "$lib/utils";
   import { Avatar, Card, Offers, ProgressLinear } from "$comp";
   import { createFollow, deleteFollow } from "$queries/follows";
+  import { getUserByUsername } from "$queries/users";
   import Menu from "./_menu.svelte";
   import { query } from "$lib/api";
 
@@ -43,9 +40,21 @@
     else ({ id } = subject);
   };
 
+  let refreshUser = async () => {
+    try {
+      let { users } = await query(getUserByUsername, {
+        username: subject.username,
+        artworksLimit: $artworksLimit,
+      });
+      subject = users[0];
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   let follow = () => {
     if (subject.followed) {
-      query(deleteFollow($user, subject)).catch(err);
+      query(deleteFollow($session.user, subject)).catch(err);
       subject.followed = false;
       subject.num_followers--;
     } else {
@@ -56,48 +65,7 @@
   };
 
   let tab = subject.is_artist ? "creations" : "collection";
-
 </script>
-
-<style>
-  .gallery-tab :global(.card-link img),
-  .gallery-tab :global(.card-link video) {
-    height: 350px;
-  }
-
-  .hover {
-    @apply border-b-2;
-    border-bottom: 3px solid #6ed8e0;
-  }
-
-  .tabs div {
-    @apply mb-auto h-10 mx-2 md:mx-4;
-    &:hover {
-      @apply border-b-2;
-      border-bottom: 3px solid #6ed8e0;
-    }
-  }
-
-  .social-details {
-    display: flex;
-    flex-direction: column;
-    margin: 25px 0;
-  }
-  .social-details a {
-    margin-top: 15px;
-  }
-
-  .social-details a:hover,
-  .social-details span:hover {
-    color: gray;
-  }
-
-  .social-details span {
-    margin-left: 8px;
-    color: #0f828a;
-  }
-
-</style>
 
 <div class="container mx-auto lg:px-16 mt-5 md:mt-20">
   {#if subject}
@@ -171,49 +139,55 @@
         {#if subject.bio}
           <p>{subject.bio}</p>
         {/if}
-        {#if $user}
-          {#if $user.id === subject.id}
+        {#if $session.user}
+          {#if $session.user.id === subject.id}
             <Menu />
           {:else}
             <button class="p-2 primary-btn follow mt-8" on:click={follow}>
-              {subject.followed ? 'Unfollow' : 'Follow'}</button>
+              {subject.followed ? "Unfollow" : "Follow"}</button
+            >
           {/if}
         {/if}
       </div>
 
       <div class="w-full xl:w-2/3">
         <div
-          class="flex justify-center text-center cursor-pointer tabs flex-wrap mb-14">
+          class="flex justify-center text-center cursor-pointer tabs flex-wrap mb-14"
+        >
           {#if subject.is_artist}
             <div
-              class:hover={tab === 'creations'}
-              on:click={() => (tab = 'creations')}>
+              class:hover={tab === "creations"}
+              on:click={() => (tab = "creations")}
+            >
               Creations
             </div>
           {/if}
           <div
-            class:hover={tab === 'collection'}
-            on:click={() => (tab = 'collection')}>
+            class:hover={tab === "collection"}
+            on:click={() => (tab = "collection")}
+          >
             Collection
           </div>
-          {#if $user && $user.id === id}
+          {#if $session.user && $session.user.id === id}
             <div
-              class:hover={tab === 'offers'}
-              on:click={() => (tab = 'offers')}>
+              class:hover={tab === "offers"}
+              on:click={() => (tab = "offers")}
+            >
               Offers
             </div>
             <div
-              class:hover={tab === 'favorites'}
-              on:click={() => (tab = 'favorites')}>
+              class:hover={tab === "favorites"}
+              on:click={() => (tab = "favorites")}
+            >
               Favorites
             </div>
           {/if}
         </div>
-        {#if tab === 'creations'}
+        {#if tab === "creations"}
           <div class="w-full justify-center">
             <div class="w-full max-w-sm mx-auto mb-12">
-              {#if $user && $user.is_artist && $user.id === subject.id}
-                <a href="/a/create" class="primary-btn">Mint a new asset</a>
+              {#if $session.user && $session.user.is_artist && $session.user.id === subject.id}
+                <a href="/a/create" class="primary-btn">Submit a new artwork</a>
               {/if}
             </div>
             <div class="w-full flex flex-wrap">
@@ -224,9 +198,15 @@
               {:else}
                 <div class="mx-auto">No creations yet</div>
               {/each}
+              {#if $artworksLimit !== undefined && subject.creations.length}
+                <a sveltekit:prefetch
+                  class="primary-btn mx-auto mb-12 w-full"
+                  href={`/${subject.username}/creations`}>Show all</a
+                >
+              {/if}
             </div>
           </div>
-        {:else if tab === 'collection'}
+        {:else if tab === "collection"}
           <div class="w-full flex justify-center">
             <div class="w-full flex flex-wrap">
               {#each subject.holdings as artwork (artwork.id)}
@@ -236,10 +216,16 @@
               {:else}
                 <div class="mx-auto">Nothing collected yet</div>
               {/each}
+              {#if $artworksLimit !== undefined && subject.holdings.length}
+                <a sveltekit:prefetch
+                  class="primary-btn mx-auto mb-12 w-full"
+                  href={`/${subject.username}/collection`}>Show all</a
+                >
+              {/if}
             </div>
           </div>
-        {:else if tab === 'offers'}
-          <Offers offers={subject.offers} />
+        {:else if tab === "offers"}
+          <Offers offers={subject.offers} activebids={subject.activebids} />
         {:else}
           <div class="w-full flex justify-center">
             <div class="w-full flex flex-wrap">
@@ -259,3 +245,42 @@
     <ProgressLinear app={true} />
   {/if}
 </div>
+
+<style>
+  .gallery-tab :global(.card-link img),
+  .gallery-tab :global(.card-link video) {
+    height: 350px;
+  }
+
+  .hover {
+    @apply border-b-2;
+    border-bottom: 3px solid #6ed8e0;
+  }
+
+  .tabs div {
+    @apply mb-auto h-10 mx-2 md:mx-4;
+    &:hover {
+      @apply border-b-2;
+      border-bottom: 3px solid #6ed8e0;
+    }
+  }
+
+  .social-details {
+    display: flex;
+    flex-direction: column;
+    margin: 25px 0;
+  }
+  .social-details a {
+    margin-top: 15px;
+  }
+
+  .social-details a:hover,
+  .social-details span:hover {
+    color: gray;
+  }
+
+  .social-details span {
+    margin-left: 8px;
+    color: #0f828a;
+  }
+</style>

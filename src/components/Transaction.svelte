@@ -14,7 +14,6 @@
     getAddress,
     parseVal,
     parseAsset,
-    broadcast,
     network,
     sign,
     requestSignature,
@@ -39,18 +38,19 @@
 
   let ins,
     outs,
-    totals,
-    senders,
-    recipients,
     showDetails,
-    users,
     loading,
     pp,
     uu;
 
+let totals = {};
+let senders = {};
+let recipients = {};
+let users = {};
+
   let labels = {};
   let retries = 0;
-  let { tx } = psbt.data.globalMap.unsignedTx;
+  let tx; 
 
   $: init(psbt);
   let init = async (p, u) => {
@@ -59,6 +59,7 @@
       loading = true;
       if (!p) return (loading = false);
 
+      tx = psbt.data.globalMap.unsignedTx.tx;
       ins = [];
       outs = [];
 

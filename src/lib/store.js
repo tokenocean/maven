@@ -5,6 +5,7 @@ const btc = import.meta.env.VITE_BTC;
 export const addresses = writable();
 export const art = writable();
 export const artworks = writable([]);
+export const artworksLimit = writable(10);
 export const asset = writable({ asset: btc });
 export const assets = writable([]);
 export const balances = writable({});
