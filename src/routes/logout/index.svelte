@@ -1,7 +1,6 @@
 <script context="module">
   import { post } from "$lib/api";
   export async function load({ fetch }) {
-console.log("LOGGING OUT");
     await post("/auth/logout", {}, fetch).res();
     return {};
   }
@@ -13,7 +12,6 @@ console.log("LOGGING OUT");
   import { goto } from "$app/navigation";
 
   if (browser) {
-    console.log("BOOM");
     $session = {};
     window.sessionStorage.removeItem("password");
     window.sessionStorage.removeItem("username");
