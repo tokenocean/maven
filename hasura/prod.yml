@@ -37,6 +37,7 @@ services:
       SMTP_PASS: "${SMTP_PASS}"
       SMTP_SENDER: "${SMTP_SENDER}"
     volumes:
+      - /var/run:/var/run
       - ./custom:/opt/src/hasura/app/custom
       - ${STORAGE_DIR}:/export
     ports:
