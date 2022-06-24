@@ -530,12 +530,7 @@ const addFee = (p) =>
 
 const bumpFee = (v) => fee.set(get(fee) + v);
 
-export const isMultisig = ({ has_royalty, auction_end }) => {
-  return !!(
-    (auction_end && compareAsc(parseISO(auction_end), new Date()) > 0) ||
-    has_royalty
-  );
-};
+export const isMultisig = ({ held }) => held === "multisig";
 
 export const releaseToSelf = async (artwork) => {
   fee.set(100);
