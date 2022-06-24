@@ -11,3 +11,13 @@ export const wait = async (f) => {
   while (!(await f())) await sleep(1000);
   return f();
 };
+
+export const getUser = async ({ headers }) => {
+  let { data, errors } = await api(headers)
+    .post({ query: getCurrentUser })
+    .json();
+
+  if (errors) throw new Error(errors[0].message);
+  return data.currentuser[0];
+};
+

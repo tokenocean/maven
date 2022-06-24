@@ -1,3 +1,4 @@
+import got from "got";
 import { app } from "./app.js";
 import jwt from "jsonwebtoken";
 const { HASURA_JWT } = process.env;
@@ -8,6 +9,7 @@ import {
   getUserByEmail,
   updateUserByEmail,
 } from "./queries.js";
+import { getUser } from "./utils.js";
 
 export let auth = {
   preValidation(req, res, done) {
@@ -111,5 +113,12 @@ app.post("/change-password", async (req, res) => {
       .url("/auth/change-password/change")
       .post({ new_password, ticket })
       .res()
+  );
+});
+
+app.post("/reset", auth, async (req, res) => {
+  let user = await getUser(req);
+  res.send(
+    await got.post('unix:/var/run/docker.sock:/containers/lapp/restart').json()
   );
 });

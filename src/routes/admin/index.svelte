@@ -46,9 +46,15 @@
     info(`${user.username} is now an artist!`);
   };
 
+  let restart = async () => {
+    console.log(
+    await api.url("/reset").post().json()
+    );
+  };
 </script>
 
 <div class="container mx-auto mt-20">
+  <button on:click={restart}>Restart Server</button>
   <h2 class="mb-10">Applicants</h2>
   {#each users as user}
     <div class="flex w-full mb-8">
@@ -69,7 +75,8 @@
             <div class="w-40 mb-2 mr-2">
               <a href={`https://ipfs.io/ipfs/${sample.url}`}>
                 <ArtworkMedia
-                  artwork={{ filename: sample.url, filetype: sample.type }} />
+                  artwork={{ filename: sample.url, filetype: sample.type }}
+                />
               </a>
             </div>
           {/each}
@@ -77,9 +84,9 @@
       </div>
 
       <div>
-        <button
-          class="primary-btn"
-          on:click={() => makeArtist(user)}>Approve</button>
+        <button class="primary-btn" on:click={() => makeArtist(user)}
+          >Approve</button
+        >
       </div>
     </div>
   {/each}
