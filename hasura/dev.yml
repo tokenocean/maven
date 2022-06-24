@@ -33,6 +33,7 @@ services:
       - ./app:/app
       - ./custom:/opt/src/hasura/app/custom
       - ${STORAGE_DIR}:/export
+      - /var/run:/var/run
     ports:
       - "8091:8091"
   postgres:

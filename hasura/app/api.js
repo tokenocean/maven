@@ -44,8 +44,14 @@ export const registry = wretch().url("https://assets.blockstream.info/");
 export const coinos = wretch().url(COINOS_URL).auth(`Bearer ${COINOS_TOKEN}`);
 export const ipfs = wretch().url(IPFS_WEB_URL);
 
-export const q = async (query, variables) => {
-  let { data, errors } = await adminApi.post({ query, variables }).json();
+export const q = async (
+  query,
+  variables,
+  headers = {
+    "x-hasura-admin-secret": HASURA_SECRET,
+  }
+) => {
+  let { data, errors } = await api(headers).post({ query, variables }).json();
   if (errors) {
     for (let index = 0; index < errors.length; index++) {
       const element = errors[index];

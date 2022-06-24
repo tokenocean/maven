@@ -1,6 +1,7 @@
 <script>
   import { Avatar, Search } from "$comp";
-  import { show, user, token } from "$lib/store";
+  import { show, token } from "$lib/store";
+  import { session } from "$app/stores";
 
   export let open = false;
   let toggle = () => (open = !open);
@@ -84,11 +85,11 @@
   <a
     href="https://www.mavennft.io/contact"
     style="color: #83e68d"><button>Contact</button></a>
-  {#if $user}
-    {#if $user.is_admin}<a href="/admin"><button>Admin</button></a>{/if}
-    <a href={`/${$user.username}`}>
+  {#if $session.user}
+    {#if $session.user.is_admin}<a href="/admin"><button>Admin</button></a>{/if}
+    <a href={`/${$session.user.username}`}>
       <button class="flex">
-        <Avatar user={$user} />
+        <Avatar user={$session.user} />
       </button></a>
   {:else}
     <a href="/login" style="color: #83e68d"><button>Sign In</button></a>

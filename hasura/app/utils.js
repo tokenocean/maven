@@ -1,3 +1,6 @@
+import { q } from "./api.js";
+import { getCurrentUser } from "./queries.js";
+
 export const kebab = (str) =>
   str &&
   str
@@ -13,11 +16,7 @@ export const wait = async (f) => {
 };
 
 export const getUser = async ({ headers }) => {
-  let { data, errors } = await api(headers)
-    .post({ query: getCurrentUser })
-    .json();
-
-  if (errors) throw new Error(errors[0].message);
-  return data.currentuser[0];
+  if (!headers.authorization) throw new Error("missing auth token");
+  let { currentuser } = await q(getCurrentUser, null, headers);
+  return currentuser[0];
 };
-

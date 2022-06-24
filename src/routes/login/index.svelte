@@ -1,28 +1,14 @@
-<script context="module">
-  export async function load({ session }) {
-    if (session && session.user) {
-      return {
-        status: 301,
-        redirect: session.redirect || `/${session.user.username}`,
-      };
-    }
-
-    return {};
-  }
-</script>
-
 <script>
   import Fa from "svelte-fa";
   import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
   import { page, session } from "$app/stores";
-  import { user, token } from "$lib/store";
+  import { token } from "$lib/store";
   import { dev, err, goto } from "$lib/utils";
   import { post } from "$lib/api";
   import cryptojs from "crypto-js";
   import { tick } from "svelte";
   import { keypair, singlesig, multisig } from "$lib/wallet";
   import { onMount } from "svelte";
-  import { redirect } from "$lib/store"; 
 
   let show;
   let email = "";
@@ -35,18 +21,13 @@
 
   let login = async () => {
     try {
-      let res = await post("/auth/login", { email, password }, fetch).json();
-
-
-      $user = res.user;
-      $session = { user: res.user, jwt: res.jwt_token };
-      $token = $session.jwt;
+      let { user, jwt_token } = await post("/auth/login", { email, password }, fetch).json();
+      $token = jwt_token;
       window.sessionStorage.setItem("password", password);
-      window.sessionStorage.setItem("username", res.user.username);
-
-      if ($redirect) goto($redirect);
-      else window.location.reload(true);
+      window.sessionStorage.setItem("username", user.username);
+      window.location.href = `/${user.username}`;
     } catch (e) {
+      console.log("login error", e);
       err(e);
     }
   };
