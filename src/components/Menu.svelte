@@ -74,9 +74,6 @@
     href="https://www.mavennft.io/"
     style="color: #83e68d"><button>Home</button></a>
   <a
-    href="https://www.mavennft.io/marketplace"
-    style="color: #83e68d"><button>Marketplace</button></a>
-  <a
     href="https://www.mavennft.io/about-us"
     style="color: #83e68d"><button>About</button></a>
   <a
