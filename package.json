@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "cypress:open": "cypress open",
-    "dev": "cross-env TAILWIND_MODE=watch svelte-kit dev --host --port 3000",
+    "dev": "TAILWIND_MODE=watch svelte-kit dev --host",
     "build": "svelte-kit build",
     "preview": "svelte-kit preview",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
@@ -16,8 +16,8 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@sveltejs/adapter-node": "1.0.0-next.76",
-    "@sveltejs/kit": "1.0.0-next.344",
+    "@sveltejs/adapter-node": "^1.0.0-next.76",
+    "@sveltejs/kit": "^1.0.0-next.344",
     "autoprefixer": "^10.4.7",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",
@@ -27,7 +27,6 @@
     "cipher-base": "github:asoltys/cipher-base",
     "cookie": "^0.4.2",
     "create-hash": "^1.2.0",
-    "cross-env": "^7.0.3",
     "crypto-js": "^4.1.1",
     "cssnano": "^5.1.9",
     "cypress": "^9.7.0",
@@ -58,8 +57,7 @@
     "uuid": "^8.3.2",
     "vite-plugin-wasm-pack": "^0.1.12",
     "wretch": "^1.7.10",
-    "wretch-middlewares": "^0.1.13",
-    "vite": "2.9.9"
+    "wretch-middlewares": "^0.1.13"
   },
   "type": "module"
 }
