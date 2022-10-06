@@ -5,6 +5,7 @@ RUN npm i -g pnpm
 
 WORKDIR /deps
 COPY package.json .
+COPY pnpm-lock.yaml
 COPY .npmrc .
 COPY .pnpmfile.cjs .
 RUN sed -i '/cypress/d' package.json
