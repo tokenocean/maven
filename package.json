@@ -60,5 +60,8 @@
     "wretch": "^1.7.10",
     "wretch-middlewares": "^0.1.13"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "vite": "2.9.9"
+  }
 }
