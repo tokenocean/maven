@@ -58,10 +58,8 @@
     "uuid": "^8.3.2",
     "vite-plugin-wasm-pack": "^0.1.12",
     "wretch": "^1.7.10",
-    "wretch-middlewares": "^0.1.13"
-  },
-  "type": "module",
-  "dependencies": {
+    "wretch-middlewares": "^0.1.13",
     "vite": "2.9.9"
-  }
+  },
+  "type": "module"
 }
