@@ -6,8 +6,8 @@ specifiers:
   '@fortawesome/free-brands-svg-icons': ^5.15.4
   '@fortawesome/free-regular-svg-icons': ^5.15.4
   '@fortawesome/free-solid-svg-icons': ^5.15.4
-  '@sveltejs/adapter-node': ^1.0.0-next.76
-  '@sveltejs/kit': ^1.0.0-next.344
+  '@sveltejs/adapter-node': 1.0.0-next.76
+  '@sveltejs/kit': 1.0.0-next.344
   autoprefixer: ^10.4.7
   bip32: ^2.0.6
   bip39: ^3.0.4
@@ -57,8 +57,8 @@ devDependencies:
   '@fortawesome/free-brands-svg-icons': 5.15.4
   '@fortawesome/free-regular-svg-icons': 5.15.4
   '@fortawesome/free-solid-svg-icons': 5.15.4
-  '@sveltejs/adapter-node': 1.0.0-next.78
-  '@sveltejs/kit': 1.0.0-next.347_svelte@3.48.0
+  '@sveltejs/adapter-node': 1.0.0-next.76
+  '@sveltejs/kit': 1.0.0-next.344_svelte@3.48.0
   autoprefixer: 10.4.7_postcss@8.4.14
   bip32: 2.0.6
   bip39: 3.0.4
@@ -228,14 +228,14 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@sveltejs/adapter-node/1.0.0-next.78:
-    resolution: {integrity: sha512-TXB5Ii0z/7o1B05p/YLsS4t+JUHFHWBzFv1U16TKvM3HMbMUJIx+AhpM2WJfDX8HtAyfd1m9OawGoUB+1ed24A==}
+  /@sveltejs/adapter-node/1.0.0-next.76:
+    resolution: {integrity: sha512-SpzjYCLwCNMI7GscsaJMX5i9nOp+OoGzUCPSBs9gln9ffjO/ICLNpyea9Yfp0CkHRfufrMzMYa3wt2lqm4o9kA==}
     dependencies:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.347_svelte@3.48.0:
-    resolution: {integrity: sha512-kxan2F8g9nM/4QzLINsPiZdLZLx6X2Tjg+Ft8KR2QPhHKCEQ3jlosnGTzmznt572PTg89UhiUhQWKK4IDk2nSA==}
+  /@sveltejs/kit/1.0.0-next.344_svelte@3.48.0:
+    resolution: {integrity: sha512-IKFyB/ErD1E6/Gl/AKA2EvOPmu6jdHDIoDYStL0PP12ZASOKTPNfSgusPHMNOTV+qyJKwo8JdOTWwLuFmZLq8A==}
     engines: {node: '>=16.7'}
     hasBin: true
     peerDependencies:
