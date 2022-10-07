@@ -7,6 +7,7 @@ services:
     image: asoltys/lnft-server
     restart: on-failure
     environment:
+      APP_URL: "${APP_URL}"
       SERVER_URL: '${SERVER_URL}'
       HASURA_SECRET:  '${HASURA_GRAPHQL_ADMIN_SECRET}'
       CLOUDFLARE_TOKEN: '${CLOUDFLARE_TOKEN}'
@@ -26,6 +27,7 @@ services:
       SMTP_USER: '${SMTP_USER}'
       SMTP_PASS: '${SMTP_PASS}'
       SMTP_SENDER: '${SMTP_SENDER}'
+      AUTH_EVENT_VALUE: '${AUTH_EVENT_VALUE}'
     volumes:
       - ./app:/app
       - ./custom:/opt/src/hasura/app/custom
