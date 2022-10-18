@@ -1,6 +1,6 @@
 import { tick } from "svelte";
 import { get } from "svelte/store";
-import { api, electrs, hasura } from "$lib/api";
+import { newapi as api, electrs, hasura, query } from "$lib/api";
 import * as middlewares from "wretch-middlewares";
 import { mnemonicToSeedSync } from "bip39";
 import { fromSeed, fromBase58 } from "bip32";
@@ -413,8 +413,9 @@ const fund = async (
   multisig = false
 ) => {
   let { address, redeem, output } = out;
-
-  let utxos = await api.url(`/address/${address}/utxo`).get().json();
+  // let utxos = await api.url(`/address/${address}/utxo`).get().json();
+  let utxos = await api().url(`/address/${address}/utxo`).get().json();
+  
   let l = (await getLocked(asset))
     .filter((t) => !(p.artwork_id && t.artwork.id === p.artwork_id))
     .map((t) => {
@@ -693,7 +694,6 @@ export const sign = async (sighash, prompt = true) => {
 
   return p;
 };
-
 export const broadcast = async (disableRetries = false) => {
   let p = await get(psbt);
   let tx = p.extractTransaction();
@@ -708,8 +708,25 @@ export const broadcast = async (disableRetries = false) => {
 
   if (disableRetries) middlewares = [];
 
-  return electrs.url("/tx").middlewares(middlewares).body(hex).post().text();
+  return api().url("/broadcast").post({ hex }).json();
 };
+// export const broadcast = async (disableRetries = false) => {
+  
+//   let p = await get(psbt);
+//   let tx = p.extractTransaction();
+//   let hex = tx.toHex();
+  
+//   let middlewares = [
+//     retry({
+//       delayTimer: 6000,
+//       maxAttempts: 5,
+//     }),
+//   ];
+
+//   if (disableRetries) middlewares = [];
+//   console.log("IN broadcast")
+//   return electrs.url("/tx").middlewares(middlewares).body(hex).post().text();
+// };
 
 export const signAndBroadcast = async () => {
   await tick();
@@ -737,30 +754,45 @@ export const executeSwap = async (artwork) => {
   let total = list_price;
 
   fee.set(100);
-
   p.addOutput({
     asset,
     nonce,
     script,
     value: 1,
   });
-
+  if (artist_id !== owner_id && has_royalty) {
+    for (let i = 0; i < royalty_recipients.length; i++) {
+      const element = royalty_recipients[i];
+      
+      const recipientValue = Math.round((list_price * element.amount) / 100);
+      total += recipientValue;
+      
+      p.addOutput({
+        asset: asking_asset,
+        value: recipientValue,
+        nonce,
+        script: Address.toOutputScript(element.address, network),
+      });
+    }
+  }
+  
   let p2 = Psbt.fromBase64(p.toBase64());
-
+  
   let construct = async (p, total) => {
     if (asking_asset === btc) total += get(fee);
     else await fund(p, out, btc, get(fee));
     await fund(p, out, asking_asset, total);
   };
-
+  
   await construct(p, total);
   addFee(p);
+  
   estimateFee(p);
 
   await construct(p2, total);
-
+  
   addFee(p2);
-
+  
   return p2;
 };
 

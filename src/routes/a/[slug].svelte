@@ -1,8 +1,9 @@
 <script context="module">
-  import { post } from "$lib/api";
+  import { newapi as api, post } from "$lib/api";
   import { browser } from "$app/env";
   import branding from "$lib/branding";
   import { host } from "$lib/utils";
+  
   export async function load({ fetch, params: { slug } }) {
     const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
 
@@ -91,7 +92,7 @@
     releaseToSelf,
   } from "$lib/wallet";
   import { Psbt } from "liquidjs-lib";
-  import { api, query } from "$lib/api";
+  import { query } from "$lib/api";
   import Armando from "$components/Armando.svelte";
   import Jose from "$components/Jose.svelte";
   import Isidro from "$components/Isidro.svelte";
@@ -237,13 +238,12 @@
       offering = false;
     }
   };
-
+  
   let save = async (e) => {
     transaction.artwork_id = artwork.id;
     transaction.asset = artwork.asking_asset;
 
-    let { data, errors } = await api
-      .auth(`Bearer ${$token}`)
+    let { data, errors } = await api()
       .url("/transaction")
       .post({ transaction })
       .json();
@@ -265,7 +265,7 @@
   let loading;
   let buyNow = async () => {
     try {
-      await requirePassword($page);
+      await requirePassword();
       loading = true;
 
       transaction.amount = -artwork.list_price;
@@ -274,12 +274,12 @@
 
       $psbt = await executeSwap(artwork);
       $psbt = await sign();
-
       if (artwork.has_royalty || artwork.auction_end) {
         $psbt = await requestSignature($psbt);
       }
-
+      
       await broadcast($psbt);
+      console.log("AFTER broadcast")
 
       let tx = $psbt.extractTransaction();
       transaction.hash = tx.getId();
@@ -287,30 +287,16 @@
 
       await save();
       await fetch();
+      // await refreshArtwork();
+      await api().url("/mail-purchase-successful").post({
+        userId: $user.id,
+        artworkId: artwork.id,
+      });
 
-      $user.email &&
-        (await api
-          .url("/mail-purchase-successful")
-          .auth(`Bearer ${$token}`)
-          .post({
-            to: $user.email,
-            userName: $user.full_name ? $user.full_name : "",
-            bidAmount: `${val(artwork.list_price)} L-BTC`,
-            artworkTitle: artwork.title,
-            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
-          }));
-
-      artwork.owner.email &&
-        (await api
-          .url("/mail-artwork-sold")
-          .auth(`Bearer ${$token}`)
-          .post({
-            to: artwork.owner.email,
-            userName: artwork.owner.full_name ? artwork.owner.full_name : "",
-            bidAmount: `${val(artwork.list_price)} L-BTC`,
-            artworkTitle: artwork.title,
-            artworkUrl: `${branding.urls.protocol}/a/${artwork.slug}`,
-          }));
+      await api().url("/mail-artwork-sold").post({
+        userId: artwork.owner.id,
+        artworkId: artwork.id,
+      });
     } catch (e) {
       err(e);
     }
