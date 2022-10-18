@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import { api, q, lnft } from "./api.js";
 import { broadcast, btc, parseAsset } from "./wallet.js";
-import { Psbt } from "liquidjs-lib";
+// import { Psbt } from "liquidjs-lib";
 import { compareAsc, parseISO } from "date-fns";
 import { mail } from "./mail.js";
 import { auth } from "./auth.js";

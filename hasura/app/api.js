@@ -7,10 +7,15 @@ const {
   HASURA_URL,
   CLOUDFLARE_TOKEN,
   CLOUDFLARE_ZONE,
-  COINOS_URL,
+  COINOS_URL, 
   COINOS_TOKEN,
   HBP_URL,
   IPFS_WEB_URL,
+  RPCHOST,
+  RPCPORT,
+  RPCUSER,
+  RPCPASS,
+  RPCWALLET,
 } = process.env;
 
 const DELAY = LIQUID_ELECTRS_URL.includes("blockstream") ? 40 : 0;
@@ -34,7 +39,7 @@ const ddequeue = () => {
 };
 
 export const hasura = wretch().url(`${HASURA_URL}/v1/graphql`);
-export const api = (h) => hasura.headers(h);
+export const api = (h) => wretch().url(`${HASURA_URL}/v1/graphql`).headers(h);
 export const adminApi = hasura.headers({
   "x-hasura-admin-secret": HASURA_SECRET,
 });
@@ -71,3 +76,23 @@ export const hbp = wretch().url(HBP_URL);
 
 const { APP_URL } = process.env;
 export const lnft = wretch().url(APP_URL);
+
+export const lq = new Proxy(
+  {},
+  {
+    get:
+      (target, prop) =>
+      (...params) =>
+        ((method, ...params) =>
+          wretch()
+            .url(`http://${RPCHOST}:${RPCPORT}/wallet/${RPCWALLET}`)
+            .auth(
+              `Basic ${Buffer.from(`${RPCUSER}:${RPCPASS}`).toString("base64")}`
+            )
+            .post({
+              method,
+              params,
+            })
+            .json(({ result }) => result))(prop.toLowerCase(), ...params),
+  }
+);

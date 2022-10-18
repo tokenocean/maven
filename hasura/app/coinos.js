@@ -1,16 +1,16 @@
 import { coinos } from "./api.js";
-import { networks } from "liquidjs-lib";
+// import { networks } from "liquidjs-lib";
 import { app } from "./app.js";
 import { auth } from "./auth.js";
 
-let network;
-if (process.env.LIQUID_ELECTRS_URL.includes("blockstream")) {
-  network = networks.liquid;
-} else {
-  network = networks.regtest;
-}
+// let network;
+// if (process.env.LIQUID_ELECTRS_URL.includes("blockstream")) {
+//   network = networks.liquid;
+// } else {
+//   network = networks.regtest;
+// }
 
-const btc = network.assetHash;
+// const btc = network.assetHash;
 const fee = 100;
 
 app.post("/bitcoin", auth, async (req, res) => {

@@ -275,6 +275,26 @@ export const getLastTransaction = `query($artwork_id: uuid!) {
   }
 }`;
 
+export const getTransactionsByTxid = `query($txids: [String!], $asset: String!) {
+  transactions(
+    where: {
+      hash: {_in: $txids},
+      asset: {_eq: $asset},
+    },
+  ) {
+    id
+    hash
+    amount
+    created_at
+    asset
+    type
+    user_id
+    address
+    confirmed
+  }
+}`;
+
+
 export const getContract = `query transactions($asset: String!) {
   transactions(where: {
     _and: [{
@@ -468,6 +488,15 @@ export const deleteUserByEmail = `mutation($email: String!) {
   { 
     affected_rows 
   } 
+}`;
+
+export const getUserByUsername = `query($username: String!) {
+  users(where: {_or: [{display_name: {_eq: $username}}, {username: {_eq: $username }}]}, limit: 1) {
+    id
+    address
+    multisig
+    display_name
+  }
 }`;
 
 export const closeAuction = `mutation update_artwork($id: uuid!, $artwork: artworks_set_input!) {

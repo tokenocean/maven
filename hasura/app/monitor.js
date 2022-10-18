@@ -2,7 +2,7 @@ import { api, ipfs, q, electrs, registry } from "./api.js";
 import { formatISO, compareAsc, parseISO, subMinutes } from "date-fns";
 import reverse from "buffer-reverse";
 import fs from "fs";
-import { Psbt } from "liquidjs-lib";
+// import { Psbt } from "liquidjs-lib";
 const sleep = (n) => new Promise((r) => setTimeout(r, n));
 import { btc, network } from "./wallet.js";
 import { app } from "./app.js";

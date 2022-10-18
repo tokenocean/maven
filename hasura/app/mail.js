@@ -222,6 +222,7 @@ app.post("/mail-purchase-successful", auth, async (req, res) => {
   }
 });
 
+
 app.post("/mail-artwork-minted", auth, async (req, res) => {
   try {
     const { userId: id, artworkId } = req.body;
