@@ -1,20 +1,23 @@
 import { v4 } from "uuid";
-import { api, q, lnft } from "./api.js";
+import { q, lnft } from "./api.js";
 import { broadcast, btc, parseAsset } from "./wallet.js";
-// import { Psbt } from "liquidjs-lib";
+import { Psbt } from "liquidjs-lib";
 import { compareAsc, parseISO } from "date-fns";
 import { mail } from "./mail.js";
 import { auth } from "./auth.js";
+// import { newapi as api, post } from "$lib/api";
+
 
 import {
   acceptBid,
   cancelBid,
+  cancelListing,
   createArtwork,
   createComment,
   createTransaction,
   deleteTransaction,
   getArtwork,
-  getCurrentUser,
+  getListing,
   getUserByAddress,
   getTransactionArtwork,
   getTransactionUser,
@@ -27,18 +30,10 @@ import {
 } from "./queries.js";
 
 const { SERVER_URL } = process.env;
-import { kebab, sleep, wait } from "./utils.js";
+import { getUser, getUserById, kebab, sleep, wait, isSpent } from "./utils.js";
 import crypto from "crypto";
 import { app } from "./app.js";
-
-const getUser = async ({ headers }) => {
-  let { data, errors } = await api(headers)
-    .post({ query: getCurrentUser })
-    .json();
-
-  if (errors) throw new Error(errors[0].message);
-  return data.currentuser[0];
-};
+import { utxos } from "./utxos.js";
 
 app.post("/cancel", auth, async (req, res) => {
   try {
@@ -70,12 +65,12 @@ app.post("/transfer", auth, async (req, res) => {
       type: "transfer",
     };
 
-    let result = await api(req.headers)
-      .post({ query: createTransaction, variables: { transaction } })
-      .json();
-
-    if (result.errors) throw new Error(result.errors[0].message);
-    transfer_id = result.data.insert_transactions_one.id;
+    let { insert_transactions_one: r } = await q(
+      createTransaction,
+      { transaction },
+      req.headers
+    );
+    transfer_id = r.id;
 
     let { users } = await q(getUserByAddress, { address });
 
@@ -98,7 +93,7 @@ app.post("/transfer", auth, async (req, res) => {
     }
 
     try {
-      await broadcast(Psbt.fromBase64(transaction.psbt));
+      await broadcast(Psbt.fromBase64(psbt));
     } catch (e) {
       if (users.length) {
         await q(deleteTransaction, { id: receipt_id });
@@ -128,14 +123,28 @@ app.post("/transfer", auth, async (req, res) => {
 
 app.post("/held", async (req, res) => {
   try {
-    let { artworks_by_pk: artwork } = await q(getArtwork, { id: req.body.id });
+    let { id } = req.body;
+    let { artworks_by_pk: artwork } = await q(getArtwork, { id });
     let { asset, owner } = artwork;
     let { address, multisig } = owner;
 
-    let find = async (a) =>
-      (await lnft.url(`/address/${a}/utxo`).get().json()).find(
-        (tx) => tx.asset === asset
-      );
+
+    if (artwork.list_price_tx) {
+      let p = Psbt.fromBase64(artwork.list_price_tx)
+      try {
+        if (await isSpent(p.data.globalMap.unsignedTx.tx, id)) {
+          let { activelistings } = await q(getListing, { id });
+          await q(cancelListing, { id: activelistings[0].id, artwork_id: id });
+        }
+      } catch (e) {
+        console.log("problem cancelling listing", e)
+      }
+    }
+
+    let find = async (a) => {
+      let txns = await utxos(a);
+      return txns.find((tx) => tx.asset === asset);
+    };
 
     let held = null;
     if (await find(address)) held = "single";
@@ -224,13 +233,12 @@ app.post("/transaction", auth, async (req, res) => {
       url: `${SERVER_URL}/a/${slug}`,
     };
 
-    let result = await api(req.headers)
-      .post({ query: createTransaction, variables: { transaction } })
-      .json();
-
-    if (result.errors) throw new Error(result.errors[0].message);
-
-    res.send(result.data.insert_transactions_one);
+    let { insert_transactions_one: r } = await q(
+      createTransaction,
+      { transaction },
+      req.headers
+    );
+    res.send(r);
   } catch (e) {
     console.log("problem creating transaction", e);
     res.code(500).send(e.message);
@@ -258,10 +266,7 @@ app.post("/tx/update", auth, async (req, res) => {
 app.post("/accept", auth, async (req, res) => {
   try {
     await broadcast(Psbt.fromBase64(req.body.psbt));
-    let { data } = await api(req.headers)
-      .post({ query: acceptBid, variables: req.body })
-      .json();
-    res.send(data);
+    res.send(await q(acceptBid, req.body, req.headers));
   } catch (e) {
     console.log(e);
     res.code(500).send(e.message);
@@ -274,6 +279,7 @@ const issue = async (issuance, ids, { artwork, transactions, user_id }) => {
   let tries = 0;
   let i = 0;
   let contract, psbt;
+  let user = await getUserById(user_id)
 
   let tags = artwork.tags.map(({ tag }) => ({
     tag,
@@ -340,13 +346,17 @@ const issue = async (issuance, ids, { artwork, transactions, user_id }) => {
   }
 
   try {
-    // await api
-    //   .url("/mail-artwork-minted")
-    //   .auth(`Bearer ${$session.jwt}`)
-    //   .post({
-    //     userId: $session.user.id,
-    //     artworkId: artwork.id,
-    //   });
+    let result = await mail.send({
+      template: "artwork-minted",
+      locals: {
+        userName: user.full_name,
+        artworkTitle: artwork.title,
+        artworkUrl: artwork.slug,
+      },
+      message: {
+        to: user.display_name,
+      },
+    });
   } catch (e) {
     console.log(e);
   }
@@ -394,9 +404,16 @@ app.post("/comment", auth, async (req, res) => {
     let { amount, comment: commentBody, psbt, artwork_id } = req.body;
 
     let {
-      artworks_by_pk: { owner_id },
+      artworks_by_pk: {
+        owner_id,
+        artist_id,
+        title,
+        artist: { bitcoin_unit },
+      },
     } = await q(getArtwork, { id: artwork_id });
+
     let user = await getUser(req);
+    let artist = await getUserById(artist_id);
 
     if (user.id !== owner_id) {
       let transaction = {
@@ -419,6 +436,24 @@ app.post("/comment", auth, async (req, res) => {
     };
 
     let r = await q(createComment, { comment });
+
+    try {
+      let result = await mail.send({
+        template: "comment-received",
+        locals: {
+          artistName: artist.full_name,
+          artworkName: title,
+          commenterName: user.full_name,
+          tipAmount: amount,
+          unit: bitcoin_unit === "sats" ? "L-sats" : "L-BTC",
+        },
+        message: {
+          to: artist.display_name,
+        },
+      });
+    } catch (e) {
+      console.log("failed to send comment notification", e);
+    }
 
     res.send({ ok: true });
   } catch (e) {

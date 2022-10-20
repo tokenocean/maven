@@ -8,4 +8,3 @@ app.register(fastifyStatic, {
   root: path.join("/export"),
   prefix: "/public/", // optional: default '/'
 });
-

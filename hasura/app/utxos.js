@@ -9,7 +9,7 @@ import {
   parseAsset,
   parseVal,
 } from "./wallet.js";
-// import { address as Address, Transaction } from "liquidjs-lib";
+import { address as Address, Transaction } from "liquidjs-lib";
 import reverse from "buffer-reverse";
 import { app } from "./app.js";
 import { auth } from "./auth.js";

@@ -7,7 +7,7 @@ const {
   HASURA_URL,
   CLOUDFLARE_TOKEN,
   CLOUDFLARE_ZONE,
-  COINOS_URL, 
+  COINOS_URL,
   COINOS_TOKEN,
   HBP_URL,
   IPFS_WEB_URL,
@@ -21,29 +21,33 @@ const {
 const DELAY = LIQUID_ELECTRS_URL.includes("blockstream") ? 40 : 0;
 
 const queue = [];
+let processed = 0;
 
 const enqueue = (next) => (url, opts) =>
-  new Promise((r) => queue.push(() => r(next(url, opts))) && ddequeue());
+  new Promise((r) => queue.push(() => r(next(url, opts))) && check());
 
-let timer;
 const dequeue = () => {
   if (queue.length) {
     queue.shift()();
-    ddequeue();
+    processed++;
+    check();
   }
 };
 
-const ddequeue = () => {
-  clearTimeout(timer);
-  timer = setTimeout(dequeue, DELAY);
+const check = () => {
+  if (processed < 40) dequeue();
+  else {
+    setTimeout(reset, 1000);
+  }
+};
+
+const reset = () => {
+  processed = 0;
+  dequeue();
 };
 
 export const hasura = wretch().url(`${HASURA_URL}/v1/graphql`);
 export const api = (h) => wretch().url(`${HASURA_URL}/v1/graphql`).headers(h);
-export const adminApi = hasura.headers({
-  "x-hasura-admin-secret": HASURA_SECRET,
-});
-
 export const electrs = wretch().middlewares([enqueue]).url(LIQUID_ELECTRS_URL);
 export const registry = wretch().url("https://assets.blockstream.info/");
 export const coinos = wretch().url(COINOS_URL).auth(`Bearer ${COINOS_TOKEN}`);

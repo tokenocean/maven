@@ -1,13 +1,14 @@
 import { keypair, parse, sign } from "./wallet.js";
-import { hasura } from "./api.js";
+import { hasura, q } from "./api.js";
 import { parseISO, isWithinInterval } from "date-fns";
-// import { address as Address } from "liquidjs-lib";
+import { address as Address } from "liquidjs-lib";
 import wretch from "wretch";
 import fetch from "node-fetch";
 wretch().polyfills({ fetch });
 const { HASURA_URL } = process.env;
 import { app } from "./app.js";
 import { auth } from "./auth.js";
+
 
 const query = `
   query($assets: [String!]) {

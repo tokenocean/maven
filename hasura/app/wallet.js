@@ -1,30 +1,31 @@
 import { mnemonicToSeedSync } from "bip39";
 import { fromSeed } from "bip32";
+import redis from "./redis.js";
+import { sleep, wait } from "./utils.js";
 
-// import {
-//   address as Address,
-//   confidential,
-//   Psbt,
-//   Transaction,
-//   payments,
-//   networks,
-// } from "liquidjs-lib";
+import {
+  address as Address,
+  confidential,
+  Psbt,
+  Transaction,
+  payments,
+  networks,
+} from "liquidjs-lib";
 
 import { ECPair } from "./ecc.js";
 
 import { electrs, lq } from "./api.js";
 import reverse from "buffer-reverse";
 
-// export const network =
-//   networks[
-//     process.env.LIQUID_ELECTRS_URL.includes("blockstream")
-//       ? "liquid"
-//       : "regtest"
-//   ];
+export const network =
+  networks[
+    process.env.LIQUID_ELECTRS_URL.includes("blockstream")
+      ? "liquid"
+      : "regtest"
+  ];
 
-// export const btc = network.assetHash;
-export let network;
-export let btc;
+export const btc = network.assetHash;
+
 const mnemonic = process.env.SIGNING_SERVER_MNEMONIC;
 
 const path = "m/84'/0'/0'/0/0";
@@ -76,7 +77,7 @@ export const broadcast = async (psbt) => {
   let tx = psbt.extractTransaction();
   let hex = tx.toHex();
 
-  return lq.sendRawTransaction(hex)
+  return lq.sendRawTransaction(hex);
 };
 
 export const parseVal = (v) => parseInt(v.slice(1).toString("hex"), 16);
