@@ -480,7 +480,7 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
     console.log("problem getting transactions", e);
   }
 });
-console.log("INSIDE")
+
 app.post("/broadcast", async (req, res) => {
   let { hex } = req.body;
 
