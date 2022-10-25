@@ -169,6 +169,7 @@ select_permissions:
         - address
         - avatar_url
         - bio
+        - bitcoin_unit
         - created_at
         - display_name
         - email
@@ -200,6 +201,7 @@ select_permissions:
         - address
         - avatar_url
         - bio
+        - bitcoin_unit
         - blindkey
         - confidential
         - email
@@ -236,6 +238,7 @@ update_permissions:
         - address
         - avatar_url
         - bio
+        - bitcoin_unit
         - blindkey
         - confidential
         - display_name
