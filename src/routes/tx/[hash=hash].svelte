@@ -2,9 +2,11 @@
   import Fa from "svelte-fa";
   import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
   import { Transaction } from "$comp";
-  import { Psbt } from "liquidjs-lib";
+  import { Transaction as T, Psbt } from "liquidjs-lib";
 
-  export let psbt, hex;
+  export let hex;
+
+  let tx = T.fromHex(hex);
 </script>
 
 <div class="container mx-auto px-10 mt-16 max-w-4xl">
@@ -21,5 +23,5 @@
     </a>
     <h3 class="py-4">Transaction details</h3>
   </div>
-  <Transaction psbt={Psbt.fromBase64(psbt)} {hex} />
+  <Transaction {tx} />
 </div>

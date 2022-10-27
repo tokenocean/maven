@@ -17,6 +17,7 @@ import { getArtworkByAsset } from "$queries/artworks.js";
 import { getUserByAddress } from "$queries/users.js";
 
 export const btc = import.meta.env.VITE_BTC;
+console.log("HERE:", btc);
 export const cad = import.meta.env.VITE_CAD;
 export const usd = import.meta.env.VITE_USD;
 export const host = import.meta.env.VITE_HOST;
@@ -316,4 +317,57 @@ export const canAccept = ({ type, artwork, created_at, accepted }, debug) => {
     isOwner(artwork) &&
     !underway(artwork)
   );
+};
+
+export const updateBitcoinUnit = async (unit) => {
+  try {
+    let currentUser = get(user);
+
+    if (currentUser) {
+      const id = currentUser.id;
+      const setUnit = { bitcoin_unit: unit };
+
+      bitcoinUnitLocal.set(unit);
+      await query(updateUser, { user: setUnit, id });
+    } else {
+      browser && window.localStorage.setItem("unit", unit);
+      bitcoinUnitLocal.set(unit);
+    }
+  } catch (e) {
+    err(e);
+  }
+};
+
+export const updateFiat = async () => {
+  try {
+    let currentUser = get(user);
+    if (currentUser) {
+      const fiats = JSON.parse(currentUser.fiats);
+      if (currentUser && fiats.length > 1) {
+        const id = currentUser.id;
+
+        const currentIndex = fiats.indexOf(currentUser.fiat);
+
+        currentUser.fiat =
+          currentIndex === fiats.length - 1
+            ? fiats[0]
+            : fiats[currentIndex + 1];
+
+        const setFiat = { fiat: currentUser.fiat };
+        user.set(currentUser);
+
+        await query(updateUser, { user: setFiat, id });
+      }
+    } else {
+      let fiats = ["USD", "EUR", "JPY", "GBP", "CAD", "AUD", "CNY"];
+      let i = fiats.indexOf(get(fiat));
+      fiat.set(++i >= fiats.length ? fiats[0] : fiats[i]);
+    }
+  } catch (e) {
+    err(e);
+  }
+};
+
+export const satsFormatted = (amount) => {
+  return new Intl.NumberFormat().format(amount);
 };

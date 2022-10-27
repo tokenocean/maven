@@ -35,8 +35,8 @@
   import Transactions from "../_transactions.svelte";
 
   export let asset, page;
-
   let a = asset.asset;
+  
   let balance, pending, funding, withdrawing;
 
   let toggleFunding = () => {
@@ -84,6 +84,7 @@
   };
 
   let init = async () => {
+    console.log("INSIDE INIT");
     if (browser) {
       prefetch("/wallet/assets/1");
       if ($confirmed[a]) {

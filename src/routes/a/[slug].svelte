@@ -279,7 +279,7 @@
       }
       
       await broadcast($psbt);
-      console.log("AFTER broadcast")
+     
 
       let tx = $psbt.extractTransaction();
       transaction.hash = tx.getId();

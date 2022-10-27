@@ -1,6 +1,23 @@
 import { writable } from "svelte/store";
+import { browser } from "$app/env";
 
 const btc = import.meta.env.VITE_BTC;
+
+const persisted = (k, i) => {
+  if (
+    browser &&
+    sessionStorage.getItem(k) &&
+    sessionStorage.getItem(k) !== "undefined"
+  ) {
+    try {
+      i = JSON.parse(sessionStorage.getItem(k));
+    } catch (e) {}
+  }
+
+  let s = writable(i);
+  s.subscribe((v) => browser && sessionStorage.setItem(k, JSON.stringify(v)));
+  return s;
+};
 
 export const addresses = writable();
 export const art = writable();
@@ -12,6 +29,7 @@ export const balances = writable({});
 export const edition = writable();
 export const error = writable();
 export const fee = writable(100);
+export const fiat = writable("USD");
 export const filterCriteria = writable({
   listPrice: false,
   openBid: false,
@@ -36,13 +54,19 @@ export const show = writable();
 export const sighash = writable();
 export const snack = writable();
 export const sortCriteria = writable("newest");
+export const bitcoinUnitLocal = writable("");
+export const fiatRates = writable({});
 export const painting = writable();
 export const variation = writable();
 export const titles = writable([]);
+export const assetCount = persisted("assetCount", 0);
 export const token = writable();
 export const transactions = writable([]);
+export const confirmed = persisted("confirmed", {});
+export const unconfirmed = persisted("unconfirmed", {});
 export const user = writable();
 export const wallet = writable();
 export const txcache = writable({});
 export const acceptStatus = writable();
 export const signStatus = writable();
+export const txCount = persisted("txCount", 0);

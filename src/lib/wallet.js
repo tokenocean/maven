@@ -82,6 +82,21 @@ export const getTransactions = (user) => {
   return txns();
 };
 
+export const getBalance = async (asset) => {
+  let { confirmed: c, unconfirmed: u } = await api()
+    .url(`/${asset}/balance`)
+    .get()
+    .json();
+
+  let nc = { ...get(confirmed) };
+  let nu = { ...get(unconfirmed) };
+  nc[asset] = c[asset];
+  nu[asset] = u[asset];
+
+  confirmed.set(nc);
+  unconfirmed.set(nu);
+};
+
 export const getBalances = async ({ user, jwt }) => {
   await requirePassword({ jwt });
 

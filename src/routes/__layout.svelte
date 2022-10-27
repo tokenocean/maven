@@ -11,10 +11,12 @@
         },
       };
 
-    const props = await get(`/announcements.json`, fetch);
+    const props = await fetch("/announcements", {
+      headers: { "content-type": "application/json" },
+    }).then((r) => r.json());
     props.jwt = session.jwt;
 
-    let authRequired = [/a\/create/, /edit/, /wallet/, ];
+    let authRequired = [/a\/create/, /edit/, /wallet/];
     if (!session?.user && authRequired.find((p) => url.pathname.match(p))) {
       return {
         status: 302,
@@ -56,7 +58,15 @@
   import { page, session } from "$app/stores";
   import decode from "jwt-decode";
   import { Sidebar, Navbar, Dialog, Footer, Snack, Head } from "$comp";
-  import { meta, popup as p, password, prompt, poll, user, token } from "$lib/store";
+  import {
+    meta,
+    popup as p,
+    password,
+    prompt,
+    poll,
+    user,
+    token,
+  } from "$lib/store";
   import { onDestroy, onMount } from "svelte";
   import branding from "$lib/branding";
   import { checkAuthFromLocalStorage } from "$lib/auth";

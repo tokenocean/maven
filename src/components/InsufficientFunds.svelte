@@ -12,7 +12,7 @@
   import { faClone } from "@fortawesome/free-regular-svg-icons";
   import { ProgressLinear } from "$comp";
   import { onDestroy, onMount, tick } from "svelte";
-  import qrcode from "qrcode-generator-es6";
+  import qrcode from "qrcode";  
   import { balances, error, locked, pending, prompt } from "$lib/store";
   import { assetLabel, btc, copy, err, fullscreen, ticker, val } from "$lib/utils";
   import { getBalances } from "$lib/wallet";
