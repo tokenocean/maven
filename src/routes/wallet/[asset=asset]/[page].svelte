@@ -84,7 +84,6 @@
   };
 
   let init = async () => {
-    console.log("INSIDE INIT");
     if (browser) {
       prefetch("/wallet/assets/1");
       if ($confirmed[a]) {

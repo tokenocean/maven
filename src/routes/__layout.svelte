@@ -11,12 +11,17 @@
         },
       };
 
+    const rates = await fetch("/rates", {
+      headers: { "content-type": "application/json" },
+    }).then((r) => r.json());
+
     const props = await fetch("/announcements", {
       headers: { "content-type": "application/json" },
     }).then((r) => r.json());
-    props.jwt = session.jwt;
 
-    let authRequired = [/a\/create/, /edit/, /wallet/];
+    props.rates = rates;
+
+    let authRequired = [/a\/create/, /edit/, /wallet/, /settings/];
     if (!session?.user && authRequired.find((p) => url.pathname.match(p))) {
       return {
         status: 302,

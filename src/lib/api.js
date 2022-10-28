@@ -75,3 +75,5 @@ export const getQ = (defaultHeaders) => {
     }
   };
 };
+
+export const coinos = wretch().url(import.meta.env.VITE_COINOS);

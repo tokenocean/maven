@@ -17,7 +17,6 @@ import { getArtworkByAsset } from "$queries/artworks.js";
 import { getUserByAddress } from "$queries/users.js";
 
 export const btc = import.meta.env.VITE_BTC;
-console.log("HERE:", btc);
 export const cad = import.meta.env.VITE_CAD;
 export const usd = import.meta.env.VITE_USD;
 export const host = import.meta.env.VITE_HOST;
