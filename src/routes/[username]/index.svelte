@@ -81,7 +81,7 @@
   let tab = subject.is_artist ? "creations" : "collection";
 </script>
 
-<!-- 
+
 <div class="container mx-auto lg:px-16 mt-5 md:mt-20">
   {#if subject}
     <div class="flex justify-between flex-wrap">
@@ -154,8 +154,8 @@
         {#if subject.bio}
           <p>{subject.bio}</p>
         {/if}
-        {#if $session.user}
-          {#if $session.user.id === subject.id}
+        {#if $user}
+          {#if $user.id === subject.id}
             <Menu />
           {:else}
             <button class="p-2 primary-btn follow mt-8" on:click={follow}>
@@ -183,7 +183,7 @@
           >
             Collection
           </div>
-          {#if $session.user && $session.user.id === id}
+          {#if $user && $user.id === id}
             <div
               class:hover={tab === "offers"}
               on:click={() => (tab = "offers")}
@@ -201,7 +201,7 @@
         {#if tab === "creations"}
           <div class="w-full justify-center">
             <div class="w-full max-w-sm mx-auto mb-12">
-              {#if $session.user && $session.user.is_artist && $session.user.id === subject.id}
+              {#if $user?.is_artist && $user?.id === subject.id}
                 <a href="/a/create" class="primary-btn">Submit a new artwork</a>
               {/if}
             </div>
@@ -298,4 +298,4 @@
     margin-left: 8px;
     color: #0f828a;
   }
-</style> -->
+</style>
