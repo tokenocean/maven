@@ -1,34 +1,37 @@
-<script context="module">
-  import { get } from "$lib/api";
-  export async function load({ fetch, params }) {
-    const { subject } = await get(`/${params.username}.json`, fetch);
-
-    return {
-      props: {
-        subject,
-      },
-    };
-  }
-</script>
-
 <script>
-  import { session } from "$app/stores";
-  import { artworksLimit } from "$lib/store";
+  import {
+    artworksLimit,
+    prompt,
+    messageUser,
+    tipUser,
+    user,
+  } from "$lib/store";
   import Fa from "svelte-fa";
   import {
     faEnvelope,
     faLink,
     faMapMarkerAlt,
+    faWallet,
   } from "@fortawesome/free-solid-svg-icons";
   import { faTwitter, faInstagram } from "@fortawesome/free-brands-svg-icons";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { err, goto } from "$lib/utils";
-  import { Avatar, Card, Offers, ProgressLinear } from "$comp";
+  import { err, goto, copy } from "$lib/utils";
+  import { fromBase58 } from "bip32";
+  import {
+    Avatar,
+    Card,
+    Offers,
+    ProgressLinear,
+    SendMessage,
+    SendTip,
+  } from "$comp";
   import { createFollow, deleteFollow } from "$queries/follows";
   import { getUserByUsername } from "$queries/users";
   import Menu from "./_menu.svelte";
   import { query } from "$lib/api";
+  import { network } from "$lib/wallet";
+  import qrcode from "qrcode";
 
   export let id;
   export let subject;
@@ -54,7 +57,7 @@
 
   let follow = () => {
     if (subject.followed) {
-      query(deleteFollow($session.user, subject)).catch(err);
+      query(deleteFollow($user, subject)).catch(err);
       subject.followed = false;
       subject.num_followers--;
     } else {
@@ -64,9 +67,21 @@
     }
   };
 
+  let qr, showQr;
+  let toggleQr = () => {
+    showQr = !showQr;
+  };
+
+  onMount(async () => {
+    let address = subject.address;
+    address = `bitcoin:${address}`;
+    qr = await qrcode.toDataURL(address);
+  });
+
   let tab = subject.is_artist ? "creations" : "collection";
 </script>
 
+<!-- 
 <div class="container mx-auto lg:px-16 mt-5 md:mt-20">
   {#if subject}
     <div class="flex justify-between flex-wrap">
@@ -283,4 +298,4 @@
     margin-left: 8px;
     color: #0f828a;
   }
-</style>
+</style> -->

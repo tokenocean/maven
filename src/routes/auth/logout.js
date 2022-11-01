@@ -6,7 +6,7 @@ const opts = {
   path: "/",
 };
 
-export async function post(request) {
+export async function POST(request) {
   return {
     body: {},
     headers: {

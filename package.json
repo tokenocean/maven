@@ -31,6 +31,8 @@
     "cssnano": "^5.1.9",
     "cypress": "^9.7.0",
     "cypress-file-upload": "^5.0.8",
+    "browserify-cipher": "^1.0.1",
+    "@noble/secp256k1": "1.6.0",
     "date-fns": "^2.28.0",
     "graphql": "^15.8.0",
     "hash-base": "github:asoltys/hash-base",

@@ -38,3 +38,5 @@ export { default as RoyaltyRecipientAdd } from "./RoyaltyRecipientAdd.svelte";
 export { default as RoyaltyRecipientList } from "./RoyaltyRecipientList.svelte";
 export { default as RoyaltyInfo } from "./RoyaltyInfo.svelte";
 export { default as Fiat } from "./Fiat.svelte";
+export {default as SendMessage } from "./SendMessage.svelte";
+export {default as SendTip } from "./SendTip.svelte";

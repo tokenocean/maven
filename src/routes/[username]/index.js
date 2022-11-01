@@ -1,7 +1,8 @@
+import { checkToken } from "$lib/auth";
 import { getUserByUsername } from "$queries/users";
-export async function get({
+export async function GET({
   request: { headers },
-  locals: { q },
+  locals: { q, user },
   params: { username },
 }) {
   try {
@@ -9,6 +10,7 @@ export async function get({
 
     if (!users.length) throw new Error("user not found");
 
+    let r = checkToken(headers);
     return {
       body: {
         subject: users[0],

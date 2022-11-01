@@ -3,13 +3,14 @@ import cookie from "cookie";
 import { addSeconds } from "date-fns";
 import { getUser } from "$queries/users";
 
-export async function post({ locals, request }) {
+export async function POST({ locals, request }) {
   let { q } = locals;
 
   try {
     let body = await request.json();
     const res = await serverApi.url("/login").post(body).res();
     body = await res.json();
+    console.log("INSIDE", body);
     let { jwt_expires_in, jwt_token } = body;
 
     let tokenExpiry = parseInt(jwt_expires_in / 1000);
