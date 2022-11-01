@@ -63,6 +63,7 @@
   import { page, session } from "$app/stores";
   import decode from "jwt-decode";
   import { Sidebar, Navbar, Dialog, Footer, Snack, Head } from "$comp";
+  import { getMessages } from "$queries/messages";
   import {
     meta,
     popup as p,
@@ -71,38 +72,101 @@
     poll,
     user,
     token,
+    bitcoinUnitLocal,
+    storeMessages,
+    unreadMessages,
+    username,
+    fiatRates,
   } from "$lib/store";
   import { onDestroy, onMount } from "svelte";
   import branding from "$lib/branding";
-  import { checkAuthFromLocalStorage } from "$lib/auth";
+  import { checkAuthFromLocalStorage, requirePassword } from "$lib/auth";
+  import { query } from "$lib/api";
+  import { err, decrypt, goto } from "$lib/utils";
+  import { keypair, network } from "$lib/wallet";
 
-  export let popup;
-  export let jwt;
+  export let popup, rates;
 
-  let unsubscribeFromSession;
-  let refreshInterval;
-  let authCheckInterval;
+  $fiatRates = rates;
+
+  function initializeBTCUnits() {
+    if ($user) {
+      $bitcoinUnitLocal = $user.bitcoin_unit;
+    } else if (window.localStorage.getItem("unit")) {
+      $bitcoinUnitLocal = window.localStorage.getItem("unit");
+    } else {
+      window.localStorage.setItem("unit", "btc");
+      $bitcoinUnitLocal = "btc";
+    }
+  }
+
+  let refreshTimeouts = [];
+  let refreshInterval = 60000;
+  let authTimer,
+    authInterval = 5000;
+  let messagesTimer,
+    messagesInterval = 5000;
 
   let refresh = async () => {
-    try {
-      let { jwt_token } = await get("/auth/refresh.json", fetch);
-      $token = jwt_token;
-    } catch (e) {
-      console.log(e);
+    if ($user) {
+      try {
+        let { currentuser, jwt_token } = await get("/auth/refresh");
+        $token = jwt_token;
+        $user = currentuser;
+      } catch (e) {
+        console.log("problem refreshing token", e);
+        goto("/logout");
+      }
     }
+
+    refreshTimeouts.map((t) => clearTimeout(t));
+    refreshTimeouts.push(setTimeout(refresh, refreshInterval));
   };
 
   let authCheck = async () => {
     try {
-      if ($session.user) {
-        checkAuthFromLocalStorage($session.user);
+      if ($user?.username) {
+        checkAuthFromLocalStorage($user);
       }
     } catch (e) {
       console.log(e);
     }
+
+    authTimer = setTimeout(authCheck, authInterval);
   };
 
+  let messages = [];
+
+  let fetchMessages = async () => {
+    if ($user) {
+      try {
+        ({ messages } = await query(getMessages));
+        let newMessages = messages.filter(
+          (m) => !$storeMessages.find((o) => m.id === o.id)
+        );
+
+        if (newMessages.length) {
+          $storeMessages = [...$storeMessages, ...newMessages];
+        }
+
+        $unreadMessages = messages.filter(
+          (message) => message.to === $user.id && message.viewed === false
+        );
+      } catch (e) {
+        err(e);
+      }
+    }
+
+    messagesTimer = setTimeout(fetchMessages, messagesInterval);
+  };
+
+  $: updateUser($session);
+  let updateUser = (s) => ($user = s.user);
+
   if (browser) {
+    $user = $session.user && { ...$session.user };
+    $token = $session.jwt;
+
     history.pushState = new Proxy(history.pushState, {
       apply(target, thisArg, argumentsList) {
         Reflect.apply(target, thisArg, argumentsList);
@@ -111,15 +175,6 @@
     });
 
     $p = popup;
-    $user = $session.user;
-    $token = jwt;
-
-    refreshInterval = setInterval(refresh, 720000);
-    authCheckInterval = setInterval(authCheck, 5000);
-
-    unsubscribeFromSession = session.subscribe((value) => {
-      value && value.user && checkAuthFromLocalStorage(value.user);
-    });
   }
 
   let open = false;
@@ -132,13 +187,19 @@
   $: stopPolling($page);
 
   onDestroy(() => {
-    clearInterval(refreshInterval);
-    clearInterval(authCheckInterval);
-    unsubscribeFromSession && unsubscribeFromSession();
+    refreshTimeouts.map((t) => clearTimeout(t));
+    clearTimeout(authTimer);
+    clearTimeout(messagesTimer);
   });
+
   onMount(() => {
-    if (browser && !$password)
-      $password = window.sessionStorage.getItem("password");
+    if (browser) {
+      refresh();
+      fetchMessages();
+      authCheck();
+      initializeBTCUnits();
+      if (!$password) $password = window.sessionStorage.getItem("password");
+    }
   });
 </script>
 
