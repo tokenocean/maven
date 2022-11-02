@@ -10,15 +10,15 @@ export async function POST({ locals, request }) {
     let body = await request.json();
     const res = await serverApi.url("/login").post(body).res();
     body = await res.json();
-    console.log("INSIDE", body);
+    
     let { jwt_expires_in, jwt_token } = body;
-
     let tokenExpiry = parseInt(jwt_expires_in / 1000);
 
     let { currentuser } = await q(getUser, undefined, {
       authorization: `Bearer ${jwt_token}`,
     });
     body.user = currentuser[0];
+    console.log("CURRENT USER:", currentuser);
 
     return {
       body,

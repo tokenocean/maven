@@ -16,12 +16,12 @@ export const api = wretch().url(`${host}/api`);
 export const newapi = (headers) => {
   let url = import.meta.env.VITE_APP;
   let jwt = headers && cookie.parse(headers.get("cookie") || "").token;
-
+  
   if (browser) {
     url = `${host}/api` 
     jwt = getStore(token);
   } 
-
+  
   return wretch().url(url).auth(jwt ? `Bearer ${jwt}` : undefined);
 } 
   

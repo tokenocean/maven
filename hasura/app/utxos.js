@@ -40,7 +40,7 @@ let balances = async (address, asset) => {
   let sum = (a, b) => ({ ...a, [b.asset]: (a[b.asset] || 0) + b.value });
   confirmed = confirmed.reduce(sum, {});
   unconfirmed = unconfirmed.reduce(sum, {});
-
+    console.log("INSIDE BALANCES:", address, confirmed, unconfirmed)
   return { confirmed, unconfirmed };
 };
 

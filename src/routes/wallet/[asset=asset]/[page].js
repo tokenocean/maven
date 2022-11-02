@@ -1,6 +1,6 @@
 import { newapi as api } from "$lib/api";
 export async function GET({ params }) {
-  console.log("INSIDE", params)
+  
   let { page } = params;
   page = parseInt(page);
 

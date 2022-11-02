@@ -15,7 +15,7 @@
   let amount;
 
   $: unitCalculated = $bitcoinUnitLocal === "sats" ? "L-sats" : "L-BTC";
-
+  
   $: fiatAmount = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: $user ? $user.fiat : $fiat,

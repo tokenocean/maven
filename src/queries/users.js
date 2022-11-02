@@ -5,7 +5,8 @@ import { fields as txFields } from "./transactions";
 let fields =
   "id, username, location, bio, email, full_name, website, twitter, instagram, avatar_url, address, multisig, pubkey, is_artist, prompt_sign";
 
-let privateFields = "mnemonic, wallet_initialized, is_admin, info, has_samples";
+let privateFields =
+  "mnemonic, wallet_initialized, is_admin, info, has_samples, bitcoin_unit, fiats, fiat";
 
 let computed = "followed, num_follows, num_followers";
 
@@ -13,6 +14,11 @@ export const getUser = `query {
   currentuser (limit: 1) {
     ${fields}
     ${privateFields}
+    user {
+      follows {
+        user_id
+      }
+    }
   }
 }`;
 
@@ -22,6 +28,7 @@ export const getUsers = `query {
     address
     multisig
     avatar_url
+    pubkey
   }
 }`;
 
@@ -32,8 +39,9 @@ export const getUserByAddress = `query($address: String!) {
       multisig
       username
       avatar_url
+      pubkey
   }
-}`
+}`;
 
 export const getUserByUsername = `query($username: String!, $artworksLimit: Int) {
   users(where: { username: {_eq: $username }}, limit: 1) {
@@ -103,6 +111,8 @@ export const topCollectors = (limit) => `query {
     id
     username
     avatar_url
+    address
+    pubkey
     owned
     collected
     resold
@@ -116,6 +126,8 @@ export const topArtists = (limit) => `query {
     id
     username
     avatar_url
+    address
+    pubkey
     creations
     total_sales
     highest_sale
