@@ -18,7 +18,6 @@ export async function POST({ locals, request }) {
       authorization: `Bearer ${jwt_token}`,
     });
     body.user = currentuser[0];
-    console.log("CURRENT USER:", currentuser);
 
     return {
       body,

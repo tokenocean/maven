@@ -7,7 +7,6 @@
   import { label, ticker, val, units, satsFormatted } from "$lib/utils";
 
   export let asset, page;
-  console.log("TRANS", asset);
   let a = asset.asset;
   let offset = 25;
   $: pages = new Array(Math.ceil($txCount / offset));

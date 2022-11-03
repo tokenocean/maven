@@ -61,7 +61,7 @@
       await getBalance(a);
       
       balance = val(a, $confirmed[a] || 0);
-      console.log("AFTER BALANCES", balance);
+      
       pending = val(a, $unconfirmed[a] || 0);
 
       let { count } = await api()

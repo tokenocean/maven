@@ -2,7 +2,7 @@ import { serverApi } from "$lib/api";
 
 export async function post({ locals, request }) {
   let { q } = locals;
-  console.log("YO");
+  
 
   try {
     let body = await request.json();

@@ -74,8 +74,6 @@ export const getBalance = async (asset) => {
 
   let nc = { ...get(confirmed) };
   let nu = { ...get(unconfirmed) };
-  console.log("NC", nc)
-  console.log("NU", nu)
   nc[asset] = c[asset];
   nu[asset] = u[asset];
 
