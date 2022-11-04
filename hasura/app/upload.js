@@ -1,7 +1,6 @@
 import fs from "fs";
 import { fileTypeFromStream } from "file-type";
-import pkg from 'ipfs-http-client';
-const { create } = pkg;
+import { create } from "ipfs-http-client";
 import sharp from "sharp";
 import ffmpeg from "fluent-ffmpeg";
 import { PassThrough } from "stream";
