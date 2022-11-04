@@ -122,6 +122,7 @@ services:
       - /build/electrs
     command:
       - -vvvv
+      - --jsonrpc-import
       - --parent-network
       - regtest
       - --network

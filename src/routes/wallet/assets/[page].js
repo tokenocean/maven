@@ -4,7 +4,7 @@ import { newapi as api } from "$lib/api";
 export async function GET({ request: { headers }, params }) {
   let r = checkToken(headers);
   if (r.status) return r;
- 
+  
   try {
     let { page = 1 } = params;
     let assets = await api(headers).url(`/assets/${page}`).get().json();
