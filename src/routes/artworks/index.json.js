@@ -1,7 +1,7 @@
 import { countArtworks, getLimited } from "$queries/artworks";
 import { hbp } from "$lib/api";
 
-export async function post({ request, locals }) {
+export async function POST({ request, locals }) {
   try {
     let body = await request.json();
     let { q } = locals;

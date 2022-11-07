@@ -75,6 +75,10 @@
     color: #6aced5;
   }
 
+  .text-xl {
+    color: black;
+  }
+
   .word {
     padding: 10px;
     display: inline-block;
