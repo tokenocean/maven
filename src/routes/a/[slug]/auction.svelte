@@ -1,35 +1,5 @@
-<script context="module">
-  export async function load({ fetch, params: { slug }, session }) {
-    if (!(session && session.user))
-      return {
-        status: 302,
-        redirect: "/login",
-      };
-
-    const props = await fetch(`/artworks/${slug}.json`).then((r) => r.json());
-
-    if (!props.artwork)
-      return {
-        status: 404,
-      };
-
-    let { artwork } = props;
-
-    const { default_royalty_recipients } = await fetch(`/royalties.json`).then(
-      (r) => r.json()
-    );
-
-    return {
-      props: {
-        artwork,
-        default_royalty_recipients,
-        user: session.user,
-      },
-    };
-  }
-</script>
-
 <script>
+  import { session } from "$app/stores";
   import { browser } from "$app/env";
   import Fa from "svelte-fa";
   import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -41,7 +11,7 @@
     updateArtworkWithRoyaltyRecipients,
   } from "$queries/artworks";
   import { api, query } from "$lib/api";
-  import { fee, password, sighash, prompt, psbt } from "$lib/store";
+  import { fee, password, sighash, prompt, psbt, user } from "$lib/store";
   import { requirePassword } from "$lib/auth";
   import { createTransaction } from "$queries/transactions";
   import {
@@ -79,7 +49,7 @@
   import Select from "svelte-select";
   import branding from "$lib/branding";
 
-  export let artwork, default_royalty_recipients, user;
+  export let artwork, default_royalty_recipients;
 
   let input;
   let initialized;
@@ -407,7 +377,7 @@
 </script>
 
 <div class="container mx-auto md:p-20">
-  <div class="w-full max-w-4xl mx-auto bg-black md:p-10 rounded-xl">
+  <div class="w-full max-w-4xl mx-auto bg-white md:p-10 rounded-xl">
     <a class="block mb-6 text-midblue" href={`/a/${artwork.slug}`}>
       <div class="flex">
         <Fa icon={faChevronLeft} class="my-auto mr-1" />
@@ -415,7 +385,7 @@
       </div>
     </a>
 
-    <h2>List asset</h2>
+    <h2>List artwork</h2>
 
     {#if loading}
       <ProgressLinear />
@@ -487,7 +457,7 @@
               </div>
             </div>
           </div>
-          {#if user.id === artwork.artist_id}
+          {#if $session.user.id === artwork.artist_id}
             <div class="flex w-full sm:w-3/4 mb-4">
               <div class="relative mt-1 rounded-md w-2/3 mr-6">
                 <div class="auction-toggle">

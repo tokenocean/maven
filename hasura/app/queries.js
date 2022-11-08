@@ -292,6 +292,11 @@ export const getLastTransaction = `query($artwork_id: uuid!) {
     limit: 1
   ) {
     created_at
+    amount
+    artwork {
+      title
+      slug
+    }
   }
 }`;
 

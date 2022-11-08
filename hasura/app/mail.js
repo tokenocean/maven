@@ -10,6 +10,7 @@ import {
   getArtwork,
   getCurrentUser,
   getTransferTransactionsByPsbt,
+  getLastTransaction,
 } from "./queries.js";
 
 import { getUser, getUserById } from "./utils.js";
@@ -302,19 +303,22 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
     }
     let user = await getUserById(id);
 
-    const { artworks_by_pk: artwork } = await query(getArtwork, {
-      id: artworkId,
+    const { transactions} = await query(getLastTransaction, {
+      artwork_id: artworkId
     });
+    
+    let artwork = transactions[0].artwork;
+    let bidAmount = transactions[0].amount * -1;
 
     if (!artwork) {
       return res.code(400).send(`Missing artwork.`);
     }
-
+    
     await mail.send({
       template: "artwork-sold",
       locals: {
         userName: user.full_name,
-        bidAmount: artwork.list_price,
+        bidAmount: bidAmount,
         artworkTitle: artwork.title,
         artworkUrl: `${constants.urls.protocol}/a/${artwork.slug}`,
       },
@@ -322,7 +326,7 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
         to: user.display_name,
       },
     });
-
+    
     return res.send("ok");
   } catch (err) {
     console.error(err);
