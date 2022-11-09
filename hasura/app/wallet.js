@@ -56,7 +56,7 @@ export const combine = (a, b) => {
 export const sign = (psbt, sighash = 1, privkey) => {
   if (!privkey) ({ privkey } = keypair());
   psbt = Psbt.fromBase64(psbt);
-
+  console.log("INSIDE SIGN:", psbt);
   psbt.data.inputs.map((input, i) => {
     try {
       let sighashTypes = [1];
@@ -69,11 +69,12 @@ export const sign = (psbt, sighash = 1, privkey) => {
       // console.log("SIGNING ERROR", e.message);
     }
   });
-
+  console.log("before return", psbt)
   return psbt;
 };
 
 export const broadcast = async (psbt) => {
+  console.log("IN BROADCAST", psbt);
   let tx = psbt.extractTransaction();
   let hex = tx.toHex();
 

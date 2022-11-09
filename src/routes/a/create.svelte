@@ -182,7 +182,7 @@
 
 <div class="container mx-auto py-20">
   <div
-    class="w-full mx-auto max-w-5xl bg-white md:p-14 rounded-xl submitArtwork boxShadow"
+    class="w-full mx-auto max-w-5xl bg-black md:p-14 rounded-xl submitArtwork boxShadow"
   >
     <a
       class="block mb-6 text-midblue"
@@ -238,7 +238,7 @@
 
 <style>
   .container {
-    background-color: #ecf6f7;
+    background-color: #83E68D;
     width: 100% !important;
     min-height: 100vh;
     margin: 0;
@@ -262,5 +262,6 @@
     .container {
       background: none;
     }
+  
   }
 </style>

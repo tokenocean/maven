@@ -45,10 +45,10 @@ let checkAuctions = async () => {
 
         await check(combined);
 
+        console.log("BEFORE PBST")
         let psbt = await sign(combined);
-
         await broadcast(psbt);
-
+          console.log("RELEASE TOKEN: ", releaseToken)
         await q(releaseToken, {
           id: artwork.id,
           owner_id: bid.user.id,
@@ -95,7 +95,9 @@ let checkAuctions = async () => {
 
         let psbt;
         try {
+          console.log("INSIDE RELEASE", artwork)
           psbt = await sign(artwork.auction_release_tx);
+          console.log("PBST", psbt)
           await broadcast(psbt);
 
           console.log("released to current owner");

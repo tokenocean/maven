@@ -429,7 +429,7 @@
                   <i class="text-midblue text-xl tooltip">
                     <Fa icon={faQuestionCircle} pull="right" class="mt-1" />
                   </i>
-                  <span class="tooltip-text bg-gray-100 shadow ml-4 rounded">
+                  <span class="tooltip-text text-black bg-gray-100 shadow ml-4 rounded">
                     Setting a price is optional. If you set one, your wallet
                     will generate a partially signed atomic swap transaction. If
                     you run an auction, this price will be the "buy it now" or
@@ -474,7 +474,7 @@
                         <Fa icon={faQuestionCircle} pull="right" class="mt-1" />
                       </i>
                       <span
-                        class="tooltip-text bg-gray-100 shadow ml-4 rounded"
+                        class="tooltip-text text-black bg-gray-100 shadow ml-4 rounded"
                       >
                         Setting royalty recipients involves transferring the
                         artwork to a 2-of-2 multisig address with us. Our server
@@ -578,7 +578,7 @@
                           />
                         </i>
                         <span
-                          class="tooltip-text bg-gray-100 shadow ml-4 rounded"
+                          class="tooltip-text text-black bg-gray-100 shadow ml-4 rounded"
                         >
                           Reserve price is the minimum price that you'll accept
                           for the artwork. Setting one is optional.
@@ -612,7 +612,7 @@
 
 <style>
   .container {
-    background-color: #ecf6f7;
+    background-color: #83E68D;
     width: 100% !important;
     min-height: 100vh;
     margin: 0;
