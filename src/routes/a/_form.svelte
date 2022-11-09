@@ -1,7 +1,9 @@
 <script>
+  import { token } from "$lib/store";
   import { browser } from "$app/env";
   import { err } from "$lib/utils";
   import { query } from "$lib/api";
+  import { getTags } from "$queries/artworks";
   import Fa from "svelte-fa";
   import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
   import { page } from "$app/stores";
@@ -24,17 +26,20 @@
     }, 550);
   };
 
-  onMount(() => {
+  onMount(async () => {
     if (artwork.title) input.value = artwork.title;
-    query(`query { tags { tag } }`)
-      .then(
-        (res) =>
-          (items = [...new Set(res.tags.map((t) => t.tag))].map((value) => ({
-            value,
-            label: value,
-          })))
-      )
-      .catch(err);
+
+    try {
+      let { tags } = await query(getTags, null, {
+        authorization: `Bearer ${$token}`,
+      });
+      items = [...new Set(tags.map((t) => t.tag))].map((value) => ({
+        value,
+        label: value,
+      }));
+    } catch (e) {
+      err(e);
+    }
   });
 
   $: focus($page);
@@ -49,31 +54,70 @@
   let handle = ({ detail }) => {
     artwork.tags = detail.map(({ value: tag }) => ({ tag }));
   };
-
 </script>
 
-<style>
-  .doesthiswork {
-    --listBackground: black;
-    --background: black;
-    --itemHoverBG: #83e68d;
-    --multiItemBG: #83e68d;
-  }
+<form class="flex flex-col w-full mb-6 mt-20" on:submit autocomplete="off">
+  <div class="flex flex-col mb-6">
+    <input
+      class="border-0 border-b-2"
+      style="border-radius: 0 !important"
+      placeholder="What's your artwork title?"
+      on:input={({ target: { value } }) => debounce(value)}
+      bind:this={input}
+    />
+  </div>
+  <div class="toggle mb-6">
+    <label for="physical" class="inline-flex items-center">
+      <input
+        id="physical"
+        class="form-checkbox h-6 w-6"
+        type="checkbox"
+        bind:checked={artwork.is_physical}
+      />
+      <span class="ml-3">This is a physical artwork</span>
+    </label>
+  </div>
+  {#if !artwork.id}
+    <div class="flex flex-col mb-6">
+      <label for="editions">Number of editions</label>
+      <input
+        id="editions"
+        placeholder="Editions"
+        bind:value={artwork.editions}
+        class="w-1/2"
+      />
+    </div>
+  {/if}
+  <div class="flex flex-col mb-6">
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      placeholder="How would you describe it?"
+      bind:value={artwork.description}
+    />
+  </div>
+  <div class="flex flex-col mb-6">
+    <label for="tags"
+      >Tags
+      <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span
+      ></label
+    >
+    <Select
+      id="tags"
+      {items}
+      isMulti={true}
+      placeholder="Tags"
+      on:select={handle}
+      {value}
+      isCreatable={true}
+    />
+  </div>
+  <div class="flex">
+    <button type="submit" class="primary-btn">Submit</button>
+  </div>
+</form>
 
-  .tooltip {
-    cursor: pointer;
-  }
-  .tooltip .tooltip-text {
-    display: none;
-    padding: 15px;
-    position: absolute;
-    z-index: 100;
-    width: 300px;
-    font-style: normal;
-  }
-  .tooltip:hover .tooltip-text {
-    display: block;
-  }
+<style>
   input[type="checkbox"]:checked {
     appearance: none;
     border: 5px solid #fff;
@@ -87,48 +131,4 @@
   textarea {
     @apply rounded-lg;
   }
-
 </style>
-
-<form class="flex flex-col w-full mb-6 mt-20" on:submit autocomplete="off">
-  <div class="flex flex-col mb-6">
-    <input
-      class="border-0 border-b-2"
-      style="border-radius: 0 !important"
-      placeholder="What's your asset title?"
-      on:input={({ target: { value } }) => debounce(value)}
-      bind:this={input} />
-  </div>
-  {#if !artwork.id}
-    <div class="flex flex-col mb-6">
-      <label for="editions">Number of editions</label>
-      <input
-        id="editions"
-        placeholder="Editions"
-        bind:value={artwork.editions}
-        class="w-1/2" />
-    </div>
-  {/if}
-  <div class="flex flex-col mb-6">
-    <label for="description">Description</label>
-    <textarea
-      id="description"
-      placeholder="How would you describe it?"
-      bind:value={artwork.description} />
-  </div>
-  <div class="flex flex-col mb-6 doesthiswork">
-    <label for="tags">Tags
-      <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span></label>
-    <Select
-      id="tags"
-      {items}
-      isMulti={true}
-      placeholder="Tags"
-      on:select={handle}
-      {value}
-      isCreatable={true} />
-  </div>
-  <div class="flex">
-    <button type="submit" class="primary-btn">Submit</button>
-  </div>
-</form>

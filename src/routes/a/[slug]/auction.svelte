@@ -377,7 +377,7 @@
 </script>
 
 <div class="container mx-auto md:p-20">
-  <div class="w-full max-w-4xl mx-auto bg-white md:p-10 rounded-xl">
+  <div class="w-full max-w-4xl mx-auto bg-black md:p-10 rounded-xl">
     <a class="block mb-6 text-midblue" href={`/a/${artwork.slug}`}>
       <div class="flex">
         <Fa icon={faChevronLeft} class="my-auto mr-1" />
@@ -385,7 +385,7 @@
       </div>
     </a>
 
-    <h2>List artwork</h2>
+    <h2>List asset</h2>
 
     {#if loading}
       <ProgressLinear />
@@ -612,7 +612,7 @@
 
 <style>
   .container {
-    @apply bg-primary;
+    background-color: #ecf6f7;
     width: 100% !important;
     min-height: 100vh;
     margin: 0;
