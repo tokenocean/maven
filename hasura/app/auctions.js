@@ -95,9 +95,9 @@ let checkAuctions = async () => {
 
         let psbt;
         try {
-          console.log("INSIDE RELEASE", artwork)
+          
           psbt = await sign(artwork.auction_release_tx);
-          console.log("PBST", psbt)
+          
           await broadcast(psbt);
 
           console.log("released to current owner");

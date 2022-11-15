@@ -34,7 +34,6 @@ export const hasura = wretch()
 export const query = async (query, variables, headers = {}) => {
   let jwt = getStore(token);
   if (jwt) headers = { ...headers, authorization: `Bearer ${jwt}` };
-
   let { data, errors } = await hasura
     .headers(headers)
     .post({ query, variables })
