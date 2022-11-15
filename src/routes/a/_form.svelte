@@ -61,7 +61,7 @@
     <input
       class="border-0 border-b-2"
       style="border-radius: 0 !important"
-      placeholder="What's your artwork title?"
+      placeholder="What's your asset title?"
       on:input={({ target: { value } }) => debounce(value)}
       bind:this={input}
     />
@@ -74,7 +74,7 @@
         type="checkbox"
         bind:checked={artwork.is_physical}
       />
-      <span class="ml-3">This is a physical artwork</span>
+      <span class="ml-3">This is a physical asset</span>
     </label>
   </div>
   {#if !artwork.id}
@@ -96,7 +96,7 @@
       bind:value={artwork.description}
     />
   </div>
-  <div class="flex flex-col mb-6">
+  <div class="flex flex-col mb-6 doesthiswork">
     <label for="tags"
       >Tags
       <span class="text-gray-400">(e.g. Abstract, monochromatic, etc)</span
@@ -118,6 +118,27 @@
 </form>
 
 <style>
+  .doesthiswork {
+    --listBackground: black;
+    --background: black;
+    --itemHoverBG: #83e68d;
+    --multiItemBG: #83e68d;
+  }
+
+  .tooltip {
+    cursor: pointer;
+  }
+  .tooltip .tooltip-text {
+    display: none;
+    padding: 15px;
+    position: absolute;
+    z-index: 100;
+    width: 300px;
+    font-style: normal;
+  }
+  .tooltip:hover .tooltip-text {
+    display: block;
+  }
   input[type="checkbox"]:checked {
     appearance: none;
     border: 5px solid #fff;
@@ -131,4 +152,5 @@
   textarea {
     @apply rounded-lg;
   }
+
 </style>
