@@ -11,8 +11,8 @@
     val,
   } from "$lib/utils";
   import { formatDistanceStrict } from "date-fns";
-  import { api } from "$lib/api";
-  import { token, prompt } from "$lib/store";
+  import { newapi as api } from "$lib/api";
+  import { user, token, prompt } from "$lib/store";
   import Fa from "svelte-fa";
   import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -158,7 +158,7 @@
             </div>
           </td>
           <td class="py-4 pl-6 text-sm ">
-            {#if canAccept(offer.transaction)}
+            {#if canAccept(offer.transaction, $user)}
               <a
                 href="/"
                 on:click|preventDefault={() => {
@@ -246,7 +246,7 @@
             </div>
           </td>
           <td class="py-4 pl-6 text-sm ">
-            {#if canCancel(offer.transaction)}
+            {#if canCancel(offer.transaction, $user)}
               <a
                 href="/"
                 on:click|preventDefault={() => cancel(offer.transaction)}

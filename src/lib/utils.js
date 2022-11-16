@@ -306,10 +306,10 @@ export const canAccept = ({ type, artwork, created_at, accepted }, user) => {
   if (accepted) return false;
 
   let isOwner = ({ owner }) => user && user.id === owner.id;
-
+  
   let underway = ({ auction_start: s, auction_end: e }) =>
-    e && isWithinInterval(new Date(), { start: parseISO(s), end: parseISO(e) });
-
+  e && isWithinInterval(new Date(), { start: parseISO(s), end: parseISO(e) });
+  
   return (
     artwork &&
     isCurrent(artwork, created_at, type) &&
