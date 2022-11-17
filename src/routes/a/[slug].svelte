@@ -18,8 +18,10 @@
 
     if (!browser) {
       try {
+        
         await post("/artworks/viewed", { id: artwork.id }, fetch).res();
         artwork.views++;
+      
       } catch (e) {
         console.log(e);
       }
