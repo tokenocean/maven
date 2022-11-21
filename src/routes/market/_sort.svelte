@@ -4,7 +4,7 @@
 
 <div class="sort-container">
   <select
-    class="rounded-full appearance-none bg-gray-100 px-8"
+    class="rounded-full appearance-none text-black bg-gray-100 px-8"
     bind:value={$sortCriteria}
   >
     <option value="newest">Newest</option>

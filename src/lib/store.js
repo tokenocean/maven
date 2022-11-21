@@ -36,6 +36,13 @@ export const filterCriteria = writable({
   openBid: false,
   ownedByCreator: false,
   hasSold: false,
+  isPhysical: false,
+  hasRoyalties: false,
+  isFavorited: false,
+  fromFollowed: false,
+  hasOpenAuction: false,
+  filterByCurrency: false,
+  selectedCurrency: "L-BTC",
 });
 export const full = writable();
 export const loading = writable();
@@ -61,6 +68,7 @@ export const snack = writable();
 export const sortCriteria = writable("newest");
 export const bitcoinUnitLocal = writable("");
 export const fiatRates = writable({});
+export const offset = writable(0);
 export const painting = writable();
 export const variation = writable();
 export const titles = writable([]);
