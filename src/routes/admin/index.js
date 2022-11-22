@@ -1,7 +1,6 @@
 import { getSamples } from "$queries/users";
 
 export async function GET({ locals: { jwt, q }}) {
-  console.log("INSIDE GET", jwt, q)
   return {
     body: {
       users: (
