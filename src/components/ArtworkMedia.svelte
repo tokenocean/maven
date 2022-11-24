@@ -7,6 +7,7 @@
     faHeadphones,
   } from "@fortawesome/free-solid-svg-icons";
   import { CID } from "multiformats/cid";
+  import { painting, variation, edition } from "$lib/store";
 
   export let artwork;
   export let showDetails;
@@ -17,6 +18,8 @@
   export let noAudio = false;
 
   let img, vid, aud;
+  
+
   $: cid = artwork.filename && CID.parse(artwork.filename).toV1().toString();
   $: ext =
     !artwork.filetype || artwork.filetype.match(/video|gif|octet/)
@@ -27,9 +30,19 @@
     (thumb
       ? `/api/public/${artwork.filename}.${ext}`
       : `/api/ipfs/${artwork.filename}`);
- 
+
   $: cover = !showDetails;
   $: contain = showDetails;
+
+  // $: if (thumb && artwork.title.startsWith("Vida")) {
+  //   if ($painting || $variation || $edition) {
+  //     path = `/api/public/${artwork.filename}.mp4`;
+  //   } else {
+  //     path = `/api/public/${artwork.filename}.jpg`;
+  //   }
+  // } else {
+  //   path = `/api/ipfs/${artwork.filename}`;
+  // }
 
   function hasAudio(v) {
     if (!v) return false;

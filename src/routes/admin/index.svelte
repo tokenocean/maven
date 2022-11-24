@@ -3,7 +3,7 @@
   import { onMount, tick, onDestroy } from "svelte";
   import { ArtworkMedia } from "$comp";
   import { updateUser, deleteSamples } from "$queries/users";
-  import { newapi as api, query } from "$lib/api";
+  import { api, hasura, query } from "$lib/api";
   import { err, info } from "$lib/utils";
   import { requireLogin } from "$lib/auth";
 
@@ -17,16 +17,17 @@
   let makeArtist = async (user) => {
     try {
       user.is_artist = true;
-      await query(
+      await query( 
         updateUser,
         { id: user.id, user: { is_artist: true, info: null } },
         headers()
       );
-
+      
       await query(deleteSamples, { user_id: user.id }, headers());
-
-      await api()
+      
+      await api
         .url("/mail-artist-application-approved")
+        .auth(`Bearer ${$token}`)
         .post({
           userId: user.id,
         });

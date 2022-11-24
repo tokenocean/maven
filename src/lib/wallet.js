@@ -116,7 +116,6 @@ export const createWallet = (mnemonic, pass) => {
 export const getMnemonic = (mnemonic, pass) => {
   if (!mnemonic && get(user)) ({ mnemonic } = get(user));
   if (!pass) pass = get(password);
-
   mnemonic = cryptojs.AES.decrypt(mnemonic, pass).toString(cryptojs.enc.Utf8);
   if (!mnemonic) throw new Error("Unable to decrypt mnmemonic");
   return mnemonic;

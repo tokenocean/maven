@@ -35,9 +35,9 @@ export const query = async (query, variables, headers = {}) => {
   let jwt = getStore(token);
   if (jwt) headers = { ...headers, authorization: `Bearer ${jwt}` };
   let { data, errors } = await hasura
-    .headers(headers)
-    .post({ query, variables })
-    .json();
+  .headers(headers)
+  .post({ query, variables })
+  .json();
   if (errors) throw new Error(errors[0].message);
   return data;
 };
