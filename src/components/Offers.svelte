@@ -35,8 +35,7 @@
 
     await confirm();
 
-    await api
-      .auth(`Bearer ${$session.jwt}`)
+    await api()
       .url("/cancel")
       .post({ id })
       .json()
@@ -54,7 +53,7 @@
     <div
       on:click={(e) => (selectedSection = "received")}
       class={`
-      ${selectedSection === "received" ? "bg-primary font-bold" : "bg-gray-100"}
+      ${selectedSection === "received" ? "bg-primary font-bold" : "bg-gray-100 text-primary"}
         rounded-l-lg
         px-6
         py-2.5
@@ -71,7 +70,7 @@
     <div
       on:click={(e) => (selectedSection = "made")}
       class={`
-      ${selectedSection === "made" ? "bg-primary font-bold" : "bg-gray-100"}
+      ${selectedSection === "made" ? "bg-primary font-bold" : "bg-gray-100 text-primary"}
         rounded-r-lg
         px-6
         py-2.5
@@ -250,7 +249,7 @@
               <a
                 href="/"
                 on:click|preventDefault={() => cancel(offer.transaction)}
-                class="rounded-full bg-gray-100 border px-4 py-2"
+                class="rounded-full bg-gray-100 border px-4 py-2 text-primary"
               >
                 Cancel
               </a>
