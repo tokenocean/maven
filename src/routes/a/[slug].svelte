@@ -16,8 +16,8 @@
         status: 404,
       };
 
-    if (!browser) {
-      try {
+      if (browser) {
+        try {
         
         await post("/artworks/viewed", { id: artwork.id }, fetch).res();
         artwork.views++;
