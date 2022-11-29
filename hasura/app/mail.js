@@ -308,8 +308,9 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
     });
     
     let artwork = transactions[0].artwork;
+    console.log("bidAmount before: ", transactions[0].amount)
     let bidAmount = transactions[0].amount * -1;
-
+    console.log("AFTER: ", bidAmount)
     if (!artwork) {
       return res.code(400).send(`Missing artwork.`);
     }

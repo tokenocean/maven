@@ -257,7 +257,7 @@
       transaction.amount = -artwork.list_price;
       transaction.asset = artwork.asset;
       transaction.type = "purchase";
-
+      
       $psbt = await executeSwap(artwork);
       $psbt = await sign();
 
@@ -265,6 +265,7 @@
         $psbt = await requestSignature($psbt);
       }
 
+      let owner = artwork.owner;
       await broadcast($psbt);
 
       let tx = $psbt.extractTransaction();
@@ -273,14 +274,14 @@
 
       await save();
       await refreshArtwork();
-
+      console.log("userID:", $user.id, "owner: ", owner)
       await api().url("/mail-purchase-successful").post({
         userId: $user.id,
         artworkId: artwork.id,
       });
 
       await api().url("/mail-artwork-sold").post({
-        userId: artwork.owner.id,
+        userId: owner.id,
         artworkId: artwork.id,
       });
     } catch (e) {
