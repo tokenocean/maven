@@ -274,7 +274,6 @@
 
       await save();
       await refreshArtwork();
-      console.log("userID:", $user.id, "owner: ", owner)
       await api().url("/mail-purchase-successful").post({
         userId: $user.id,
         artworkId: artwork.id,
