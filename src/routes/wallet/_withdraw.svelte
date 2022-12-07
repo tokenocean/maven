@@ -45,9 +45,17 @@
   let loading;
   let artwork;
 
-  const log = function () {
-    console.log("HERE");
-  };
+  let bitcoin = async () => {
+    tab = "bitcoin"
+  }
+
+  let liquid = async () => {
+    tab = "liquid"
+  }
+
+  let lightning = async () => {
+    tab = "lightning"
+  }
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -117,9 +125,9 @@
         <div
           class="flex justify-center text-center cursor-pointer tabs flex-wrap mb-2"
         >
-          <div class:hover={tab === "liquid"} on:click={log}>Liquid</div>
-          <div class:hover={tab === "bitcoin"} on:click={log}>Bitcoin</div>
-          <div class:hover={tab === "lightning"} on:click={log}>
+          <div class:hover={tab === "liquid"} on:click={liquid}>Liquid</div>
+          <div class:hover={tab === "bitcoin"} on:click={bitcoin}>Bitcoin</div>
+          <div class:hover={tab === "lightning"} on:click={lightning}>
             Lightning
           </div>
         </div>
@@ -175,7 +183,7 @@
       border-bottom: 3px solid #6ed8e0;
     }
   }
-  
+
   textarea,
   input,
   select {
