@@ -1,21 +1,28 @@
 <script>
   import { query } from "$lib/api";
   import { tick } from "svelte";
+  import Fa from "svelte-fa";
   import { fiat, user, psbt, bitcoinUnitLocal, fiatRates } from "$lib/store";
   import { broadcast, pay, keypair, requestSignature } from "$lib/wallet";
   import { btc, dev, err, info, sats, val, ticker } from "$lib/utils";
   import sign from "$lib/sign";
+  import {
+    faUserSecret,
+    faChevronUp,
+    faChevronDown,
+    faTimes,
+  } from "@fortawesome/free-solid-svg-icons";
   import { ProgressLinear, Fiat } from "$comp";
   import { requirePassword } from "$lib/auth";
   import { getArtworkByAsset } from "$queries/artworks";
 
   export let asset;
   export let withdrawing = false;
-
+  let tab = "liquid";
   let amount;
 
   $: unitCalculated = $bitcoinUnitLocal === "sats" ? "L-sats" : "L-BTC";
-  
+
   $: fiatAmount = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: $user ? $user.fiat : $fiat,
@@ -37,6 +44,10 @@
 
   let loading;
   let artwork;
+
+  const log = function () {
+    console.log("HERE");
+  };
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -93,6 +104,26 @@
     {#if loading}
       <ProgressLinear />
     {:else}
+      <div class="flex justify-between place-items-center text-gray-400">
+        <p>Withdraw Wallet</p>
+        <button
+          class="text-gray-400 text-xl w-auto"
+          on:click={() => (withdrawing = false)}
+        >
+          <Fa icon={faTimes} />
+        </button>
+      </div>
+      {#if asset === btc}
+        <div
+          class="flex justify-center text-center cursor-pointer tabs flex-wrap mb-2"
+        >
+          <div class:hover={tab === "liquid"} on:click={log}>Liquid</div>
+          <div class:hover={tab === "bitcoin"} on:click={log}>Bitcoin</div>
+          <div class:hover={tab === "lightning"} on:click={log}>
+            Lightning
+          </div>
+        </div>
+        {/if}
       <div class="flex flex-col mb-4">
         <label for="amount">Amount</label>
         <div class="flex relative justify-between text-black">
@@ -132,6 +163,19 @@
 {/if}
 
 <style>
+  .hover {
+    @apply border-b-2;
+    border-bottom: 3px solid #6ed8e0;
+  }
+
+  .tabs div {
+    @apply mb-auto h-8 mx-2 md:mx-4 mt-6;
+    &:hover {
+      @apply border-b-2;
+      border-bottom: 3px solid #6ed8e0;
+    }
+  }
+  
   textarea,
   input,
   select {
