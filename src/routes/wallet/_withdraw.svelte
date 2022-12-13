@@ -2,6 +2,7 @@
   import { query } from "$lib/api";
   import { tick } from "svelte";
   import Fa from "svelte-fa";
+  import { newapi as api } from "$lib/api";
   import { fiat, user, psbt, bitcoinUnitLocal, fiatRates } from "$lib/store";
   import { broadcast, pay, keypair, requestSignature } from "$lib/wallet";
   import { btc, dev, err, info, sats, val, ticker } from "$lib/utils";
@@ -44,7 +45,8 @@
 
   let loading;
   let artwork;
-
+  let showAmount = true;
+  let lightningInvoice;
   let bitcoin = async () => {
     tab = "bitcoin"
   }
@@ -55,7 +57,32 @@
 
   let lightning = async () => {
     tab = "lightning"
+    address = $user.address;
+    loading = true;
+    
+    try {
+      ({address} = await api()
+      .url("/conversion")
+      .post({
+        invoice_id: "something",
+        text: "also something"
+      })
+      .json());
+    } catch (e) {
+      err(e)
+    }
+    loading = false;
+
+    lightningInvoice = true
+    if (lightningInvoice) {
+      showAmount = false
+    }
+
   }
+
+  let toggle = () => {
+    showAmount = !showAmount;
+  };
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -101,6 +128,7 @@
     }
     loading = false;
   };
+  let address;
 </script>
 
 {#if $user && withdrawing}
@@ -133,6 +161,7 @@
         </div>
         {/if}
       <div class="flex flex-col mb-4">
+        {#if showAmount}
         <label for="amount">Amount</label>
         <div class="flex relative justify-between text-black">
           <input
@@ -147,6 +176,7 @@
             </div>
           {/if}
         </div>
+        {/if}
         {#if ticker(asset) !== "L-CAD" && ticker(asset) !== "L-USDt"}
           <div class="flex justify-end">
             <Fiat amount={fiatAmount} />

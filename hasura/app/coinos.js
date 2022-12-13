@@ -69,3 +69,17 @@ app.post("/lightning", auth, async (req, res) => {
 
   res.send({ address, fee });
 });
+
+app.post("/conversion", auth, async (req, res) => {
+  let { invoice_id, text } = req.body
+
+  let {} = await coinos
+  .url("/conversion")
+  .post({
+    invoice_id,
+    text
+  })
+  .json();
+
+  res.send({invoice_id, text})
+})
