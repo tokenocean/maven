@@ -16,11 +16,13 @@
   import { ProgressLinear, Fiat } from "$comp";
   import { requirePassword } from "$lib/auth";
   import { getArtworkByAsset } from "$queries/artworks";
+  import bolt11 from "bolt11";
 
   export let asset;
   export let withdrawing = false;
   let tab = "liquid";
   let amount;
+  let showAmount = true;
 
   $: unitCalculated = $bitcoinUnitLocal === "sats" ? "L-sats" : "L-BTC";
 
@@ -45,8 +47,18 @@
 
   let loading;
   let artwork;
-  let showAmount = true;
   let lightningInvoice;
+
+  let decode = (invoice) => {
+    let decodedInvoice = bolt11.decode(invoice);
+   
+    if (decodedInvoice.millisatoshis) {
+      showAmount = false;
+    }
+    amount = decodedInvoice.millisatoshis / 100000000000
+    return decodedInvoice
+  }
+
   let bitcoin = async () => {
     tab = "bitcoin"
   }
@@ -57,32 +69,27 @@
 
   let lightning = async () => {
     tab = "lightning"
-    address = $user.address;
-    loading = true;
-    
-    try {
-      ({address} = await api()
-      .url("/conversion")
-      .post({
-        invoice_id: "something",
-        text: "also something"
-      })
-      .json());
-    } catch (e) {
-      err(e)
-    }
-    loading = false;
+    // address = $user.address;
+    // loading = true;
 
-    lightningInvoice = true
-    if (lightningInvoice) {
-      showAmount = false
-    }
+    // try {
+    //   ({address} = await api()
+    //   .url("/conversion")
+    //   .post({
+    //     invoice_id: "",
+    //     text: lightningInvoice
+    //   })
+    //   .json());
+    // } catch (e) {
+    //   err(e)
+    // }
+    // loading = false;
+    // if (lightningInvoice) {
+    //   showAmount = false
+    // }
 
   }
 
-  let toggle = () => {
-    showAmount = !showAmount;
-  };
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -162,20 +169,36 @@
         {/if}
       <div class="flex flex-col mb-4">
         {#if showAmount}
-        <label for="amount">Amount</label>
-        <div class="flex relative justify-between text-black">
-          <input
-            id="amount"
-            class="w-full"
-            placeholder={val(asset, 0)}
-            bind:value={amount}
-          />
-          {#if ticker(asset) === "L-BTC"}
-            <div class="absolute top-[17px] right-2">
-              {unitCalculated}
+          <label for="amount">Amount</label>
+          <div class="flex relative justify-between text-black">
+            <input
+              id="amount"
+              class="w-full"
+              placeholder={val(asset, 0)}
+              bind:value={amount}
+            />
+            {#if ticker(asset) === "L-BTC"}
+              <div class="absolute top-[17px] right-2">
+                {unitCalculated}
+              </div>
+            {/if}
+          </div>
+          {:else}
+            <label for="amount">Amount</label>
+            <div class="flex relative justify-between text-black">
+              <input
+                id="amount"
+                class="w-full"
+                placeholder={val(asset, 0)}
+                bind:value={amount}
+                disabled
+              />
+              {#if ticker(asset) === "L-BTC"}
+                <div class="absolute top-[17px] right-2">
+                  {unitCalculated}
+                </div>
+              {/if}
             </div>
-          {/if}
-        </div>
         {/if}
         {#if ticker(asset) !== "L-CAD" && ticker(asset) !== "L-USDt"}
           <div class="flex justify-end">
@@ -183,6 +206,19 @@
           </div>
         {/if}
       </div>
+      {#if tab === "lightning"}
+      <div class="flex flex-col mb-4">
+        <label for="address">Lightning Invoice</label>
+        <textarea
+          id="address"
+          style="overflow:auto"
+          placeholder="Invoice"
+          bind:value={lightningInvoice}
+          on:input="{() => decode(lightningInvoice)}"
+          rows={4}
+        />
+      </div>
+      {:else}
       <div class="flex flex-col mb-4">
         <label for="address">Recipient Address</label>
         <textarea
@@ -193,6 +229,7 @@
           rows={4}
         />
       </div>
+      {/if}
       <button type="submit" class="primary-btn w-full mt-5"
         >Complete withdraw</button
       >
