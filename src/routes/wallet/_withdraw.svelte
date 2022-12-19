@@ -47,7 +47,7 @@
 
   let loading;
   let artwork;
-  let lightningInvoice;
+  $: lightningInvoice = "";
 
   let decode = (invoice) => {
     let decodedInvoice = bolt11.decode(invoice);
@@ -89,7 +89,7 @@
     // }
 
   }
-
+  let invoiceInfo;
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -107,6 +107,35 @@
     await requirePassword();
 
     loading = true;
+    if (tab === "lightning") {
+      address = $user.address;
+      // post invoice then post to conversion with liquid address
+      try {
+        ({address} = await api()
+        .url("invoice")
+        .post({
+          liquidAddress: address,
+          user: $user,
+        })
+        .json());
+        console.log("INSIDE SEND")
+
+      } catch (e) {
+        err(e)
+      }
+      
+      // try {
+      //   ({address} = await api()
+      //   .url("/conversion")
+      //   .post({
+      //     invoice_id: "",
+      //     text: lightningInvoice
+      //   })
+      //   .json());
+      // } catch (e) {
+      //   err(e)
+      // }
+    }
     try {
       if (asset !== btc && !artwork) artwork = { asset };
       $psbt = await pay(
