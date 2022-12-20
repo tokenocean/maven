@@ -52,8 +52,6 @@ export const utxos = async (address) => {
     locked[address] = true;
     let utxoSet = `${address}:utxos`;
     let last = await redis.lRange(`${address}`, -50, -1);
-    
-
     let curr = await electrs.url(`/address/${address}/txs`).get().json();
     let txns = [
       ...curr.filter((tx) => !tx.status.confirmed).reverse(),
@@ -70,18 +68,16 @@ export const utxos = async (address) => {
     }
 
     
-
     txns = txns.filter((txid) => !last.includes(txid));
-
+    
     await redis.del(address);
     let latest = [...txns, ...last].slice(0, 50);
     if (latest.length) await redis.rPush(address, latest);
-   
-
-    last = await redis.lRange(`${address}`, -50, -1);
-
     
-
+    
+    last = await redis.lRange(`${address}`, -50, -1);
+    
+    
     while (txns.length) {
       let tx = Transaction.fromHex(await hex(txns[0]));
 
@@ -133,6 +129,7 @@ export const utxos = async (address) => {
             }
           }
         } catch (e) {
+          console.log(e);
           continue;
         }
       }

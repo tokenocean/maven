@@ -69,27 +69,7 @@
 
   let lightning = async () => {
     tab = "lightning"
-    // address = $user.address;
-    // loading = true;
-
-    // try {
-    //   ({address} = await api()
-    //   .url("/conversion")
-    //   .post({
-    //     invoice_id: "",
-    //     text: lightningInvoice
-    //   })
-    //   .json());
-    // } catch (e) {
-    //   err(e)
-    // }
-    // loading = false;
-    // if (lightningInvoice) {
-    //   showAmount = false
-    // }
-
   }
-  let invoiceInfo;
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -104,37 +84,33 @@
   };
 
   let send = async (e) => {
+    let id;
     await requirePassword();
 
     loading = true;
     if (tab === "lightning") {
       address = $user.address;
-      // post invoice then post to conversion with liquid address
       try {
-        ({address} = await api()
-        .url("invoice")
-        .post({
-          liquidAddress: address,
-          user: $user,
-        })
+       ({address:to, id}= await api()
+        .url("/invoice")
+        .post()
         .json());
-        console.log("INSIDE SEND")
-
       } catch (e) {
+        console.log(e);
         err(e)
       }
       
-      // try {
-      //   ({address} = await api()
-      //   .url("/conversion")
-      //   .post({
-      //     invoice_id: "",
-      //     text: lightningInvoice
-      //   })
-      //   .json());
-      // } catch (e) {
-      //   err(e)
-      // }
+      try {
+        (await api()
+        .url("/conversion")
+        .post({
+          invoice_id: id,
+          text: lightningInvoice
+        })
+        .json());
+      } catch (e) {
+        err(e)
+      }
     }
     try {
       if (asset !== btc && !artwork) artwork = { asset };
