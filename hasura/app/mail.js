@@ -226,12 +226,12 @@ app.post("/offer-notifications", auth, async (req, res) => {
 
 app.post("/mail-purchase-successful", auth, async (req, res) => {
   try {
-    const { userId: id, artworkId } = req.body;
+    const { userId: id, artworkId, amount } = req.body;
     if (!id) {
       return res.code(400).send("Missing userId parameter.");
     }
     let user = await getUserById(id);
-
+    let bidAmount = amount * -1;
     const { artworks_by_pk: artwork } = await query(getArtwork, {
       id: artworkId,
     });
@@ -244,7 +244,7 @@ app.post("/mail-purchase-successful", auth, async (req, res) => {
       template: "purchase-successful",
       locals: {
         userName: user.full_name,
-        bidAmount: `${artwork.list_price / 100000000} L-BTC`,
+        bidAmount: `${bidAmount / 100000000} L-BTC`,
         artworkTitle: artwork.title,
         artworkUrl: `${constants.urls.protocol}/a/${artwork.slug}`,
       },
@@ -297,7 +297,7 @@ app.post("/mail-artwork-minted", auth, async (req, res) => {
 
 app.post("/mail-artwork-sold", auth, async (req, res) => {
   try {
-    const { userId: id, artworkId } = req.body;
+    const { userId: id, artworkId, amount } = req.body;
     if (!id) {
       return res.code(400).send("Missing userId parameter.");
     }
@@ -306,11 +306,8 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
     const { transactions} = await query(getLastTransaction, {
       artwork_id: artworkId
     });
-    
     let artwork = transactions[0].artwork;
-    console.log("bidAmount before: ", transactions[0].amount)
-    let bidAmount = transactions[0].amount * -1;
-    console.log("AFTER: ", bidAmount)
+    let bidAmount = amount * -1;
     if (!artwork) {
       return res.code(400).send(`Missing artwork.`);
     }
@@ -319,7 +316,7 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
       template: "artwork-sold",
       locals: {
         userName: user.full_name,
-        bidAmount: bidAmount,
+        bidAmount: `${bidAmount / 100000000} L-BTC`,
         artworkTitle: artwork.title,
         artworkUrl: `${constants.urls.protocol}/a/${artwork.slug}`,
       },

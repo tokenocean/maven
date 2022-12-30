@@ -99,7 +99,7 @@
         console.log(e);
         err(e)
       }
-      
+  
       try {
         (await api()
         .url("/conversion")
@@ -125,6 +125,7 @@
         )
       );
       $psbt = await sign();
+      
 
       if (artwork?.held === "multisig") {
         $psbt = await requestSignature($psbt);

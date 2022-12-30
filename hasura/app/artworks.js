@@ -5,7 +5,6 @@ import { Psbt } from "liquidjs-lib";
 import { compareAsc, parseISO } from "date-fns";
 import { mail } from "./mail.js";
 import { auth } from "./auth.js";
-// import { newapi as api, post } from "$lib/api";
 
 
 import {
@@ -267,6 +266,11 @@ app.post("/accept", auth, async (req, res) => {
   try {
     await broadcast(Psbt.fromBase64(req.body.psbt));
     res.send(await q(acceptBid, req.body, req.headers));
+
+    // await api().url("/mail-artwork-sold").post({
+    //   userId: owner.id,
+    //   artworkId: artwork.id,
+    // });
   } catch (e) {
     console.log(e);
     res.code(500).send(e.message);

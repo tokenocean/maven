@@ -274,14 +274,17 @@
 
       await save();
       await refreshArtwork();
+      
       await api().url("/mail-purchase-successful").post({
         userId: $user.id,
         artworkId: artwork.id,
+        amount: transaction.amount
       });
 
       await api().url("/mail-artwork-sold").post({
         userId: owner.id,
         artworkId: artwork.id,
+        amount: transaction.amount
       });
     } catch (e) {
       err(e);
