@@ -333,11 +333,12 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
 });
 
 app.post("/mail-event-actions", async (req, res) => {
+  console.log("HERE", req.headers)
   if (!req.headers.auth_event || req.headers.auth_event !== AUTH_EVENT_VALUE) {
     res.status(401).send("Unauthorized!");
   }
   const transaction = req.body.event.data.new;
-
+  console.log("Trans", transaction)
   const getArtworkById = async (artworkId) => {
     let { artworks_by_pk: artwork } = artworkId
       ? await query(getArtwork, {

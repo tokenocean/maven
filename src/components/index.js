@@ -40,3 +40,4 @@ export { default as RoyaltyInfo } from "./RoyaltyInfo.svelte";
 export { default as Fiat } from "./Fiat.svelte";
 export {default as SendMessage } from "./SendMessage.svelte";
 export {default as SendTip } from "./SendTip.svelte";
+export {default as UserPopup } from "./UserPopup.svelte";

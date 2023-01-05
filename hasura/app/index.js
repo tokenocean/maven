@@ -14,6 +14,7 @@ import "./proxy.js";
 import "./messages.js";
 import "./monitor.js";
 import "./registry.js";
+import "./tips.js";
 import "./signing.js";
 import "./upload.js";
 import "./mail.js";

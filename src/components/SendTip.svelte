@@ -19,7 +19,7 @@
 
       let res = await api
         .auth(`Bearer ${$token}`)
-        .url("/tip")
+        .url("/tips")
         .post({
           psbt: $psbt && $psbt.toBase64(),
           amount,

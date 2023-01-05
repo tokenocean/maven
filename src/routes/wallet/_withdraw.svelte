@@ -51,25 +51,25 @@
 
   let decode = (invoice) => {
     let decodedInvoice = bolt11.decode(invoice);
-   
+
     if (decodedInvoice.millisatoshis) {
       showAmount = false;
     }
-    amount = decodedInvoice.millisatoshis / 100000000000
-    return decodedInvoice
-  }
+    amount = decodedInvoice.millisatoshis / 100000000000;
+    return decodedInvoice;
+  };
 
   let bitcoin = async () => {
-    tab = "bitcoin"
-  }
+    tab = "bitcoin";
+  };
 
   let liquid = async () => {
-    tab = "liquid"
-  }
+    tab = "liquid";
+  };
 
   let lightning = async () => {
-    tab = "lightning"
-  }
+    tab = "lightning";
+  };
 
   $: updateAsset(asset);
   let updateAsset = (asset) =>
@@ -86,30 +86,26 @@
   let send = async (e) => {
     let id;
     await requirePassword();
-
     loading = true;
     if (tab === "lightning") {
       address = $user.address;
       try {
-       ({address:to, id}= await api()
-        .url("/invoice")
-        .post()
-        .json());
+        ({ address: to, id } = await api().url("/invoice").post().json());
       } catch (e) {
         console.log(e);
-        err(e)
+        err(e);
       }
-  
+
       try {
-        (await api()
-        .url("/conversion")
-        .post({
-          invoice_id: id,
-          text: lightningInvoice
-        })
-        .json());
+        await api()
+          .url("/conversion")
+          .post({
+            invoice_id: id,
+            text: lightningInvoice,
+          })
+          .json();
       } catch (e) {
-        err(e)
+        err(e);
       }
     }
     try {
@@ -125,7 +121,6 @@
         )
       );
       $psbt = await sign();
-      
 
       if (artwork?.held === "multisig") {
         $psbt = await requestSignature($psbt);
@@ -134,6 +129,12 @@
       await broadcast();
 
       info("Payment sent!");
+      console.log("INSIDE SEND");
+
+      await api().url("/mail-event-actions").post({
+        event: e,
+      });
+
       withdrawing = false;
     } catch (e) {
       console.log(e);
@@ -172,7 +173,7 @@
             Lightning
           </div>
         </div>
-        {/if}
+      {/if}
       <div class="flex flex-col mb-4">
         {#if showAmount}
           <label for="amount">Amount</label>
@@ -189,22 +190,22 @@
               </div>
             {/if}
           </div>
-          {:else}
-            <label for="amount">Amount</label>
-            <div class="flex relative justify-between text-black">
-              <input
-                id="amount"
-                class="w-full"
-                placeholder={val(asset, 0)}
-                bind:value={amount}
-                disabled
-              />
-              {#if ticker(asset) === "L-BTC"}
-                <div class="absolute top-[17px] right-2">
-                  {unitCalculated}
-                </div>
-              {/if}
-            </div>
+        {:else}
+          <label for="amount">Amount</label>
+          <div class="flex relative justify-between text-black">
+            <input
+              id="amount"
+              class="w-full"
+              placeholder={val(asset, 0)}
+              bind:value={amount}
+              disabled
+            />
+            {#if ticker(asset) === "L-BTC"}
+              <div class="absolute top-[17px] right-2">
+                {unitCalculated}
+              </div>
+            {/if}
+          </div>
         {/if}
         {#if ticker(asset) !== "L-CAD" && ticker(asset) !== "L-USDt"}
           <div class="flex justify-end">
@@ -213,28 +214,28 @@
         {/if}
       </div>
       {#if tab === "lightning"}
-      <div class="flex flex-col mb-4">
-        <label for="address">Lightning Invoice</label>
-        <textarea
-          id="address"
-          style="overflow:auto"
-          placeholder="Invoice"
-          bind:value={lightningInvoice}
-          on:input="{() => decode(lightningInvoice)}"
-          rows={4}
-        />
-      </div>
+        <div class="flex flex-col mb-4">
+          <label for="address">Lightning Invoice</label>
+          <textarea
+            id="address"
+            style="overflow:auto"
+            placeholder="Invoice"
+            bind:value={lightningInvoice}
+            on:input={() => decode(lightningInvoice)}
+            rows={4}
+          />
+        </div>
       {:else}
-      <div class="flex flex-col mb-4">
-        <label for="address">Recipient Address</label>
-        <textarea
-          id="address"
-          style="overflow:auto"
-          placeholder="Address"
-          bind:value={to}
-          rows={4}
-        />
-      </div>
+        <div class="flex flex-col mb-4">
+          <label for="address">Recipient Address</label>
+          <textarea
+            id="address"
+            style="overflow:auto"
+            placeholder="Address"
+            bind:value={to}
+            rows={4}
+          />
+        </div>
       {/if}
       <button type="submit" class="primary-btn w-full mt-5"
         >Complete withdraw</button

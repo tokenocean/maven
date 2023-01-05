@@ -1,19 +1,48 @@
 <script>
+  import { UserPopup } from "$comp";
+  import OutClick from "svelte-outclick";
+  import { user as currentuser } from "$lib/store";
+  import { createPopperActions } from "svelte-popperjs";
+
   export let user = undefined;
   export let src = undefined;
   export let overlay = undefined;
   export let size = "small";
+  export let disablePopup = false;
+
+  const [popperRef, popperContent] = createPopperActions({
+    placement: "right",
+  });
+
+  let showPopup = false;
 </script>
 
-<div class={`${size} my-auto relative`}>
+{#if showPopup}
+  <OutClick on:outclick={() => (showPopup = false)}>
+    <UserPopup bind:showPopup {user} {popperContent} />
+  </OutClick>
+{/if}
+
+<div
+  class={`${size} my-auto relative`}
+  use:popperRef
+  on:click={(e) => {
+    if (user && (!$currentuser || (user && $currentuser.username !== user.username)) && !disablePopup) {
+      e.preventDefault();
+      e.stopPropagation();
+      showPopup = !showPopup;
+    }
+  }}
+>
   <div
-    class={`relative ${size} group rounded-full overflow-hidden shadow-inner text-center cursor-pointer`}
+    class={`relative ${size} group rounded-full overflow-hidden shadow-inner text-center`}
+           class:cursor-pointer={user}
   >
     {#if user || src}
       <img
         key={user && user.username}
         src={user
-          ? `/api/public/${user.avatar_url}`
+          ? `/api/public/${user.avatar_url}.webp`
           : src.startsWith("data") || src[0] === "/"
           ? src
           : `/api/public/${src}`}
@@ -33,6 +62,10 @@
 </div>
 
 <style>
+  .z {
+    z-index: 1;
+  }
+
   .small {
     @apply w-12 h-12;
   }
