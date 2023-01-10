@@ -39,13 +39,8 @@ import { getArtworkByAsset } from "$queries/artworks";
 import { getActiveBids } from "$queries/transactions";
 import { compareAsc, parseISO } from "date-fns";
 import { SignaturePrompt, AcceptPrompt } from "$comp";
-import createHash from "create-hash";
 
 const { retry } = middlewares.default || middlewares;
-
-function sha256(buffer) {
-  return createHash("sha256").update(buffer).digest();
-}
 
 export const CANCELLED = "cancelled";
 export const ACCEPTED = "accepted";

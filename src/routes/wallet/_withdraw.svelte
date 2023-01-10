@@ -1,5 +1,5 @@
 <script>
-  import { query } from "$lib/api";
+import { query } from "$lib/api";
   import { tick } from "svelte";
   import Fa from "svelte-fa";
   import { newapi as api } from "$lib/api";

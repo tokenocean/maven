@@ -36,7 +36,7 @@
 
   export let asset, page;
   let a = asset.asset;
-  
+
   let balance, pending, funding, withdrawing;
 
   let toggleFunding = () => {
@@ -57,11 +57,11 @@
       let { username } = $user;
       if (!username) return;
 
-      
+
       await getBalance(a);
-      
+
       balance = val(a, $confirmed[a] || 0);
-      
+
       pending = val(a, $unconfirmed[a] || 0);
 
       let { count } = await api()
@@ -92,7 +92,7 @@
         balance = val(a, $confirmed[a] || 0);
         pending = val(a, $unconfirmed[a] || 0);
       }
-      
+
       $assetCount = await api().url(`/assets/count`).get().json();
       clearTimeout(timeout);
       poll();

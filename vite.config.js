@@ -1,11 +1,12 @@
 // vite.config.js
 import { sveltekit } from "@sveltejs/kit/vite";
-import shim from "@asoltys/vite-plugin-stream-shim";
 import path from "path";
+
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 /** @type {import('vite').UserConfig} */
 const config = {
-  plugins: [sveltekit(), shim()],
+  plugins: [nodePolyfills(), sveltekit()],
   resolve: {
     alias: {
       $comp: path.resolve("src/components/index.js"),
