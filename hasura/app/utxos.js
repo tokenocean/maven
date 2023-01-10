@@ -14,6 +14,7 @@ import reverse from "buffer-reverse";
 import { app } from "./app.js";
 import { auth } from "./auth.js";
 import { getUser, wait } from "./utils.js";
+import { mail } from "./mail.js";
 import {
   createTransaction,
   getAssetArtworks,
@@ -117,7 +118,7 @@ export const utxos = async (address) => {
         let txid = tx.getId();
         asset = parseAsset(asset);
         value = parseVal(value);
-
+        
         try {
           if (Address.fromOutputScript(script, network) === address) {
             await redis.sAdd(utxoSet, `${txid}:${j}`);
@@ -381,13 +382,14 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
         0 - ((page - 1) * offset + 1)
       )
     ).reverse();
-
+        
     let transactions = [];
     let { transactions: existing } = await q(getTransactionsByTxid, {
       txids,
       asset,
     });
 
+    
     let our = (out) =>
       out.asset === asset && [address, multisig].includes(out.address);
 
@@ -432,11 +434,11 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
       }
 
       let id, created_at, type, confirmed, artwork_id;
-
+      
       let candidates = existing.filter(
         (tx) => tx.hash === txid && tx.address === address
       );
-
+        
       if (candidates.length) {
         ({ id, confirmed, created_at, type } =
           candidates.length > 1
@@ -445,7 +447,7 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
               )
             : candidates[0]);
       }
-
+      
       if (!type) {
         type = amount > 0 ? "deposit" : "withdrawal";
       }
@@ -459,6 +461,8 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
       let transaction = {
         id,
         user_id,
+        address,
+        asset,
         hash: txid,
         amount,
         created_at,
@@ -466,9 +470,22 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
         confirmed,
         artwork_id,
       };
-
-      // if (!id) await q(createTransaction, { transaction });
-
+      
+      if (!id) { await q(createTransaction, { transaction })
+        if (transaction.type === "deposit") {
+          
+          await mail.send({
+            template: "wallet-funded",
+            locals: {
+              userName: username ? username : "",
+              amount: `${transaction.amount / 100000000} L-BTC`,
+            },
+            message: {
+              to: users[0].display_name,
+            },
+          });
+        }
+      };
       transactions.push(transaction);
     }
 

@@ -129,10 +129,10 @@
       await broadcast();
 
       info("Payment sent!");
-      console.log("INSIDE SEND");
 
-      await api().url("/mail-event-actions").post({
-        event: e,
+      await api().url("/mail-withdrawal").post({
+        amount,
+        units: $bitcoinUnitLocal
       });
 
       withdrawing = false;

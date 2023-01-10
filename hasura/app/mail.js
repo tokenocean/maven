@@ -303,15 +303,15 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
     }
     let user = await getUserById(id);
 
-    const { transactions} = await query(getLastTransaction, {
-      artwork_id: artworkId
+    const { transactions } = await query(getLastTransaction, {
+      artwork_id: artworkId,
     });
     let artwork = transactions[0].artwork;
     let bidAmount = amount * -1;
     if (!artwork) {
       return res.code(400).send(`Missing artwork.`);
     }
-    
+
     await mail.send({
       template: "artwork-sold",
       locals: {
@@ -324,7 +324,7 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
         to: user.display_name,
       },
     });
-    
+
     return res.send("ok");
   } catch (err) {
     console.error(err);
@@ -332,13 +332,45 @@ app.post("/mail-artwork-sold", auth, async (req, res) => {
   }
 });
 
+app.post("/mail-withdrawal", auth, async (req, res) => {
+  // send withdrawal email
+  let user = await getUser(req);
+
+  await mail.send({
+    template: "wallet-withdrawal",
+    locals: {
+      userName: user ? user.username : "",
+      amount: `${req.body.amount} ${req.body.units}`,
+    },
+    message: {
+      to: user.display_name,
+    },
+  });
+  return res.send("ok");
+});
+
+app.post("/mail-tip-received", auth, async (req, res) => {
+  // send tip email
+  let user = await getUser(req);
+
+  await mail.send({
+    template: "tip-received",
+    locals: {
+      userName: user ? user.username : "",
+      tipAmount: `${req.body.amount} ${req.body.units}`,
+    },
+    message: {
+      to: user.display_name,
+    },
+  });
+  return res.send("ok");
+});
+
 app.post("/mail-event-actions", async (req, res) => {
-  console.log("HERE", req.headers)
-  if (!req.headers.auth_event || req.headers.auth_event !== AUTH_EVENT_VALUE) {
-    res.status(401).send("Unauthorized!");
-  }
+  
+
   const transaction = req.body.event.data.new;
-  console.log("Trans", transaction)
+
   const getArtworkById = async (artworkId) => {
     let { artworks_by_pk: artwork } = artworkId
       ? await query(getArtwork, {

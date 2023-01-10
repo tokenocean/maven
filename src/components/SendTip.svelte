@@ -23,6 +23,7 @@
         .post({
           psbt: $psbt && $psbt.toBase64(),
           amount,
+          artist: $tipUser
         })
         .json();
 
