@@ -1,9 +1,9 @@
 <script context="module">
-  export const load = ({ session, props }) => {
-    if (session.user) {
+  export const load = ({ session, props, url }) => {
+    if (session.user ) {
       return {
         status: 302,
-        redirect: "/",
+        redirect: url.origin.includes("local") ? `/${session.user.username}` : "/",
       };
     }
 

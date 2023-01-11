@@ -1,3 +1,4 @@
+import * as ecc from "tiny-secp256k1";
 import { tick } from "svelte";
 import { get } from "svelte/store";
 import { newapi as api, electrs, hasura, query } from "$lib/api";
@@ -6,12 +7,13 @@ import { mnemonicToSeedSync } from "bip39";
 import { fromBase58, fromSeed } from "bip32";
 import {
   address as Address,
-  ECPair,
   Psbt,
   payments,
   networks,
   Transaction,
 } from "liquidjs-lib";
+import { ECPairFactory } from "ecpair";
+const ECPair = ECPairFactory(ecc);
 
 import reverse from "buffer-reverse";
 import {
@@ -660,7 +662,6 @@ export const sign = async (sighash, prompt = true) => {
         ])
         .finalizeInput(i);
     } catch (e) {
-      // console.log("failed to sign", e.message, i);
     }
   });
 
@@ -816,9 +817,9 @@ export const createIssuance = async (
     }
 
     p.addIssuance({
-      assetAmount: 1,
+      assetSats: 1,
       assetAddress: out.address,
-      tokenAmount: 0,
+      tokenSats: 0,
       precision: 0,
       net: network,
       contract,

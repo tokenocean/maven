@@ -1,12 +1,15 @@
 // vite.config.js
 import { sveltekit } from "@sveltejs/kit/vite";
+
+import wasm from 'vite-plugin-wasm';
+import topLevelAwait from 'vite-plugin-top-level-await';
 import path from "path";
 
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 /** @type {import('vite').UserConfig} */
 const config = {
-  plugins: [nodePolyfills(), sveltekit()],
+  plugins: [nodePolyfills(), sveltekit(), wasm(), topLevelAwait()],
   resolve: {
     alias: {
       $comp: path.resolve("src/components/index.js"),
