@@ -470,9 +470,8 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
         confirmed,
         artwork_id,
       };
-      
       if (!id) { await q(createTransaction, { transaction })
-        if (transaction.type === "deposit") {
+      if (transaction.type === "deposit") {
           
           await mail.send({
             template: "wallet-funded",
