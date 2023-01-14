@@ -11,6 +11,13 @@
   let username = "";
   let password = dev ? "liquidart" : "";
   let email = dev ? makeid(6) + "@a.com" : "";
+  let first_name = "";
+  let last_name = "";
+  let address;
+  let country;
+  let zipcode;
+  let city;
+  let state;
   let registered;
 
   function makeid(length) {
@@ -33,7 +40,7 @@
     loading = true;
 
     try {
-      await register(email, username, password);
+      await register(email, username, password, first_name, first_name, address, country, zipcode, city, state);
       window.sessionStorage.setItem("password", password);
       await post("auth/login", { email, password }, fetch).json();
       window.location.reload(true);
@@ -150,6 +157,72 @@
             <Fa icon={show ? faEyeSlash : faEye} class="my-auto mr-1" />
           </button>
         </div>
+      </div>
+      <div class="flex flex-col mb-4">
+        <h3 class="mb-5">Shipping Information</h3>
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="first_name">First Name</label>
+        <input
+          id="first_name"
+          name="first_name"
+          placeholder="First Name"
+          autocapitalize="off"
+          bind:value={first_name} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="last_name">Last Name</label>
+        <input
+          id="last_name"
+          name="last_name"
+          placeholder="Last Name"
+          autocapitalize="off"
+          bind:value={last_name} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="address">Address</label>
+        <input
+          id="address"
+          name="address"
+          placeholder="Address"
+          autocapitalize="off"
+          bind:value={address} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="country">Country</label>
+        <input
+          id="country"
+          name="country"
+          placeholder="Country"
+          autocapitalize="off"
+          bind:value={country} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="zipcode">Zip Code</label>
+        <input
+          id="zipcode"
+          name="zipcode"
+          placeholder="Zip Code"
+          autocapitalize="off"
+          bind:value={zipcode} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="city">City</label>
+        <input
+          id="city"
+          name="city"
+          placeholder="City"
+          autocapitalize="off"
+          bind:value={city} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="state">State/Province</label>
+        <input
+          id="state"
+          name="state"
+          placeholder="State"
+          autocapitalize="off"
+          bind:value={state} />
       </div>
       <span class="block w-full">By signing up, you agree to the
         <a href="/terms-and-conditions">Terms and Conditions</a>
