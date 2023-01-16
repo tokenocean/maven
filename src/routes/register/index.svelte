@@ -13,7 +13,7 @@
   let email = dev ? makeid(6) + "@a.com" : "";
   let first_name = "";
   let last_name = "";
-  let address;
+  let shipping_address;
   let country;
   let zipcode;
   let city;
@@ -40,7 +40,7 @@
     loading = true;
 
     try {
-      await register(email, username, password, first_name, first_name, address, country, zipcode, city, state);
+      await register(email, username, password, first_name, last_name, shipping_address, country, zipcode, city, state);
       window.sessionStorage.setItem("password", password);
       await post("auth/login", { email, password }, fetch).json();
       window.location.reload(true);
@@ -160,24 +160,30 @@
       </div>
       <div class="flex flex-col mb-4">
         <h3 class="mb-5">Shipping Information</h3>
-        <label
-          class="mb-2 font-medium text-gray-300"
-          for="first_name">First Name</label>
-        <input
-          id="first_name"
-          name="first_name"
-          placeholder="First Name"
-          autocapitalize="off"
-          bind:value={first_name} />
-        <label
-          class="mb-2 font-medium text-gray-300"
-          for="last_name">Last Name</label>
-        <input
-          id="last_name"
-          name="last_name"
-          placeholder="Last Name"
-          autocapitalize="off"
-          bind:value={last_name} />
+        <div class="flex flex-row">
+          <div class="flex flex-col mb-4 mr-3">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="first_name">First Name</label>
+            <input
+              id="first_name"
+              name="first_name"
+              placeholder="First Name"
+              autocapitalize="off"
+              bind:value={first_name} />
+          </div>
+          <div class="flex flex-col mb-4">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="last_name">Last Name</label>
+            <input
+              id="last_name"
+              name="last_name"
+              placeholder="Last Name"
+              autocapitalize="off"
+              bind:value={last_name} />
+          </div>
+        </div>
         <label
           class="mb-2 font-medium text-gray-300"
           for="address">Address</label>
@@ -186,7 +192,7 @@
           name="address"
           placeholder="Address"
           autocapitalize="off"
-          bind:value={address} />
+          bind:value={shipping_address} />
         <label
           class="mb-2 font-medium text-gray-300"
           for="country">Country</label>
