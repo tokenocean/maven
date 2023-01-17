@@ -1,4 +1,4 @@
-<script>
+  ````````<script>
   import Fa from "svelte-fa";
   import { post } from "$lib/api";
   import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -99,7 +99,7 @@
 
 </style>
 
-<div class="form-container px-4">
+<div class="form-container px-4 max-h-screen">
   <form class="mb-6" on:submit|preventDefault={submit} autocomplete="off">
     {#if loading}
       <ProgressLinear />
@@ -161,7 +161,7 @@
       <div class="flex flex-col mb-4">
         <h3 class="mb-5">Shipping Information</h3>
         <div class="flex flex-row">
-          <div class="flex flex-col mb-4 mr-3">
+          <div class="flex flex-col mb-4 mr-3 w-44">
             <label
               class="mb-2 font-medium text-gray-300"
               for="first_name">First Name</label>
@@ -172,7 +172,7 @@
               autocapitalize="off"
               bind:value={first_name} />
           </div>
-          <div class="flex flex-col mb-4">
+          <div class="flex flex-col mb-4 w-44">
             <label
               class="mb-2 font-medium text-gray-300"
               for="last_name">Last Name</label>
@@ -202,33 +202,41 @@
           placeholder="Country"
           autocapitalize="off"
           bind:value={country} />
-        <label
-          class="mb-2 font-medium text-gray-300"
-          for="zipcode">Zip Code</label>
-        <input
-          id="zipcode"
-          name="zipcode"
-          placeholder="Zip Code"
-          autocapitalize="off"
-          bind:value={zipcode} />
-        <label
-          class="mb-2 font-medium text-gray-300"
-          for="city">City</label>
-        <input
-          id="city"
-          name="city"
-          placeholder="City"
-          autocapitalize="off"
-          bind:value={city} />
-        <label
-          class="mb-2 font-medium text-gray-300"
-          for="state">State/Province</label>
-        <input
-          id="state"
-          name="state"
-          placeholder="State"
-          autocapitalize="off"
-          bind:value={state} />
+        <div class="flex flex-row">
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="zipcode">Zip Code</label>
+            <input
+              id="zipcode"
+              name="zipcode"
+              placeholder="Zip Code"
+              autocapitalize="off"
+              bind:value={zipcode} />
+          </div>
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="city">City</label>
+            <input
+              id="city"
+              name="city"
+              placeholder="City"
+              autocapitalize="off"
+              bind:value={city} />
+          </div>
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="state">State/Province</label>
+            <input
+              id="state"
+              name="state"
+              placeholder="State"
+              autocapitalize="off"
+              bind:value={state} />
+          </div>
+        </div>
       </div>
       <span class="block w-full">By signing up, you agree to the
         <a href="/terms-and-conditions">Terms and Conditions</a>
