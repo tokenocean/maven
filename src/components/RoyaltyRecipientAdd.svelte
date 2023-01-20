@@ -1,22 +1,38 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { royaltyRecipientIndividualType, err } from "$lib/utils";
+  import Fa from "svelte-fa";
+  import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
   const dispatch = createEventDispatcher();
 
   export let defaultName;
   export let defaultAddress;
+  
+  let oneTimeRoyaltyEnabled = false;
 
   const recipientModel = {
     name: "",
     amount: 1,
     address: "",
     type: royaltyRecipientIndividualType,
+    one_time_royalty: false
   };
 
   let recipient = {
     ...recipientModel,
     ...{ address: defaultAddress, name: defaultName },
   };
+
+  const handleOneTimeRoyalty = () => {
+    if (!oneTimeRoyaltyEnabled) {
+      recipient.one_time_royalty = true;
+      oneTimeRoyaltyEnabled = true;
+    } else {
+      recipient.one_time_royalty = false;
+      oneTimeRoyaltyEnabled = false;
+    }
+    console.log("HERE", recipient)
+  }
 
   const onSubmit = (e) => {
     if (!recipient.name.length)
@@ -36,20 +52,7 @@
 
 </script>
 
-<style>
-  input[type="submit"] {
-    height: 54px;
-    font-size: 0.9rem;
-  }
 
-  input {
-    @apply rounded-lg mb-4 mt-2;
-    &:disabled {
-      @apply bg-gray-100;
-    }
-  }
-
-</style>
 
 <form
   class="w-full mb-6 mt-6"
@@ -77,6 +80,33 @@
         id="recipientAmount" />
     </div>
   </div>
+  <div class="flex w-full sm:w-3/4 mb-4">
+    <div class="relative mt-1 rounded-md w-2/3 mr-6">
+      <div class="auction-toggle">
+        <label class="inline-flex items-center">
+          <input
+            class="form-checkbox h-6 w-6 mt-3"
+            type="checkbox"
+            bind:checked={oneTimeRoyaltyEnabled} 
+            on:click={handleOneTimeRoyalty}
+          />
+          <span class="ml-3 text-xl">One Time Royalty Payment</span>
+          <span class="tooltip">
+            <i class="ml-3 text-midblue text-xl tooltip">
+              <Fa icon={faQuestionCircle} pull="right" class="mt-1" />
+            </i>
+            <span
+              class="tooltip-text text-black bg-gray-100 shadow ml-4 rounded"
+            >
+              Setting a One Time Royalty Payment means 
+              original sale would have payment disbursement 
+              and no secondary sale royalties.
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </div>
   <div class="flex w-full mb-4">
     <div class="mt-1 rounded-md w-4/5 pr-6">
       <label for="recipientAddress">Address</label>
@@ -95,3 +125,53 @@
     </div>
   </div>
 </form>
+
+
+<style>
+  input[type="submit"] {
+    height: 54px;
+    font-size: 0.9rem;
+  }
+
+  input {
+    @apply rounded-lg mb-4 mt-2;
+    &:disabled {
+      @apply bg-gray-100;
+    }
+  }
+
+  .tooltip {
+    cursor: pointer;
+  }
+  .tooltip .tooltip-text {
+    visibility: hidden;
+    padding: 15px;
+    position: absolute;
+    z-index: 100;
+    width: 300px;
+    font-style: normal;
+  }
+  .tooltip:hover .tooltip-text {
+    visibility: visible;
+  }
+
+  input[type="checkbox"]:checked {
+    appearance: none;
+    border: 5px solid #fff;
+    outline: 2px solid #6ed8e0;
+    background-color: #6ed8e0;
+    padding: 2px;
+    border-radius: 0;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .container {
+      background: none;
+    }
+    .tooltip .tooltip-text {
+      width: 100%;
+      left: 0px;
+      top: 30px;
+    }
+  }
+</style>
