@@ -624,6 +624,7 @@ export const getArtworks = `
         amount
         address
         name
+        one_time_sale
       }
       auction_start
       auction_end
