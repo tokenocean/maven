@@ -61,6 +61,7 @@
     faTimes,
   } from "@fortawesome/free-solid-svg-icons";
   import { getArtworkBySlug, deleteArtwork } from "$queries/artworks";
+  import { deleteRoyaltyRecipientsByArtwork } from "$queries/royalty_recipients";
   import { faHeart, faImage } from "@fortawesome/free-regular-svg-icons";
   import { compareAsc, format, parseISO } from "date-fns";
   import {
@@ -273,6 +274,11 @@
       transaction.psbt = $psbt.toBase64();
 
       await save();
+      if (artwork.has_royalty) {
+        await query(deleteRoyaltyRecipientsByArtwork, {
+          artwork_id: artwork.id,
+        });
+      }
       await refreshArtwork();
       
       await api().url("/mail-purchase-successful").post({

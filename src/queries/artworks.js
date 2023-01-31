@@ -70,7 +70,7 @@ export const fields = `
     amount
     address
     type
-    one_time_sale
+    one_time_payment
   }
   slug
   is_physical

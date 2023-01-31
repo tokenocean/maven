@@ -624,7 +624,7 @@ export const getArtworks = `
         amount
         address
         name
-        one_time_sale
+        one_time_payment
       }
       auction_start
       auction_end
@@ -648,3 +648,8 @@ export const allMultisig = `query {
   } 
 }`;
 
+export const deleteRoyaltyRecipient = `mutation delete_royalty_recipients($id: uuid!) {
+  delete_royalty_recipients_by_pk(id: $id) {
+    id
+  }
+}`;

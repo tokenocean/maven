@@ -15,7 +15,7 @@
     amount: 1,
     address: "",
     type: royaltyRecipientIndividualType,
-    one_time_sale: false
+    one_time_payment: false
   };
 
   let recipient = {
@@ -25,10 +25,10 @@
 
   const handleOneTimeRoyalty = () => {
     if (!oneTimeRoyaltyEnabled) {
-      recipient.one_time_sale = true;
+      recipient.one_time_payment = true;
       oneTimeRoyaltyEnabled = true;
     } else {
-      recipient.one_time_sale = false;
+      recipient.one_time_payment = false;
       oneTimeRoyaltyEnabled = false;
     }
     console.log("HERE", recipient)

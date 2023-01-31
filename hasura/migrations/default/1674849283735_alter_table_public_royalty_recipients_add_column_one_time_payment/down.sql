@@ -1,0 +1,4 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- alter table "public"."royalty_recipients" add column "one_time_payment" boolean
+--  null default 'false';

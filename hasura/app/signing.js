@@ -8,38 +8,7 @@ wretch().polyfills({ fetch });
 const { HASURA_URL } = process.env;
 import { app } from "./app.js";
 import { auth } from "./auth.js";
-
-
-const query = `
-  query($assets: [String!]) {
-    artworks(where: { asset: { _in: $assets }}) {
-      id 
-      asset
-      asking_asset
-      has_royalty
-      royalty_recipients {
-        id
-        asking_asset
-        amount
-        address
-        name
-        one_time_sale
-      }
-      auction_start
-      auction_end
-      list_price
-      artist {
-        id
-        address
-        multisig
-      } 
-      owner {
-        id
-        address
-        multisig
-      } 
-    } 
-  }`;
+import { getArtworks } from "./queries.js";
 
 const allMultisig = `query {
   users {
@@ -67,17 +36,13 @@ app.post("/sign", auth, async (req, res) => {
 
 export const check = async (psbt) => {
   const [txid, inputs, outputs] = await parse(psbt);
-
   const multisig = (
     await hasura.post({ query: allMultisig }).json().catch(console.log)
-  ).data.users.map((u) => u.multisig);
-
-  let variables = { assets: outputs.map((o) => o.asset) };
-
-  let {
-    data: { artworks },
-  } = await hasura.post({ query, variables }).json();
-
+    ).data.users.map((u) => u.multisig);
+    
+    let variables = { assets: outputs.map((o) => o.asset) };
+    let {artworks} = await q (getArtworks, variables)
+    
   artworks.map(
     ({
       asset,

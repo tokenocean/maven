@@ -13,12 +13,16 @@ insert_permissions:
           owner_id:
             _eq: X-Hasura-User-Id
       columns:
-        - address
-        - amount
+        - id
+        - name
         - artwork_id
         - asking_asset
-        - name
+        - amount
+        - address
+        - created_at
+        - updated_at
         - type
+        - one_time_payment
       backend_only: false
 select_permissions:
   - role: anonymous
@@ -38,17 +42,17 @@ select_permissions:
   - role: user
     permission:
       columns:
-        - address
+        - one_time_payment
         - amount
-        - artwork_id
+        - address
         - asking_asset
-        - created_at
-        - id
         - name
         - type
+        - created_at
         - updated_at
+        - artwork_id
+        - id
       filter: {}
-      allow_aggregations: true
 update_permissions:
   - role: user
     permission:
