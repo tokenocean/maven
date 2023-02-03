@@ -108,7 +108,7 @@
           information, and include links to their website or other social
           platforms. For users submitting an application to become Listers in
           the Website we may collect information such as name, email address,
-          artwork samples, information about your promoting sites (website or
+          product samples, information about your promoting sites (website or
           other social platforms) and other information about your art. In
           addition, if any Token has a physical item associated, we may collect
           shipping information (such as name and mailing address) from you in

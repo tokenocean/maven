@@ -255,7 +255,7 @@
 
             <Dropzone
               on:file={uploadFile}
-              title={files.length < 1 ? 'Upload artwork samples' : 'Add artwork samples'}
+              title={files.length < 1 ? 'Upload product samples' : 'Add product samples'}
               style={files.length < 1 ? 'box' : 'link'} />
           </div>
         </div>

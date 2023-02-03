@@ -202,7 +202,7 @@
           <div class="w-full justify-center">
             <div class="w-full max-w-sm mx-auto mb-12">
               {#if $user?.is_artist && $user?.id === subject.id}
-                <a href="/a/create" class="primary-btn">Submit a new artwork</a>
+                <a href="/a/create" class="primary-btn">Add your product or service</a>
               {/if}
             </div>
             <div class="w-full flex flex-wrap">
