@@ -234,12 +234,11 @@
       .url("/transaction")
       .post({ transaction })
       .json();
-
-    if (errors) throw new Error(errors[0].message);
-
-    if (transaction.type === "purchase") info("Sold! Congratulations!");
-    if (transaction.type === "bid") info("Bid placed!");
-    bidding = false;
+      if (errors) throw new Error(errors[0].message);
+      
+      if (transaction.type === "purchase") info("Sold! Congratulations!");
+      if (transaction.type === "bid") info("Bid placed!");
+      bidding = false;
   };
 
   let bidding, amountInput, offering;
@@ -258,7 +257,7 @@
       transaction.amount = -artwork.list_price;
       transaction.asset = artwork.asset;
       transaction.type = "purchase";
-      
+      console.log("ARTWORK", artwork)
       $psbt = await executeSwap(artwork);
       $psbt = await sign();
 
@@ -272,7 +271,7 @@
       let tx = $psbt.extractTransaction();
       transaction.hash = tx.getId();
       transaction.psbt = $psbt.toBase64();
-
+      console.log("transaction", transaction)
       await save();
       if (artwork.has_royalty) {
         await query(deleteRoyaltyRecipientsByArtwork, {

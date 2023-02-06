@@ -710,7 +710,7 @@ export const executeSwap = async (artwork) => {
   let out = singlesig();
   let script = (has_royalty ? multisig() : singlesig()).output;
   let total = list_price;
-
+  let oneTimeRecips = royalty_recipients.filter(recipient => recipient.one_time_payment === true)
   fee.set(100);
 
   p.addOutput({
@@ -719,11 +719,23 @@ export const executeSwap = async (artwork) => {
     script,
     value: 1,
   });
-
+  
   if (artist_id !== owner_id && has_royalty) {
     for (let i = 0; i < royalty_recipients.length; i++) {
       const element = royalty_recipients[i];
+      const recipientValue = Math.round((list_price * element.amount) / 100);
+      total += recipientValue;
 
+      p.addOutput({
+        asset: asking_asset,
+        value: recipientValue,
+        nonce,
+        script: Address.toOutputScript(element.address, network),
+      });
+    }
+  } else if (oneTimeRecips) {
+    for (let i = 0; i < oneTimeRecips.length; i++) {
+      const element = oneTimeRecips[i];
       const recipientValue = Math.round((list_price * element.amount) / 100);
       total += recipientValue;
 
