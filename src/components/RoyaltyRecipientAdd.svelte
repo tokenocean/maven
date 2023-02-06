@@ -47,6 +47,7 @@
         recipient = { ...recipientModel };
       },
     });
+    oneTimeRoyaltyEnabled = false;
   };
 
 </script>
