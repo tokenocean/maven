@@ -31,7 +31,6 @@
       recipient.one_time_payment = false;
       oneTimeRoyaltyEnabled = false;
     }
-    console.log("HERE", recipient)
   }
 
   const onSubmit = (e) => {

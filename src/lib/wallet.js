@@ -1010,6 +1010,8 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
     royalty_recipients,
     owner_id,
   } = artwork;
+  
+  let oneTimeRecips = royalty_recipients.filter(recipient => recipient.one_time_payment === true);
 
   if (asset === btc && amount < DUST)
     throw new Error(`Minimum bid is ${(DUST / 100000000).toFixed(8)} L-BTC`);
@@ -1028,6 +1030,7 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
 
   if (has_royalty) {
     if (artist_id !== owner_id) {
+      
       for (let i = 0; i < royalty_recipients.length; i++) {
         const element = royalty_recipients[i];
 
@@ -1036,6 +1039,20 @@ export const createOffer = async (artwork, amount, input, f = 150) => {
         );
         total += recipientValue;
 
+        p.addOutput({
+          asset,
+          value: recipientValue,
+          nonce,
+          script: Address.toOutputScript(element.address, network),
+        });
+      }
+    } else {
+      
+      for (let i = 0; i < oneTimeRecips.length; i++) {
+        const element = oneTimeRecips[i];
+        const recipientValue = Math.round((parseInt(amount) * element.amount) / 100);
+        total += recipientValue;
+  
         p.addOutput({
           asset,
           value: recipientValue,

@@ -257,7 +257,7 @@
       transaction.amount = -artwork.list_price;
       transaction.asset = artwork.asset;
       transaction.type = "purchase";
-      console.log("ARTWORK", artwork)
+      
       $psbt = await executeSwap(artwork);
       $psbt = await sign();
 
@@ -271,7 +271,7 @@
       let tx = $psbt.extractTransaction();
       transaction.hash = tx.getId();
       transaction.psbt = $psbt.toBase64();
-      console.log("transaction", transaction)
+      
       await save();
       if (artwork.has_royalty) {
         await query(deleteRoyaltyRecipientsByArtwork, {

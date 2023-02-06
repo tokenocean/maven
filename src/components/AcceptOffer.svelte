@@ -2,18 +2,24 @@
   import { tick } from "svelte";
   import { prompt, snack, psbt, user, token } from "$lib/store";
   import { broadcast, sign, requestSignature } from "$lib/wallet";
+  import { deleteRoyaltyRecipientsByArtwork } from "$queries/royalty_recipients";
   import { err, info } from "$lib/utils";
+  
   import { requirePassword } from "$lib/auth";
   import { Psbt } from "liquidjs-lib";
-  import { api } from "$lib/api";
+  import { api, query } from "$lib/api";
 
   export const accept = async ({ id, amount, artwork, psbt: base64, user }) => {
     try {
       await requirePassword();
       $psbt = Psbt.fromBase64(base64);
       $psbt = await sign();
+      
       if (artwork.has_royalty || artwork.auction_end) {
         $psbt = await requestSignature($psbt);
+        await query(deleteRoyaltyRecipientsByArtwork, {
+          artwork_id: artwork.id,
+        });
       }
 
       let result = await api
