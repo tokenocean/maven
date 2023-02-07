@@ -404,10 +404,10 @@
             class="flex ml-auto py-1 px-4 bg-gray-100 rounded rounded-full my-auto"
           >
             <div class="my-auto">
-              <Fa icon={faImage} class="mr-1" />
+              <Fa icon={faImage} class="mr-1 secondary-color" />
             </div>
             <div class="my-auto mb-1">
-              <span class="text-sm">Physical artwork</span>
+              <span class="text-sm text-black">Physical artwork</span>
             </div>
           </div>
         {/if}

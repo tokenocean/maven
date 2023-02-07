@@ -90,7 +90,7 @@
             bind:checked={oneTimeRoyaltyEnabled} 
             on:click={handleOneTimeRoyalty}
           />
-          <span class="ml-3 text-xl">One Time Royalty Payment</span>
+          <span class="ml-3 text-xl">One Time Payment</span>
           <span class="tooltip">
             <i class="ml-3 text-midblue text-xl tooltip">
               <Fa icon={faQuestionCircle} pull="right" class="mt-1" />
@@ -98,9 +98,9 @@
             <span
               class="tooltip-text text-black bg-gray-100 shadow ml-4 rounded"
             >
-              Setting a One Time Royalty Payment means 
-              original sale would have payment disbursement 
-              and no secondary sale royalties.
+              Setting a One Time Payment means 
+              original sale would have a single payment disbursement 
+              and no following payments.
             </span>
           </span>
         </label>
