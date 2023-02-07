@@ -8,7 +8,8 @@
   } from "@fortawesome/free-solid-svg-icons";
   export let artwork, hideDetails;
   let show;
-
+  let oneTimePayment = artwork.royalty_recipients.find(recipient => recipient.one_time_payment === true)
+  console.log("HERE", oneTimePayment)
 </script>
 
 {#if artwork.royalty_recipients.length}
@@ -18,7 +19,11 @@
       <i class="text-midblue text-xs mr-1 my-auto">
         <Fa icon={faGem} />
       </i>
+      {#if oneTimePayment}
+      <div class="my-auto">Payment Distribution</div>
+      {:else}
       <div class="my-auto">Royalties</div>
+      {/if}
       <div class="my-auto ml-1">
         <Fa icon={show ? faChevronUp : faChevronDown} />
       </div>
