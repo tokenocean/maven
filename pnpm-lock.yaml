@@ -110,8 +110,8 @@ devDependencies:
     specifier: ^3.1.2
     version: 3.1.2
   liquidjs-lib:
-    specifier: v6.0.2-liquid.11
-    version: 6.0.2-liquid.11
+    specifier: github:asoltys/liquidjs-lib#v6.0.4
+    version: github.com/asoltys/liquidjs-lib/ac1b516d2112ad5f69ac915db2a54d3d9795956f
   long:
     specifier: ^4.0.0
     version: 4.0.0
@@ -857,6 +857,14 @@ packages:
     dev: true
     optional: true
 
+  /@vulpemventures/secp256k1-zkp@2.1.1:
+    resolution: {integrity: sha512-OIfvP0kRC38Ab8C2MMibKlPVY/PmT81uNGZrCxK24INLh5PPUqOcdK2VvK+xpCvh8TjAsZrwT3KdN6N9fqsTZQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@types/node': 13.13.52
+      long: 4.0.0
+    dev: true
+
   /acorn-node@1.8.2:
     resolution: {integrity: sha512-8mt+fslDufLYntIoPAaIMUe/lrbrehIiwmR3t2k9LljIzoigEPF27eLk2hy8zSGzmR/ogr7zbRKINMo1u0yh5A==}
     dependencies:
@@ -1118,10 +1126,6 @@ packages:
       typeforce: 1.18.0
       varuint-bitcoin: 1.1.2
       wif: 2.0.6
-    dev: true
-
-  /bitset@5.1.1:
-    resolution: {integrity: sha512-oKaRp6mzXedJ1Npo86PKhWfDelI6HxxJo+it9nAcBB0HLVvYVp+5i6yj6DT5hfFgo+TS5T57MRWtw8zhwdTs3g==}
     dev: true
 
   /blech32@1.1.2:
@@ -1962,6 +1966,15 @@ packages:
     dependencies:
       jsbn: 0.1.1
       safer-buffer: 2.1.2
+    dev: true
+
+  /ecpair@2.0.1:
+    resolution: {integrity: sha512-iT3wztQMeE/nDTlfnAg8dAFUfBS7Tq2BXzq3ae6L+pWgFU0fQ3l0woTzdTBrJV3OxBjxbzjq8EQhAbEmJNWFSw==}
+    engines: {node: '>=8.0.0'}
+    dependencies:
+      randombytes: 2.1.0
+      typeforce: 1.18.0
+      wif: 2.0.6
     dev: true
 
   /ecpair@2.1.0:
@@ -3196,32 +3209,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /liquidjs-lib@6.0.2-liquid.11:
-    resolution: {integrity: sha512-sYOd3gLy6Q1L1if/TdysLJ529CYyFS01XsTVBCCu6ZbTYMsRElI2TqWt0Re9c9qx4co8VFYN3FXeRD/Kj46YLA==}
-    engines: {node: '>=8.0.0'}
-    dependencies:
-      '@types/randombytes': 2.0.0
-      '@types/wif': 2.0.2
-      '@vulpemventures/secp256k1-zkp': github.com/vulpemventures/secp256k1-zkp/c1cd7ba26d80b7460c8bcf9ba43a52aa1c282ddb
-      axios: 0.21.4
-      bech32: 2.0.0
-      bip174-liquid: 1.0.3
-      bip66: 1.1.5
-      bitcoin-ops: 1.4.1
-      bitcoinjs-lib: 6.1.0
-      bitset: 5.1.1
-      blech32: 1.1.2
-      bs58check: 2.1.2
-      create-hash: 1.2.0
-      ecpair: 2.1.0
-      slip77: 0.2.0
-      typeforce: 1.18.0
-      varuint-bitcoin: 1.1.2
-      wif: 2.0.6
-    transitivePeerDependencies:
-      - debug
-    dev: true
-
   /listr2@3.14.0(enquirer@2.3.6):
     resolution: {integrity: sha512-TyWI8G99GX9GjE54cJ+RrNMcIFBfwMPxc3XTFiAYGN4s10hWROGtOg7+O6u6LE3mNkyld7RSLE6nrKBvTfcs3g==}
     engines: {node: '>=10.0.0'}
@@ -3292,10 +3279,6 @@ packages:
 
   /long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
-
-  /long@5.2.3:
-    resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
-    dev: true
 
   /lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
@@ -4846,15 +4829,6 @@ packages:
       typeforce: 1.18.0
     dev: true
 
-  /slip77@0.2.0:
-    resolution: {integrity: sha512-LQaxb1Hef10kU36qvk71tlSt5BWph7GM0j+t2n5zs169X4QfnNbb6xqKZ38X3ETzGmCQaVdBwr925HDagHra/Q==}
-    engines: {node: '>=8.0.0'}
-    dependencies:
-      '@types/node': 13.13.52
-      create-hmac: 1.1.7
-      typeforce: 1.18.0
-    dev: true
-
   /sorcery@0.10.0:
     resolution: {integrity: sha1-iukK19fLBfxZ8asMY3hF1cFaUrc=}
     hasBin: true
@@ -5633,11 +5607,28 @@ packages:
       vite-compatible-readable-stream: 3.6.0
     dev: true
 
-  github.com/vulpemventures/secp256k1-zkp/c1cd7ba26d80b7460c8bcf9ba43a52aa1c282ddb:
-    resolution: {tarball: https://codeload.github.com/vulpemventures/secp256k1-zkp/tar.gz/c1cd7ba26d80b7460c8bcf9ba43a52aa1c282ddb}
-    name: '@vulpemventures/secp256k1-zkp'
-    version: 3.2.1
-    engines: {node: '>=12'}
+  github.com/asoltys/liquidjs-lib/ac1b516d2112ad5f69ac915db2a54d3d9795956f:
+    resolution: {tarball: https://codeload.github.com/asoltys/liquidjs-lib/tar.gz/ac1b516d2112ad5f69ac915db2a54d3d9795956f}
+    name: liquidjs-lib
+    version: 6.0.4
+    engines: {node: '>=8.0.0'}
     dependencies:
-      long: 5.2.3
+      '@types/randombytes': 2.0.0
+      '@types/wif': 2.0.2
+      '@vulpemventures/secp256k1-zkp': 2.1.1
+      axios: 0.21.4
+      bech32: 2.0.0
+      bip174-liquid: 1.0.3
+      bip32: 2.0.6
+      bip66: 1.1.5
+      bitcoin-ops: 1.4.1
+      blech32: 1.1.2
+      bs58check: 2.1.2
+      create-hash: 1.2.0
+      ecpair: 2.0.1
+      typeforce: 1.18.0
+      varuint-bitcoin: 1.1.2
+      wif: 2.0.6
+    transitivePeerDependencies:
+      - debug
     dev: true
