@@ -4,6 +4,7 @@ import {
   blocktime,
   broadcast,
   btc,
+  keypair,
   hex,
   network,
   parseAsset,
@@ -13,21 +14,18 @@ import { address as Address, Transaction } from "liquidjs-lib";
 import reverse from "buffer-reverse";
 import { app } from "./app.js";
 import { auth } from "./auth.js";
-import { getUser, wait } from "./utils.js";
-import { mail } from "./mail.js";
+import { getUser, wait, SATS } from "./utils.js";
 import {
   createTransaction,
   getAssetArtworks,
   getTransactionsByTxid,
   getUserByUsername,
+  getUserByAddress,
 } from "./queries.js";
 import { compareDesc, parseISO, formatISO } from "date-fns";
+import { fromBase58 } from "bip32";
 
 let balances = async (address, asset) => {
-  let mempool = (
-    await electrs.url(`/address/${address}/txs/mempool`).get().json()
-  ).map((tx) => tx.txid);
-
   let confirmed = [],
     unconfirmed = [];
 
@@ -35,130 +33,62 @@ let balances = async (address, asset) => {
   (await utxos(address))
     .filter((tx) => !asset || tx.asset === asset)
     .map((tx) =>
-      mempool.includes(tx.txid) ? unconfirmed.push(tx) : confirmed.push(tx)
+        tx.confirmed ? confirmed.push(tx) : unconfirmed.push(tx)
     );
 
   let sum = (a, b) => ({ ...a, [b.asset]: (a[b.asset] || 0) + b.value });
   confirmed = confirmed.reduce(sum, {});
   unconfirmed = unconfirmed.reduce(sum, {});
-    
+
   return { confirmed, unconfirmed };
 };
 
-let locked = {};
 export const utxos = async (address) => {
-  await wait(() => !locked[address]);
+  let { users } = await q(getUserByAddress, { address });
+  if (!users.length) return res.code.send("user not found");
+  let { multisig, pubkey } = users[0];
+  let key = fromBase58(pubkey, network);
+  let hex = key.publicKey.toString("hex");
+  let server = keypair().pubkey.toString("hex");
+  let sorted = [hex, server].sort((a, b) => a.localeCompare(b));
 
-  try {
-    locked[address] = true;
-    let utxoSet = `${address}:utxos`;
-    let last = await redis.lRange(`${address}`, -50, -1);
-    let curr = await electrs.url(`/address/${address}/txs`).get().json();
-    let txns = [
-      ...curr.filter((tx) => !tx.status.confirmed).reverse(),
-      ...curr.filter((tx) => tx.status.confirmed),
-    ].map((tx) => tx.txid);
+  let desc =
+    address === multisig
+      ? `sh(wsh(multi(2,${sorted[0]},${sorted[1]})))`
+      : `sh(wpkh(${hex}))`;
 
-    while (curr.length >= 25 && curr.find((tx) => !last.includes(tx.txid))) {
-      let prev = txns.at(-1);
-      curr = await electrs
-        .url(`/address/${address}/txs/chain/${prev}`)
-        .get()
-        .json();
-      txns = [...txns, ...curr.map((tx) => tx.txid)];
+  await wait(async () => {
+    let result = await lq.scanTxOutSet("status");
+    return !result;
+  });
+
+  let r = await lq.scanTxOutSet("start", [desc]);
+
+  let utxos = r.unspents.map(({ asset, vout, txid, amount }) => ({
+    asset,
+    confirmed: true,
+    txid,
+    value: Math.round(amount * SATS),
+    vout,
+  }));
+
+  let mempool = await lq.getRawMempool();
+  for (let txid of mempool) {
+    let hex = await lq.getRawTransaction(txid);
+    let tx = await lq.decodeRawTransaction(hex);
+    for (let { value, asset, n, scriptPubKey } of tx.vout) {
+      if (scriptPubKey && scriptPubKey.address === address)
+        utxos.push({
+          asset,
+          confirmed: false,
+          txid,
+          value: Math.round(value * SATS),
+          vout: n,
+        });
     }
-
-    
-    txns = txns.filter((txid) => !last.includes(txid));
-    
-    await redis.del(address);
-    let latest = [...txns, ...last].slice(0, 50);
-    if (latest.length) await redis.rPush(address, latest);
-    
-    
-    last = await redis.lRange(`${address}`, -50, -1);
-    
-    
-    while (txns.length) {
-      let tx = Transaction.fromHex(await hex(txns[0]));
-
-      let { ins, outs } = tx;
-      let defer;
-      let skip = {};
-
-      for (let j = 0; j < ins.length; j++) {
-        let { hash, index } = ins[j];
-        let txid = reverse(hash).toString("hex");
-        if (!(await redis.sIsMember(utxoSet, `${txid}:${index}`))) {
-          let k = txns.indexOf(txid);
-          if (k > -1) {
-            defer = true;
-            txns.splice(k, 1);
-            txns.unshift(txid);
-            break;
-          } else {
-            skip[j] = true;
-          }
-        }
-      }
-
-      if (defer) continue;
-
-      for (let j = 0; j < ins.length; j++) {
-        if (skip[j]) continue;
-        let { hash, index } = ins[j];
-        let txid = reverse(hash).toString("hex");
-        await redis.sRem(utxoSet, `${txid}:${index}`);
-      }
-
-      let added = {};
-
-      for (let j = 0; j < outs.length; j++) {
-        let { script, value, asset } = outs[j];
-        let txid = tx.getId();
-        asset = parseAsset(asset);
-        value = parseVal(value);
-        
-        try {
-          if (Address.fromOutputScript(script, network) === address) {
-            await redis.sAdd(utxoSet, `${txid}:${j}`);
-            await redis.set(`${txid}:${j}`, `${asset},${value}`);
-
-            if (!added[asset]) {
-              added[asset] = true;
-              redis.rPush(`${address}:${asset}`, txid);
-            }
-          }
-        } catch (e) {
-          console.log(e);
-          continue;
-        }
-      }
-
-      txns.shift();
-    }
-
-    let utxos = [];
-    let set = await redis.sMembers(utxoSet);
-
-    for (let i = 0; i < set.length; i++) {
-      let utxo = set[i];
-      let [txid, vout] = utxo.split(":");
-      let [asset, value] = (await redis.get(utxo)).split(",");
-
-      vout = parseInt(vout);
-      value = parseInt(value);
-
-      utxos.push({ txid, vout, asset, value });
-    }
-
-    delete locked[address];
-    return utxos;
-  } catch (e) {
-    console.log(e);
-    delete locked[address];
-    return [];
   }
+
+  return utxos;
 };
 
 app.get("/assets/count", auth, async (req, res) => {
@@ -312,7 +242,11 @@ app.get("/tx/:txid/hex", async (req, res) => {
   try {
     res.send(await hex(txid));
   } catch (e) {
-    console.log("problem getting tx hex", txid);
+    console.log(
+      "problem getting tx hex",
+      txid,
+      req.headers["cf-connecting-ip"]
+    );
     res.code(500).send(e.message);
   }
 });
@@ -382,14 +316,13 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
         0 - ((page - 1) * offset + 1)
       )
     ).reverse();
-        
+
     let transactions = [];
     let { transactions: existing } = await q(getTransactionsByTxid, {
       txids,
       asset,
     });
 
-    
     let our = (out) =>
       out.asset === asset && [address, multisig].includes(out.address);
 
@@ -434,11 +367,11 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
       }
 
       let id, created_at, type, confirmed, artwork_id;
-      
+
       let candidates = existing.filter(
         (tx) => tx.hash === txid && tx.address === address
       );
-        
+
       if (candidates.length) {
         ({ id, confirmed, created_at, type } =
           candidates.length > 1
@@ -447,7 +380,7 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
               )
             : candidates[0]);
       }
-      
+
       if (!type) {
         type = amount > 0 ? "deposit" : "withdrawal";
       }
@@ -461,8 +394,6 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
       let transaction = {
         id,
         user_id,
-        address,
-        asset,
         hash: txid,
         amount,
         created_at,
@@ -470,21 +401,9 @@ app.get("/:username/:asset/transactions/:page", async (req, res) => {
         confirmed,
         artwork_id,
       };
-      if (!id) { await q(createTransaction, { transaction })
-      if (transaction.type === "deposit") {
-          
-          await mail.send({
-            template: "wallet-funded",
-            locals: {
-              userName: username ? username : "",
-              amount: `${transaction.amount / 100000000} L-BTC`,
-            },
-            message: {
-              to: users[0].display_name,
-            },
-          });
-        }
-      };
+
+      // if (!id) await q(createTransaction, { transaction });
+
       transactions.push(transaction);
     }
 
