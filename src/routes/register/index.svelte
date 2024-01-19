@@ -1,4 +1,4 @@
-<script>
+  ````````<script>
   import Fa from "svelte-fa";
   import { post } from "$lib/api";
   import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -11,6 +11,13 @@
   let username = "";
   let password = dev ? "liquidart" : "";
   let email = dev ? makeid(6) + "@a.com" : "";
+  let first_name = "";
+  let last_name = "";
+  let shipping_address;
+  let country;
+  let zipcode;
+  let city;
+  let state;
   let registered;
 
   function makeid(length) {
@@ -33,7 +40,7 @@
     loading = true;
 
     try {
-      await register(email, username, password);
+      await register(email, username, password, first_name, last_name, shipping_address, country, zipcode, city, state);
       window.sessionStorage.setItem("password", password);
       await post("auth/login", { email, password }, fetch).json();
       window.location.reload(true);
@@ -92,7 +99,7 @@
 
 </style>
 
-<div class="form-container px-4">
+<div class="form-container px-4 max-h-screen">
   <form class="mb-6" on:submit|preventDefault={submit} autocomplete="off">
     {#if loading}
       <ProgressLinear />
@@ -149,6 +156,86 @@
             on:click|preventDefault|stopPropagation={() => (show = !show)}>
             <Fa icon={show ? faEyeSlash : faEye} class="my-auto mr-1" />
           </button>
+        </div>
+      </div>
+      <div class="flex flex-col mb-4">
+        <h3 class="mb-5">Shipping Information</h3>
+        <div class="flex flex-row">
+          <div class="flex flex-col mb-4 mr-3 w-44">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="first_name">First Name</label>
+            <input
+              id="first_name"
+              name="first_name"
+              placeholder="First Name"
+              autocapitalize="off"
+              bind:value={first_name} />
+          </div>
+          <div class="flex flex-col mb-4 w-44">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="last_name">Last Name</label>
+            <input
+              id="last_name"
+              name="last_name"
+              placeholder="Last Name"
+              autocapitalize="off"
+              bind:value={last_name} />
+          </div>
+        </div>
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="address">Address</label>
+        <input
+          id="address"
+          name="address"
+          placeholder="Address"
+          autocapitalize="off"
+          bind:value={shipping_address} />
+        <label
+          class="mb-2 font-medium text-gray-300"
+          for="country">Country</label>
+        <input
+          id="country"
+          name="country"
+          placeholder="Country"
+          autocapitalize="off"
+          bind:value={country} />
+        <div class="flex flex-row">
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="zipcode">Zip Code</label>
+            <input
+              id="zipcode"
+              name="zipcode"
+              placeholder="Zip Code"
+              autocapitalize="off"
+              bind:value={zipcode} />
+          </div>
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="city">City</label>
+            <input
+              id="city"
+              name="city"
+              placeholder="City"
+              autocapitalize="off"
+              bind:value={city} />
+          </div>
+          <div class="flex flex-col mb-4 mr-3 w-28">
+            <label
+              class="mb-2 font-medium text-gray-300"
+              for="state">State/Province</label>
+            <input
+              id="state"
+              name="state"
+              placeholder="State"
+              autocapitalize="off"
+              bind:value={state} />
+          </div>
         </div>
       </div>
       <span class="block w-full">By signing up, you agree to the

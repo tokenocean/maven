@@ -56,7 +56,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  let { address, pubkey, mnemonic, multisig, email, password, username } =
+  let { address, pubkey, mnemonic, multisig, email, password, username, first_name, last_name, shipping_address, country, zipcode, city, state } =
     req.body;
 
   try {
@@ -80,6 +80,13 @@ app.post("/register", async (req, res) => {
           pubkey,
           mnemonic,
           multisig,
+          first_name,
+          last_name,
+          shipping_address,
+          country,
+          zipcode,
+          city,
+          state
         },
       });
     } catch (e) {
