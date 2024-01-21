@@ -19,7 +19,7 @@ export async function GET({ locals: { q } }) {
       },
     };
   } catch (e) {
-    console.log("problem fetching assets", e);
+    console.log("problem fetching artworks", e);
     return {
       body: {},
       status: 500,

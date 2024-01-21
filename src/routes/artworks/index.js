@@ -1,15 +1,15 @@
 import { countArtworks, getLimited } from "$queries/artworks";
-import { hbp } from "$lib/api";
 
 export async function POST({ request, locals }) {
   try {
     let body = await request.json();
+
     let { q } = locals;
     let {
-      limit,
+      limit = 21,
       offset = 0,
       where = {},
-      order_by = { sequence: "asc" },
+      order_by = { created_at: "desc" },
     } = body;
 
     let { artworks_aggregate: a } = await q(countArtworks, { where });
@@ -22,7 +22,7 @@ export async function POST({ request, locals }) {
       },
     };
   } catch (e) {
-    console.log(e);
+    console.log("problem fetching artworks", e);
     return {
       body: {},
       status: 500,
