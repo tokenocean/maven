@@ -32,9 +32,7 @@ let balances = async (address, asset) => {
   let balances = {};
   (await utxos(address))
     .filter((tx) => !asset || tx.asset === asset)
-    .map((tx) =>
-        tx.confirmed ? confirmed.push(tx) : unconfirmed.push(tx)
-    );
+    .map((tx) => (tx.confirmed ? confirmed.push(tx) : unconfirmed.push(tx)));
 
   let sum = (a, b) => ({ ...a, [b.asset]: (a[b.asset] || 0) + b.value });
   confirmed = confirmed.reduce(sum, {});

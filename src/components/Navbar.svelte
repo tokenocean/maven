@@ -48,7 +48,7 @@
     <Hamburger bind:open={sidebar} />
   </nav>
   <div>
-    <a href="https://www.mavennft.io/">
+    <a href="/market">
       <img src="/maven.png" alt="logo" class="w-24" /></a>
   </div>
   <a class="mobileSearch" href="/search">

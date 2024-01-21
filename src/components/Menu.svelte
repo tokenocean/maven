@@ -17,7 +17,7 @@
   on:blur={hideDropdown}
 >
   <Search />
-  <a href="https://www.mavennft.io/" style="color: #83e68d"
+  <a href="/market" style="color: #83e68d"
     ><button>Home</button></a
   >
   <a href="https://www.mavennft.io/about-us" style="color: #83e68d"
